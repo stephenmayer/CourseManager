@@ -141,7 +141,10 @@ class CourseRequestService:
             return self.get_student_detail(student_id)
         updated = req.model_copy(update={**changes, "updated_at": _now(), "updated_by": actor})
         self.requests.save_request(updated)
-        detail = ", ".join(f"{k} → {v.value if hasattr(v, 'value') else v or '(cleared)'}" for k, v in changes.items())
+        labels = {"type": "type", "note": "note", "override_reason": "override"}
+        detail = ", ".join(
+            f"{labels[k]} → {v.value if hasattr(v, 'value') else v or '(cleared)'}" for k, v in changes.items()
+        )
         self._record(student_id, actor, "updated", f"{req.course_code}: {detail}")
         return self.get_student_detail(student_id)
 

@@ -8,6 +8,7 @@ The thresholds below are assumptions for the prototype. In production they'd be 
 """
 
 from collections import Counter
+from difflib import get_close_matches
 from collections.abc import Callable
 
 from app.models import Course, CourseRequest, Issue, RequestType, Severity, Student
@@ -24,16 +25,17 @@ Rule = Callable[[Student, list[CourseRequest], Catalog], list[Issue]]
 
 
 def unknown_course(student: Student, requests: list[CourseRequest], catalog: Catalog) -> list[Issue]:
-    return [
-        Issue(
-            rule="unknown_course",
-            severity=Severity.ERROR,
-            message=f"{r.course_code} is not in the course catalog. Replace or remove it.",
-            request_id=r.id,
-        )
-        for r in requests
-        if r.course_code not in catalog
-    ]
+    issues = []
+    for r in requests:
+        if r.course_code in catalog:
+            continue
+        message = f"{r.course_code} is not in the course catalog. Replace or remove it."
+        # Typos in SIS data are common; point the counselor at the likely intended course.
+        guesses = get_close_matches(r.course_code, catalog.keys(), n=2, cutoff=0.8)
+        if guesses:
+            message += " Did you mean " + " or ".join(f"{g} {catalog[g].name}" for g in guesses) + "?"
+        issues.append(Issue(rule="unknown_course", severity=Severity.ERROR, message=message, request_id=r.id))
+    return issues
 
 
 def duplicate_course(student: Student, requests: list[CourseRequest], catalog: Catalog) -> list[Issue]:

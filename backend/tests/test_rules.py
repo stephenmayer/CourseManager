@@ -54,6 +54,11 @@ def test_unknown_course_is_an_error():
     assert [(i.rule, i.severity.value, i.request_id) for i in issues] == [("unknown_course", "error", "R-SS303")]
 
 
+def test_unknown_course_suggests_close_matches():
+    [issue] = rules.unknown_course(student(), [req("SCI10")], CATALOG)
+    assert "Did you mean SCI101 Biology?" in issue.message
+
+
 def test_duplicate_flags_only_the_later_copy():
     reqs = [req("SS402", rid="R1"), req("SS402", RequestType.ELECTIVE, rid="R2")]
     issues = rules.duplicate_course(student(12), reqs, CATALOG)
