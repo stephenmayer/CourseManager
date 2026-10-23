@@ -1,0 +1,352 @@
+[
+ {
+  "sis_id": "SIS-S001-01",
+  "student_id": "S001",
+  "course_code": "MTH101",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S001-02",
+  "student_id": "S001",
+  "course_code": "ENG101",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S001-03",
+  "student_id": "S001",
+  "course_code": "SS101",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S001-04",
+  "student_id": "S001",
+  "course_code": "SCI101",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S001-05",
+  "student_id": "S001",
+  "course_code": "AT101",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S002-01",
+  "student_id": "S002",
+  "course_code": "MTH101",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S002-02",
+  "student_id": "S002",
+  "course_code": "ENG101",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S002-03",
+  "student_id": "S002",
+  "course_code": "ENG102",
+  "type": "priority",
+  "note": "ELL support"
+ },
+ {
+  "sis_id": "SIS-S002-04",
+  "student_id": "S002",
+  "course_code": "SS101",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S002-05",
+  "student_id": "S002",
+  "course_code": "SCI101",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S003-01",
+  "student_id": "S003",
+  "course_code": "MTH101",
+  "type": "priority",
+  "note": "Retake"
+ },
+ {
+  "sis_id": "SIS-S003-02",
+  "student_id": "S003",
+  "course_code": "ENG201",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S003-03",
+  "student_id": "S003",
+  "course_code": "SS201",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S003-04",
+  "student_id": "S003",
+  "course_code": "SCI201",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S003-05",
+  "student_id": "S003",
+  "course_code": "AT201",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S004-01",
+  "student_id": "S004",
+  "course_code": "MTH201",
+  "type": "priority",
+  "note": "Accelerated"
+ },
+ {
+  "sis_id": "SIS-S004-02",
+  "student_id": "S004",
+  "course_code": "ENG201",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S004-03",
+  "student_id": "S004",
+  "course_code": "SS201",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S004-04",
+  "student_id": "S004",
+  "course_code": "SCI201",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S004-05",
+  "student_id": "S004",
+  "course_code": "AT301",
+  "type": "elective",
+  "note": "Early AP"
+ },
+ {
+  "sis_id": "SIS-S005-01",
+  "student_id": "S005",
+  "course_code": "MTH202",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S005-02",
+  "student_id": "S005",
+  "course_code": "ENG301",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S005-03",
+  "student_id": "S005",
+  "course_code": "SS301",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S005-04",
+  "student_id": "S005",
+  "course_code": "SCI301",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S005-05",
+  "student_id": "S005",
+  "course_code": "AT302",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S005-06",
+  "student_id": "S005",
+  "course_code": "AT303",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S006-01",
+  "student_id": "S006",
+  "course_code": "MTH401",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S006-02",
+  "student_id": "S006",
+  "course_code": "ENG401",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S006-03",
+  "student_id": "S006",
+  "course_code": "SS401",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S006-04",
+  "student_id": "S006",
+  "course_code": "SCI401",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S006-05",
+  "student_id": "S006",
+  "course_code": "AT301",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S007-01",
+  "student_id": "S007",
+  "course_code": "MTH202",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S007-02",
+  "student_id": "S007",
+  "course_code": "ENG301",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S007-03",
+  "student_id": "S007",
+  "course_code": "SS301",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S007-04",
+  "student_id": "S007",
+  "course_code": "SCI301",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S007-05",
+  "student_id": "S007",
+  "course_code": "SS302",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S008-01",
+  "student_id": "S008",
+  "course_code": "MTH302",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S008-02",
+  "student_id": "S008",
+  "course_code": "ENG401",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S008-03",
+  "student_id": "S008",
+  "course_code": "SS402",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S008-04",
+  "student_id": "S008",
+  "course_code": "SCI403",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S008-05",
+  "student_id": "S008",
+  "course_code": "SS303",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S008-06",
+  "student_id": "S008",
+  "course_code": "SS402",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S009-01",
+  "student_id": "S009",
+  "course_code": "MTH401",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S009-02",
+  "student_id": "S009",
+  "course_code": "ENG402",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S009-03",
+  "student_id": "S009",
+  "course_code": "SS402",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S009-04",
+  "student_id": "S009",
+  "course_code": "SCI402",
+  "type": "priority",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S009-05",
+  "student_id": "S009",
+  "course_code": "AT301",
+  "type": "elective",
+  "note": ""
+ },
+ {
+  "sis_id": "SIS-S010-01",
+  "student_id": "S010",
+  "course_code": "ENG403",
+  "type": "priority",
+  "note": "Placeholder pending transcript review"
+ },
+ {
+  "sis_id": "SIS-S010-02",
+  "student_id": "S010",
+  "course_code": "SCI403",
+  "type": "elective",
+  "note": "Placeholder pending transcript review"
+ },
+ {
+  "sis_id": "SIS-S010-03",
+  "student_id": "S010",
+  "course_code": "SS302",
+  "type": "elective",
+  "note": "Placeholder pending transcript review"
+ }
+]
