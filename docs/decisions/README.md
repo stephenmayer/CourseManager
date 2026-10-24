@@ -16,3 +16,4 @@ One file per decision (`q0NN-<slug>.md`, template in `.claude/process-kit/templa
 | [Q2](q002-request-ownership.md) | Edited requests are kept; SIS changes to them are flagged, never overwritten | current | 2026-10-24, Stephen |
 | [Q3](q003-student-review-status.md) | Counselor sets per-student status (Not started, In progress, On hold with reason, Done); edits reopen Done | current | 2026-10-24, Stephen |
 | [Q4](q004-priority-core-check.md) | Priority is a counselor label plus one warning: missing a priority course in a core subject | current | 2026-10-24, Stephen |
+| [Q5](q005-bad-sis-request-data.md) | Bad SIS request data loads as-is, shows as errors, and blocks Done until fixed | current | 2026-10-24, Stephen |

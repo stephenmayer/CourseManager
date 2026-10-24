@@ -39,7 +39,7 @@ These are places where two parts of the document can't both be right. They matte
 | G3 | Prerequisites | Three profiles depend on them (C3) | "Does the SIS have prerequisites and transcripts? Is checking them in scope for this tool?" |
 | G4 | How many requests a student needs (min, max) | Lets us say a list is "complete" or "overloaded" | "Is there a target number of courses per student, e.g. one per period?" |
 | G5 | Course length and credits | A semester course and a year course aren't equal load | "Are all courses full-year? Do they carry credits?" |
-| G6 | Whether a course can be requested twice | S008 has SS402 twice | "Is a duplicate ever valid (e.g. a repeatable course), or always an error?" |
+| G6 | Whether a course can be requested twice | S008 has SS402 twice | "Is a duplicate ever valid (e.g. a repeatable course), or always an error?" Assumed for now: always an error ([Q5](../decisions/q005-bad-sis-request-data.md)) |
 | G7 | What the request annotations are | "retake", "ELL Support", "accelerated", "early AP" appear on requests | "Do requests carry a reason or note, or is that just commentary in the PDF?" |
 | G8 | Alternates | Real request processes collect backup choices for electives *(inferred)* | "Do counselors collect alternate electives? What happens when an elective is full?" |
 | G9 | What "AP" is | Heavy-AP-load warnings need it; today it's only in the course name | "Is AP (or honors) a catalog attribute from the SIS?" |
@@ -75,7 +75,7 @@ These are places where two parts of the document can't both be right. They matte
 | G24 | Write-back | Not stated whether requests go back to the SIS | "Do edited requests need to be written back to the SIS?" |
 | G25 | Stable identifiers | Course codes or student IDs that change break every link | "Are student IDs and course codes stable year to year?" |
 | G26 | What happens to requests when SIS data changes underneath them | A course retired, a student withdraws or changes grade | "If a requested course disappears from the catalog, what should the counselor see?" |
-| G27 | Data quality expectations | S008 suggests SIS data arrives dirty | "How bad is the incoming data, and who fixes it today?" |
+| G27 | Data quality expectations | S008 suggests SIS data arrives dirty | "How bad is the incoming data, and who fixes it today?" Assumed for now: load as-is, flag, block Done ([Q5](../decisions/q005-bad-sis-request-data.md)) |
 
 ### The exercise itself (what the reviewers want)
 
