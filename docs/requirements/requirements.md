@@ -65,7 +65,7 @@ So the data itself argues for three behaviours: catch real data errors (unknown 
 | # | Candidate | User value | Cost | My lean |
 | --- | --- | --- | --- | --- |
 | M1 | Data-error checks: unknown course code, duplicate course | Stops bad SIS data reaching scheduling (S008) | Low | In |
-| M2 | Judgment warnings: out-of-grade, missing core subject, heavy AP load, override with a reason | Counselor stays in control; reason is visible to the AP | Low-medium | In, as warnings not blocks |
+| M2 | Judgment warnings: out-of-grade, missing core subject, heavy AP load, override with a reason | Counselor stays in control; reason is visible to the AP | Low-medium | In, as warnings not blocks (decided for grade levels: [Q1](../decisions/q001-out-of-grade-courses.md)) |
 | M3 | Per-student review status (not started / in progress / done / on hold) and a caseload filter | Turns the list into a work queue; covers S010 "on hold" | Low | In |
 | M4 | Request source: from SIS vs added in app | Needed for any safe SIS sync; links the prototype to the design doc | Low | In (data only, small UI cue) |
 | M5 | Notes on a student or request | Captures why (retake, early AP) | Low | Maybe: fold into M2's reason |
@@ -85,7 +85,7 @@ So the data itself argues for three behaviours: catch real data errors (unknown 
 ## 8. Questions to walk through together (in order)
 
 1. **Timebox.** Do we hold to about 3 hours and say so, or spend more and say what we added? My lean: hold to it and list what more time would buy.
-2. **Validation philosophy.** Warn and let the counselor override with a reason, or block? My lean: block only true data errors (M1), warn on judgment calls (M2).
+2. **Validation philosophy.** Judgment calls warn and are kept with a reason ([Q1](../decisions/q001-out-of-grade-courses.md)). Still open: do true data errors (M1) block?
 3. **MVP scope.** Which of M1-M10 are in? My lean: M1-M4 in, M5 folded into M2, M6 only if time, rest out with a sentence each.
 4. **AP role.** Separate role or same screen plus a cohort view? My lean: same screen; the status filter covers oversight.
 5. **Complex students.** Handle all four, or skip as the exercise allows? My lean: handle them; they are the best demo of judgment.

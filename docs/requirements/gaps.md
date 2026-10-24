@@ -34,7 +34,7 @@ These are places where two parts of the document can't both be right. They matte
 
 | # | Missing | Why it matters | Question to ask |
 | --- | --- | --- | --- |
-| G1 | What the catalog's Grade(s) column means | Decides whether a grade check blocks, warns, or doesn't exist (C1, C6) | "Is Grade(s) who may take it, or who usually takes it? Can a counselor override it?" |
+| G1 | What the catalog's Grade(s) column means | Decides whether a grade check blocks, warns, or doesn't exist (C1, C6) | "Is Grade(s) who may take it, or who usually takes it? Can a counselor override it?" Assumed for now: warn, keep with a reason ([Q1](../decisions/q001-out-of-grade-courses.md)) |
 | G2 | Graduation requirements | Needed to check or suggest priority requests (C2) | "Do schools give you graduation requirements in a structured form, or do counselors carry them in their heads?" |
 | G3 | Prerequisites | Three profiles depend on them (C3) | "Does the SIS have prerequisites and transcripts? Is checking them in scope for this tool?" |
 | G4 | How many requests a student needs (min, max) | Lets us say a list is "complete" or "overloaded" | "Is there a target number of courses per student, e.g. one per period?" |

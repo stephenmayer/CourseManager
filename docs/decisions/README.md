@@ -12,4 +12,4 @@ One file per decision (`q0NN-<slug>.md`, template in `.claude/process-kit/templa
 
 | Q | Decision | Status | Decided |
 | --- | --- | --- | --- |
-| | None yet | | |
+| [Q1](q001-out-of-grade-courses.md) | Out-of-grade courses warn; counselor keeps them with a reason | current | 2026-10-24, Stephen |
