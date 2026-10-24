@@ -79,7 +79,7 @@ So the data itself argues for three behaviours: catch real data errors (unknown 
 
 - A1. One school, one upcoming year, about 10 students in the seed but the UI should still work at a few hundred per counselor.
 - A2. Seeded suggested requests are what came from the SIS, loaded as-is with their errors.
-- A3. Graduation rules are not given; any "missing core subject" check uses a stated simple rule that a school would configure.
+- A3. Graduation rules are not given; any "missing core subject" check uses a stated simple rule that a school would configure ([Q4](../decisions/q004-priority-core-check.md)).
 - A4. No need to persist across restarts for the prototype (to confirm in step 3).
 
 ## 8. Questions to walk through together (in order)
