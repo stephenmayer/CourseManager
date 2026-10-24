@@ -60,7 +60,9 @@ The roster is clean for six students; four are flagged by Timely as intentionall
 
 So the data itself argues for three behaviours: catch real data errors (unknown course, duplicate), flag but allow judgment calls (out-of-grade, heavy AP load) with a reason, and mark a student's list as not ready (S010).
 
-## 6. MVP candidates beyond R1-R4 (to brainstorm)
+## 6. MVP candidates beyond R1-R4
+
+Scope decided in [Q6](../decisions/q006-timebox-and-mvp-scope.md).
 
 | # | Candidate | User value | Cost | My lean |
 | --- | --- | --- | --- | --- |
@@ -82,11 +84,11 @@ So the data itself argues for three behaviours: catch real data errors (unknown 
 - A3. Graduation rules are not given; any "missing core subject" check uses a stated simple rule that a school would configure ([Q4](../decisions/q004-priority-core-check.md)).
 - A4. No need to persist across restarts for the prototype (to confirm in step 3).
 
-## 8. Questions to walk through together (in order)
+## 8. Questions walked through (all answered 2026-10-24)
 
-1. **Timebox.** Do we hold to about 3 hours and say so, or spend more and say what we added? My lean: hold to it and list what more time would buy.
-2. **Validation philosophy.** Judgment calls warn and are kept with a reason ([Q1](../decisions/q001-out-of-grade-courses.md)). Data errors block only the Done status ([Q5](../decisions/q005-bad-sis-request-data.md)).
-3. **MVP scope.** Which of M1-M10 are in? My lean: M1-M4 in, M5 folded into M2, M6 only if time, rest out with a sentence each.
-4. **AP role.** Separate role or same screen plus a cohort view? My lean: same screen; the status filter covers oversight.
-5. **Complex students.** Handle all four, or skip as the exercise allows? My lean: handle them; they are the best demo of judgment.
-6. **SIS design format.** Markdown in the repo with a diagram, then exported to PDF? My lean: yes, plus the video outline.
+1. **Timebox:** 2 hours prototype, 1 hour SIS design, AI-accelerated ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
+2. **Validation:** judgment calls warn and are kept with a reason ([Q1](../decisions/q001-out-of-grade-courses.md)); data errors block only Done ([Q5](../decisions/q005-bad-sis-request-data.md)).
+3. **MVP scope:** M1-M4 in, M5 folded into M2, M6 if time, M7-M10 out ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
+4. **AP role:** same screen; status filter covers oversight; sign-off deferred ([Q3](../decisions/q003-student-review-status.md)).
+5. **Complex students:** all handled through warnings and errors ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
+6. **SIS design format:** decided with the architecture (step 3).
