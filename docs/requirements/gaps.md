@@ -50,7 +50,7 @@ These are places where two parts of the document can't both be right. They matte
 | --- | --- | --- | --- |
 | G10 | Counselor vs assistant principal: what's different | Decides whether there are roles, permissions, or just one screen | "Does an AP approve a counselor's work, or do both just edit?" |
 | G11 | Caseloads | A counselor sees their students, not the whole school *(inferred)* | "Is each student assigned to a counselor? Do counselors see others' students?" |
-| G12 | What "done" means, and is there a deadline | Decides whether we need a status per student and a progress view | "How does a counselor know they've finished? Who checks?" |
+| G12 | What "done" means, and is there a deadline | Decides whether we need a status per student and a progress view | "How does a counselor know they've finished? Who checks?" Assumed for now: counselor sets status ([Q3](../decisions/q003-student-review-status.md)) |
 | G13 | What happens after requests | Tells us when lists lock and who consumes them | "Do requests go into Timely's scheduler, back to the SIS, or both? When are they frozen?" |
 | G14 | Where electives come from | "Student interest" implies student input, but students have no access | "Do students pick electives somewhere else (paper, SIS portal), and does that arrive as requests?" |
 | G15 | Several staff editing one student | Last-write-wins could lose work | "Can two staff work on the same student at once?" |

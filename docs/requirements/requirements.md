@@ -66,7 +66,7 @@ So the data itself argues for three behaviours: catch real data errors (unknown 
 | --- | --- | --- | --- | --- |
 | M1 | Data-error checks: unknown course code, duplicate course | Stops bad SIS data reaching scheduling (S008) | Low | In |
 | M2 | Judgment warnings: out-of-grade, missing core subject, heavy AP load, override with a reason | Counselor stays in control; reason is visible to the AP | Low-medium | In, as warnings not blocks (decided for grade levels: [Q1](../decisions/q001-out-of-grade-courses.md)) |
-| M3 | Per-student review status (not started / in progress / done / on hold) and a caseload filter | Turns the list into a work queue; covers S010 "on hold" | Low | In |
+| M3 | Per-student review status (not started / in progress / done / on hold) and a caseload filter | Turns the list into a work queue; covers S010 "on hold" | Low | In ([Q3](../decisions/q003-student-review-status.md)) |
 | M4 | Request source: from SIS vs added in app | Needed for any safe SIS sync; links the prototype to the design doc | Low | In (data only, small UI cue); sync rule in [Q2](../decisions/q002-request-ownership.md) |
 | M5 | Notes on a student or request | Captures why (retake, early AP) | Low | Maybe: fold into M2's reason |
 | M6 | Course demand tally across students | Shows how requests feed scheduling | Low | Maybe: good debrief story, not core to the counselor's job |
