@@ -1,0 +1,92 @@
+---
+id: requirements
+title: Course request management requirements
+status: draft
+owns: "the problem, users, stated requirements, assumptions, MVP scope candidates and open questions"
+updated: 2026-10-24
+---
+
+# Course request management: requirements
+
+Draft for the step 2 walkthrough with Stephen. Nothing here is decided until it moves into `docs/decisions/`. Source: the Timely exercise PDF (2026-10-24).
+
+## 1. The problem, as I understand it
+
+Each spring, a counselor or assistant principal builds next year's course request list for every student on their caseload. Each request maps a student to a catalog course and is either **priority** (must take: graduation requirement, retake) or **elective** (interest or recommendation). Those requests feed the master schedule, so a wrong or missing request turns into a scheduling problem later. Today the inputs (students, catalog, sometimes draft requests) come from the school's SIS, and the counselor's job is to review and correct them, one student at a time, using judgment.
+
+**The job to be done:** "Get every student on my caseload to a correct, reviewed request list before the scheduling deadline, and know which students still need me."
+
+## 2. Users
+
+| User | What they do | What "done" looks like |
+| --- | --- | --- |
+| Counselor (primary) | Works through a caseload of students, builds and fixes each list | Every student reviewed; tricky cases handled with a reason |
+| Assistant principal | Same edits, plus oversight of the cohort | Can see who is unfinished or unusual across counselors |
+| Out of scope | Students, parents | No access |
+
+Open: is the AP a separate role with different permissions, or the same screen with a cohort view? (Q4 below)
+
+## 3. Stated requirements (from the exercise)
+
+| # | Requirement | Notes / what it implies |
+| --- | --- | --- |
+| R1 | List students for the upcoming year, showing grade and key context | "Key context" is ours to define: profile flags, request count, status |
+| R2 | Select a student; view and edit their requests for next year | |
+| R3 | Assign and remove catalog courses, each marked priority or elective | Changing P/E on an existing request is implied |
+| R4 | Clear, organized summary of each student's request list | Grouping (P/E, department) is ours to choose |
+| R5 | Other features critical for a staff MVP | Our call; see section 6 |
+| R6 | Backend or data layer serving students and courses, swappable for a real API | Seed in code is allowed |
+| R7 | Runs on localhost, staff only | No auth required |
+| R8 | Be ready to discuss: data-layer swap, testing strategy, pilot speed vs scale | Tests not required, strategy is |
+| R9 | SIS sync design: requirements, key decisions with options and a recommendation, 1-2 flow/architecture approaches | Students and catalog read-only from SIS; requests may come from SIS and are edited in the app |
+
+## 4. Deliverables and timebox
+
+Working prototype on localhost; source on GitHub; short README (how to run, key architecture decisions); SIS sync design artifact; 5-minute video on the SIS design. Suggested budget: about 3 hours (2 prototype, 1 design). The 60-minute follow-up will add new input and expect us to iterate live, so the code must be easy to extend in conversation.
+
+## 5. What the sample data tells us (checked against Appendix A)
+
+The roster is clean for six students; four are flagged by Timely as intentionally complex. Checking each suggested request against the catalog's grade levels turns up more than the note mentions:
+
+| Student | Grade | Finding |
+| --- | --- | --- |
+| S002 Mei Chen | 9 | ENG101 and ENG102 both priority: ELL support runs alongside core English, so two English priorities is correct, not a duplicate |
+| S003 Jordan Williams | 10 | MTH101 is a grade 9 course: a legitimate retake that a strict grade check would block |
+| S004 Priya Patel | 10 | AT301 (AP CS A) is grades 11/12: an early AP the counselor chose deliberately |
+| S006 Sofia Mendez | 11 | MTH401 and ENG401 are grade 12 courses; four APs plus AP elective. Profile says "confirm prerequisites, don't overload" |
+| S008 Aisha Johnson | 12 | **SS303 does not exist** in the catalog. **SS402 appears twice** (P and E). Profile wants Psychology (SS403) and Economics (SS302), so both look like typos for those |
+| S009 Liam O'Brien | 12 | Five AP courses; "review for schedule conflicts across AP courses" |
+| S010 Nina Torres | 12 | Requests are a placeholder pending transcript review |
+
+So the data itself argues for three behaviours: catch real data errors (unknown course, duplicate), flag but allow judgment calls (out-of-grade, heavy AP load) with a reason, and mark a student's list as not ready (S010).
+
+## 6. MVP candidates beyond R1-R4 (to brainstorm)
+
+| # | Candidate | User value | Cost | My lean |
+| --- | --- | --- | --- | --- |
+| M1 | Data-error checks: unknown course code, duplicate course | Stops bad SIS data reaching scheduling (S008) | Low | In |
+| M2 | Judgment warnings: out-of-grade, missing core subject, heavy AP load, override with a reason | Counselor stays in control; reason is visible to the AP | Low-medium | In, as warnings not blocks |
+| M3 | Per-student review status (not started / in progress / done / on hold) and a caseload filter | Turns the list into a work queue; covers S010 "on hold" | Low | In |
+| M4 | Request source: from SIS vs added in app | Needed for any safe SIS sync; links the prototype to the design doc | Low | In (data only, small UI cue) |
+| M5 | Notes on a student or request | Captures why (retake, early AP) | Low | Maybe: fold into M2's reason |
+| M6 | Course demand tally across students | Shows how requests feed scheduling | Low | Maybe: good debrief story, not core to the counselor's job |
+| M7 | Change history / audit | Several staff edit the same list | Medium | Out; mention as next |
+| M8 | Prerequisite checks | S006 asks for it | High: needs transcript data we don't have | Out; explain why |
+| M9 | Schedule conflict detection | S009 asks for it | High: needs sections and periods | Out; this is the scheduler's job, explain why |
+| M10 | Auth, roles, persistence across restarts | Production basics | Medium | Out for prototype, except where architecture needs a seam |
+
+## 7. Assumptions (to confirm)
+
+- A1. One school, one upcoming year, about 10 students in the seed but the UI should still work at a few hundred per counselor.
+- A2. Seeded suggested requests are what came from the SIS, loaded as-is with their errors.
+- A3. Graduation rules are not given; any "missing core subject" check uses a stated simple rule that a school would configure.
+- A4. No need to persist across restarts for the prototype (to confirm in step 3).
+
+## 8. Questions to walk through together (in order)
+
+1. **Timebox.** Do we hold to about 3 hours and say so, or spend more and say what we added? My lean: hold to it and list what more time would buy.
+2. **Validation philosophy.** Warn and let the counselor override with a reason, or block? My lean: block only true data errors (M1), warn on judgment calls (M2).
+3. **MVP scope.** Which of M1-M10 are in? My lean: M1-M4 in, M5 folded into M2, M6 only if time, rest out with a sentence each.
+4. **AP role.** Separate role or same screen plus a cohort view? My lean: same screen; the status filter covers oversight.
+5. **Complex students.** Handle all four, or skip as the exercise allows? My lean: handle them; they are the best demo of judgment.
+6. **SIS design format.** Markdown in the repo with a diagram, then exported to PDF? My lean: yes, plus the video outline.

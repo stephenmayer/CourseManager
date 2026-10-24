@@ -1,0 +1,51 @@
+# <<Feature or phase>>: plan and seams review
+
+Status: <<design approved by owner on DATE / awaiting design / nothing built>>.
+
+## What changes
+
+1. <<Numbered change, user-visible wording>>
+2. ...
+
+## Why it is needed (verified in code)
+
+<<Cite files and functions that show the current behaviour. Mark anything unproven as (inferred).>>
+
+## Summary (for larger phases)
+
+- N integration issues: X blockers, Y must-resolve, Z minor. M edge cases. K owner questions.
+- Already built and affected: <<list>>
+- Top 3 risks: <<one line each, with a worked example and numbers>>
+
+## Seams review
+
+| # | Seam | Finding | Resolution |
+|---|---|---|---|
+| S1 | <<existing system/touch point>> | <<what breaks or surprises, with example>> | <<agreed fix and owning part>> |
+
+Severity (larger phases): blocker = design cannot deliver what was approved; must-resolve = settle before the named part; minor = rides along.
+
+Lenses to walk: data and migrations (deployed revision, FK delete/move paths, enums), derived data and jobs, invariants, roles and tenancy, copied values that can drift, old clients, concurrency, notifications and search, docs that own each rule.
+
+## Edge cases
+
+| # | Case | Behaviour | Owning part |
+|---|---|---|---|
+
+## Open questions for the owner (each with a default)
+
+1. <<Question, plain words, example with numbers, default you will use>>
+
+## Build plan (dependency order)
+
+1. <<Part: what, which seams and edge cases it handles, tests that prove them>>
+2. ...
+N. Docs (below), merge-gate command, simplify, code-review, ready, merge on green.
+
+## Documentation
+
+- <<Each doc to change and what changes, including help articles, API docs, schema docs, design notes, decision amendments>>
+
+## Seams review applied
+
+<<Date, and who resolved the questions. The implement gate checks for this line.>>

@@ -1,0 +1,35 @@
+---
+id: q0NN-<<slug>>
+title: <<Topic, not provenance>>
+status: current            # open | current | superseded
+amends: <<optional, e.g. Q24a>>
+decided: <<YYYY-MM-DD, by whom>>
+---
+
+<a id="q0NN"></a>
+# Q<<NN>>: <<Question>>
+
+## Context
+
+<<What exists, why it needs deciding. A worked example with real numbers.>>
+
+## Options
+
+| Option | What happens (same example) | Tradeoffs |
+|---|---|---|
+| A | | |
+| B | | |
+
+## Resolution
+
+<<Chosen option, and the reasoning in the owner's words where possible.>>
+
+## Impacts (all updated in the same change)
+
+- [ ] Architecture: <<file>>
+- [ ] API: <<file>>
+- [ ] Roadmap/plan: <<file>>
+- [ ] Scenarios: <<file>>
+- [ ] Design notes: <<file>>
+- [ ] Help / user docs: <<file>>
+- [ ] Decisions index row
