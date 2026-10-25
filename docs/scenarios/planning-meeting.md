@@ -41,9 +41,14 @@ flowchart TD
     K --> M
 
     subgraph PREFS [3. What does Jordan want?]
-        M[Talk about interests] --> N[Browse catalog<br/>filtered to grade 10, 'show all' toggle]
+        M{Did Jordan pick<br/>electives beforehand?}
+        M -->|yes: picks came in<br/>through the SIS| M1[Review his picks<br/>tagged 'From SIS']
+        M1 --> M2{Keep each pick?}
+        M2 -->|keep| P
+        M2 -->|change| N
+        M -->|no: choose together| N[Browse catalog<br/>filtered to grade 10, 'show all' toggle]
         N --> O[Swap elective AT201 Web Design<br/>for AT202 Music Theory]
-        O --> P[Request tagged 'Added in app']
+        O --> P[Final electives<br/>new ones tagged 'Added in app']
     end
 
     P --> Q
@@ -67,14 +72,14 @@ flowchart TD
 | Find the student | To get to Jordan in seconds, with him sitting there | Search by name or ID; status filter | R1, [Q3](../decisions/q003-student-review-status.md) |
 | Review where he is | His situation and the SIS draft at a glance | Profile, draft requests tagged by source, check panel | [Q2](../decisions/q002-request-ownership.md), [Q5](../decisions/q005-bad-sis-request-data.md) |
 | What he needs | Confidence the core is covered, and the retake handled | Core-subject check; grade warning kept with "retake" | [Q1](../decisions/q001-out-of-grade-courses.md), [Q4](../decisions/q004-priority-core-check.md) |
-| What he wants | To add or swap electives quickly while talking | Catalog filtered to his grade; add, remove, switch P/E | R3 |
+| What he wants | Review picks he made beforehand, or choose together, then adjust quickly while talking | His SIS-sourced picks; catalog filtered to his grade; add, remove, switch P/E | R3, [Q11](../decisions/q011-student-preferences.md) |
 | Wrap up | To read back the plan and close it out | Summary grouped Priority then Elective; set status | R4, Q3, Q5 |
 
 ## What this scenario raises (to discuss)
 
 1. **"Where is he now" needs history we don't have.** A real meeting starts from the transcript: credits earned, courses passed and failed. The exercise gives only a free-text profile. The prototype shows the profile; the design names transcripts as the next data to bring from the SIS (gaps.md G3).
 2. **The student is looking at the screen.** Staff-only doesn't mean nobody else sees it. Are counselor reasons ("retake", "transcript pending") fine for Jordan to read? *(Inferred: yes for these, but notes on sensitive matters would need a private field.)*
-3. **Preferences vs requests.** Do students state preferences somewhere else first (a form, the SIS portal), so the counselor reviews them rather than collecting them live? That changes step 3 from "browse catalog" to "review what Jordan picked" (gaps.md G14).
+3. **Preferences vs requests.** Both happen ([Q11](../decisions/q011-student-preferences.md)): some students arrive with picks made beforehand, which reach the app through the SIS; others choose with the counselor live. One screen handles both.
 4. **Ranked electives and alternates.** If Music Theory is full, what's Jordan's second choice? Real request processes collect alternates (gaps.md G8; out of MVP per [Q6](../decisions/q006-timebox-and-mvp-scope.md)).
 5. **Leaving with something.** Does Jordan (or his parents) get a copy of the plan? Printing a summary is cheap; a parent portal is out of scope.
 6. **Meeting speed.** With a student waiting, every action must be one or two clicks and never reload the page. That argues for adding courses inline on the detail screen rather than a separate catalog page.
