@@ -2,7 +2,7 @@
 id: q007-stack
 title: Prototype stack, and where DuckDB fits
 status: current
-decided: 2026-10-25, by Stephen (thumbs-up on the recommendation)
+decided: 2026-10-25, by Stephen
 ---
 
 <a id="q007"></a>
