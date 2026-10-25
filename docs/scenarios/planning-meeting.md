@@ -14,6 +14,8 @@ Draft for brainstorming with Stephen. Each step names what the counselor needs, 
 
 ## The flow
 
+Rendered image: [img/planning-meeting-flow.png](img/planning-meeting-flow.png) (regenerate when the diagram below changes).
+
 ```mermaid
 flowchart TD
     A([Ms. Lee opens the app]) --> B[Student list<br/>her caseload, filtered to Not started]
@@ -25,14 +27,14 @@ flowchart TD
 
     F[Student detail: Jordan Williams, grade 10] --> G
 
-    subgraph REVIEW [1. Where is Jordan now?]
+    subgraph REVIEW [Step 1: Where is Jordan now?]
         G[Profile from the SIS<br/>'Failed MTH101, must retake'] --> H[Draft requests from the SIS<br/>each tagged 'From SIS']
         H --> I[Check panel<br/>warning: MTH101 is a grade 9 course]
     end
 
     I --> J
 
-    subgraph NEEDS [2. What does Jordan need next year?]
+    subgraph NEEDS [Step 2: What does Jordan need next year?]
         J{Core subjects covered?<br/>Math, English, Soc. Studies, Science} -->|yes| K[Keep MTH101 as Priority<br/>reason: 'retake' clears the warning]
         J -->|missing one| L[Warning: no priority Science<br/>add from catalog]
         L --> K
@@ -40,7 +42,7 @@ flowchart TD
 
     K --> M
 
-    subgraph PREFS [3. What does Jordan want?]
+    subgraph PREFS [Step 3: What does Jordan want?]
         M{Did Jordan pick<br/>electives beforehand?}
         M -->|yes: picks came in<br/>through the SIS| M1[Review his picks<br/>tagged 'From SIS']
         M1 --> M2{Keep each pick?}
@@ -53,7 +55,7 @@ flowchart TD
 
     P --> Q
 
-    subgraph WRAP [4. Wrap up]
+    subgraph WRAP [Step 4: Wrap up]
         Q[Summary: 4 Priority, 1 Elective<br/>grouped, with reasons] --> R{Any errors left?}
         R -->|no| S[Mark Done]
         R -->|yes| T[Done is blocked<br/>fix or mark On hold with a reason]
