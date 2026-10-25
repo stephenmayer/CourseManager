@@ -7,7 +7,7 @@ description: >
   owner approval only for irreversible or costly steps. Use at the start of a
   project, when asked how work should flow, or to decide which sibling skill
   (plan-and-seams, design-before-build, decide, implement-change, pr-flow,
-  bug-bash) applies next.
+  pr-sweep, bug-bash) applies next.
 ---
 
 # Build process (map)
@@ -29,6 +29,7 @@ idea -> decide (options, tradeoffs) -> plan -> seams review -> design approval (
 | Anything visible | `design-before-build` | Owner said OK to the light and dark designs |
 | Build | `implement-change` | Verify command passes on the final commit |
 | Ship to main | `pr-flow` | CI green on the current head; self-review done |
+| Many open PRs | `pr-sweep` | Every PR merged, handed to its owner thread, or flagged with who it waits on |
 | Many defects | `bug-bash` | Coverage ledger accounts for every defect once |
 
 ## Standing rules (apply at every stage)

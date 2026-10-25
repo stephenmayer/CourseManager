@@ -28,6 +28,7 @@ description: >
 - Order: fix for a red main first, then free wins (no conflicts), then parents before children, small conflicts before big.
 - Map PRs against main and each other; merge main into conflicting PRs and resolve by the repo's playbook (migration renumbering, lockfiles, decision indexes, generated registries). Re-verify to the gate each needs.
 - If a defect on main makes every PR fail, prove it on a clean main, find or write the fix, land it first.
+- For a whole-queue pass (scheduled or on request), use `pr-sweep`.
 - A pass is self-contained: read live state, act, report, end. It does not schedule itself or wait for CI.
 
 ## Never without the owner

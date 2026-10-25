@@ -82,7 +82,7 @@ Scope decided in [Q6](../decisions/q006-timebox-and-mvp-scope.md).
 - A1. One school, one upcoming year, about 10 students in the seed but the UI should still work at a few hundred per counselor.
 - A2. Seeded suggested requests are what came from the SIS, loaded as-is with their errors.
 - A3. Graduation rules are not given; any "missing core subject" check uses a stated simple rule that a school would configure ([Q4](../decisions/q004-priority-core-check.md)).
-- A4. No need to persist across restarts for the prototype (to confirm in step 3).
+- A4. Counselor edits persist across restarts in a SQLite file ([Q8](../decisions/q008-prototype-storage.md)).
 
 ## 8. Questions walked through (all answered 2026-10-24)
 

@@ -21,7 +21,7 @@ API (thin routes)
 Service ── rules (pure functions → issues)
    │
    ├── SisSource      read-only: students, catalog, SIS requests   ← seed today, SIS connector tomorrow
-   └── RequestStore   read/write: requests, reasons, review status ← in-memory today, database tomorrow
+   └── RequestStore   read/write: requests, reasons, review status ← SQLite file today (Q8), Mongo tomorrow
 ```
 
 The two ports split the data by **who owns it**, which is the exercise's own split: the SIS owns students and the catalog; the app owns what counselors do. That one seam answers "how is the data layer abstracted so the source is easy to swap?" and is the same seam the SIS sync design hangs off ([Q2](../decisions/q002-request-ownership.md)).
@@ -66,7 +66,7 @@ Adding a rule = one function + its tests. That is the "generalize" story: gradua
 ## 5. Testing strategy
 
 - Unit tests on every rule, using the seed's own cases (S003, S006, S008) as fixtures: the bulk of the value.
-- API tests through the service with a fresh in-memory store per test: add, remove, switch type, Done blocked by an error, edit reopens Done.
+- API tests through the service with a fresh in-memory SQLite database per test: add, remove, switch type, Done blocked by an error, edit reopens Done.
 - Frontend: typecheck plus one smoke test of the main flow if time allows.
 - One command runs it all (the kit's merge gate).
 
@@ -77,7 +77,7 @@ Pilot vs scale, in one line each for the README: the ports let a pilot run on a 
 | # | Choice | Options | My lean |
 | --- | --- | --- | --- |
 | A1 | Stack | **Decided: FastAPI + React/TS ([Q7](../decisions/q007-stack.md)).** DuckDB only for SIS file diffs and the tally, never the edit store | |
-| A2 | Storage in the prototype | In-memory with reset; SQLite file; MongoDB | In-memory: zero setup for reviewers; the port shows where a database goes |
+| A2 | Storage in the prototype | **Decided: SQLite file via built-in `sqlite3`, reset re-seeds ([Q8](../decisions/q008-prototype-storage.md))** | |
 | A3 | Show the SIS sync in the prototype? | Design doc only; a "Run SIS sync" button that loads a changed SIS file and shows Q2's flags | Button, if time: it turns the design doc into something they can click |
 | A4 | SIS design format | Markdown + diagram in the repo, exported to PDF; slides | Markdown + PDF, plus a video outline |
 
