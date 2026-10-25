@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-CourseManager: a localhost prototype of a course request management tool for school counselors and assistant principals, plus an SIS data sync design. Built for the Timely Director of Engineering take-home. Stack: not chosen yet (see `docs/decisions/open/`).
+CourseManager: a localhost prototype of a course request management tool for school counselors and assistant principals, plus an SIS data sync design. Built for the Timely Director of Engineering take-home. Stack: FastAPI + React/TypeScript ([Q7](docs/decisions/q007-stack.md)).
 
 **Start at [`docs/README.md`](docs/README.md).** `docs/` is the system of record (`docs/CONVENTIONS.md`); read it before any product-behaviour decision. A digest disagreeing with a `docs/` owner file: newer wins, raise it with Stephen, never resolve silently. Status: `docs/plan/README.md`. Rationale: `docs/decisions/`; bare `Qn` = the Decisions Log.
 

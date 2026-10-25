@@ -76,7 +76,7 @@ Pilot vs scale, in one line each for the README: the ports let a pilot run on a 
 
 | # | Choice | Options | My lean |
 | --- | --- | --- | --- |
-| A1 | Stack | FastAPI + React/TS; all TypeScript (Node + React); Python server-rendered pages | FastAPI + React/TS: Timely's own stack, so their engineers can extend it live |
+| A1 | Stack | **Decided: FastAPI + React/TS ([Q7](../decisions/q007-stack.md)).** DuckDB only for SIS file diffs and the tally, never the edit store | |
 | A2 | Storage in the prototype | In-memory with reset; SQLite file; MongoDB | In-memory: zero setup for reviewers; the port shows where a database goes |
 | A3 | Show the SIS sync in the prototype? | Design doc only; a "Run SIS sync" button that loads a changed SIS file and shows Q2's flags | Button, if time: it turns the design doc into something they can click |
 | A4 | SIS design format | Markdown + diagram in the repo, exported to PDF; slides | Markdown + PDF, plus a video outline |

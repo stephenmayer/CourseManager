@@ -18,3 +18,4 @@ One file per decision (`q0NN-<slug>.md`, template in `.claude/process-kit/templa
 | [Q4](q004-priority-core-check.md) | Priority is a counselor label plus one warning: missing a priority course in a core subject | current | 2026-10-24, Stephen |
 | [Q5](q005-bad-sis-request-data.md) | Bad SIS request data loads as-is, shows as errors, and blocks Done until fixed | current | 2026-10-24, Stephen |
 | [Q6](q006-timebox-and-mvp-scope.md) | 2h prototype + 1h SIS design, AI-accelerated; MVP is M1-M4, M6 if time | current | 2026-10-24, Stephen |
+| [Q7](q007-stack.md) | FastAPI + React/TS; DuckDB only for SIS file diffs and the tally | current | 2026-10-25, Stephen |
