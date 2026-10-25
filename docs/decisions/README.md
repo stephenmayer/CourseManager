@@ -20,3 +20,4 @@ One file per decision (`q0NN-<slug>.md`, template in `.claude/process-kit/templa
 | [Q6](q006-timebox-and-mvp-scope.md) | 2h prototype + 1h SIS design, AI-accelerated; MVP is M1-M4, M6 if time | current | 2026-10-24, Stephen |
 | [Q7](q007-stack.md) | FastAPI + React/TS; DuckDB only for SIS file diffs and the tally | current | 2026-10-25, Stephen |
 | [Q8](q008-prototype-storage.md) | Counselor edits stored in a SQLite file; reset re-seeds; tests use in-memory SQLite | current | 2026-10-25, Stephen |
+| [Q9](q009-sis-sync-demo.md) | SIS sync demo only if time: counselor flow first, then sync demo, then tally | current | 2026-10-25, Stephen |

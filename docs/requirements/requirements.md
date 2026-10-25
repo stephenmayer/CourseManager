@@ -71,7 +71,7 @@ Scope decided in [Q6](../decisions/q006-timebox-and-mvp-scope.md).
 | M3 | Per-student review status (not started / in progress / done / on hold) and a caseload filter | Turns the list into a work queue; covers S010 "on hold" | Low | In ([Q3](../decisions/q003-student-review-status.md)) |
 | M4 | Request source: from SIS vs added in app | Needed for any safe SIS sync; links the prototype to the design doc | Low | In (data only, small UI cue); sync rule in [Q2](../decisions/q002-request-ownership.md) |
 | M5 | Notes on a student or request | Captures why (retake, early AP) | Low | Maybe: fold into M2's reason |
-| M6 | Course demand tally across students | Shows how requests feed scheduling | Low | Maybe: good debrief story, not core to the counselor's job |
+| M6 | Course demand tally across students | Shows how requests feed scheduling | Low | If time, after the sync demo ([Q9](../decisions/q009-sis-sync-demo.md)) |
 | M7 | Change history / audit | Several staff edit the same list | Medium | Out; mention as next |
 | M8 | Prerequisite checks | S006 asks for it | High: needs transcript data we don't have | Out; explain why |
 | M9 | Schedule conflict detection | S009 asks for it | High: needs sections and periods | Out; this is the scheduler's job, explain why |

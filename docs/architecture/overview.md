@@ -78,7 +78,7 @@ Pilot vs scale, in one line each for the README: the ports let a pilot run on a 
 | --- | --- | --- | --- |
 | A1 | Stack | **Decided: FastAPI + React/TS ([Q7](../decisions/q007-stack.md)).** DuckDB only for SIS file diffs and the tally, never the edit store | |
 | A2 | Storage in the prototype | **Decided: SQLite file via built-in `sqlite3`, reset re-seeds ([Q8](../decisions/q008-prototype-storage.md))** | |
-| A3 | Show the SIS sync in the prototype? | Design doc only; a "Run SIS sync" button that loads a changed SIS file and shows Q2's flags | Button, if time: it turns the design doc into something they can click |
+| A3 | Show the SIS sync in the prototype? | **Decided: only if time allows, after the counselor flow and before the tally ([Q9](../decisions/q009-sis-sync-demo.md))** | |
 | A4 | SIS design format | Markdown + diagram in the repo, exported to PDF; slides | Markdown + PDF, plus a video outline |
 
 ## 7. Decided here as obvious engineering (tell Stephen, reversible)
