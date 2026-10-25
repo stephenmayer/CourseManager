@@ -27,14 +27,14 @@ flowchart TD
 
     F[Student detail: Jordan Williams, grade 10] --> G
 
-    subgraph REVIEW [Step 1: Where is Jordan now?]
+    subgraph REVIEW [Step 1: Where he is now]
         G[Profile from the SIS<br/>'Failed MTH101, must retake'] --> H[Draft requests from the SIS<br/>each tagged 'From SIS']
         H --> I[Check panel<br/>warning: MTH101 is a grade 9 course]
     end
 
     I --> J
 
-    subgraph NEEDS [Step 2: What does Jordan need next year?]
+    subgraph NEEDS [Step 2: What he needs]
         J{Core subjects covered?<br/>Math, English, Soc. Studies, Science} -->|yes| K[Keep MTH101 as Priority<br/>reason: 'retake' clears the warning]
         J -->|missing one| L[Warning: no priority Science<br/>add from catalog]
         L --> K
@@ -42,7 +42,7 @@ flowchart TD
 
     K --> M
 
-    subgraph PREFS [Step 3: What does Jordan want?]
+    subgraph PREFS [Step 3: What he wants]
         M{Did Jordan pick<br/>electives beforehand?}
         M -->|yes: picks came in<br/>through the SIS| M1[Review his picks<br/>tagged 'From SIS']
         M1 --> M2{Keep each pick?}
