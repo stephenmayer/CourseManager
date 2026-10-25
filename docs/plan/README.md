@@ -12,7 +12,7 @@ updated: 2026-10-24
 | --- | --- | --- |
 | 1 | Install the build kit | Done 2026-10-24 |
 | 2 | Requirements walkthrough and solution brainstorm with Stephen | Done 2026-10-24 (Q1-Q6) |
-| 3 | Architecture and solution brainstorm with Stephen | In progress |
+| 3 | Architecture and solution brainstorm with Stephen | Done 2026-10-25 (Q7-Q10) |
 | 4 | Build with the kit (plan, seams review, design approval, test-first) | Waiting for Stephen's go-ahead |
 
 Seams reviews go in [`reviews/`](reviews/).

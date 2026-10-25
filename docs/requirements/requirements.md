@@ -91,4 +91,4 @@ Scope decided in [Q6](../decisions/q006-timebox-and-mvp-scope.md).
 3. **MVP scope:** M1-M4 in, M5 folded into M2, M6 if time, M7-M10 out ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
 4. **AP role:** same screen; status filter covers oversight; sign-off deferred ([Q3](../decisions/q003-student-review-status.md)).
 5. **Complex students:** all handled through warnings and errors ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
-6. **SIS design format:** decided with the architecture (step 3).
+6. **SIS design format:** Markdown in the repo to start ([Q10](../decisions/q010-sis-design-format.md)).

@@ -1,7 +1,7 @@
 ---
 id: arch-overview
 title: Prototype architecture
-status: draft
+status: current
 owns: "the shape of the prototype: components, data model, rules, the swap seam, testing strategy, and the open architecture choices"
 updated: 2026-10-24
 ---
@@ -72,14 +72,14 @@ Adding a rule = one function + its tests. That is the "generalize" story: gradua
 
 Pilot vs scale, in one line each for the README: the ports let a pilot run on a nightly SIS file and an in-memory or SQLite store, and move to a real database and SIS API without touching rules or UI; what doesn't scale yet is auth, tenancy (every query scoped by school), and audit history.
 
-## 6. Open choices for Stephen
+## 6. Choices made with Stephen (all decided)
 
 | # | Choice | Options | My lean |
 | --- | --- | --- | --- |
 | A1 | Stack | **Decided: FastAPI + React/TS ([Q7](../decisions/q007-stack.md)).** DuckDB only for SIS file diffs and the tally, never the edit store | |
 | A2 | Storage in the prototype | **Decided: SQLite file via built-in `sqlite3`, reset re-seeds ([Q8](../decisions/q008-prototype-storage.md))** | |
 | A3 | Show the SIS sync in the prototype? | **Decided: only if time allows, after the counselor flow and before the tally ([Q9](../decisions/q009-sis-sync-demo.md))** | |
-| A4 | SIS design format | Markdown + diagram in the repo, exported to PDF; slides | Markdown + PDF, plus a video outline |
+| A4 | SIS design format | **Decided: Markdown in the repo to start; PDF later if wanted ([Q10](../decisions/q010-sis-design-format.md))** | |
 
 ## 7. Decided here as obvious engineering (tell Stephen, reversible)
 
