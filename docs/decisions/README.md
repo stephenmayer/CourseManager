@@ -23,3 +23,4 @@ One file per decision (`q0NN-<slug>.md`, template in `.claude/process-kit/templa
 | [Q9](q009-sis-sync-demo.md) | SIS sync demo only if time: counselor flow first, then sync demo, then tally | current | 2026-10-25, Stephen |
 | [Q10](q010-sis-design-format.md) | SIS design is Markdown in the repo to start; PDF later if wanted | current | 2026-10-25, Stephen |
 | [Q11](q011-student-preferences.md) | Both: students may arrive with picks (via the SIS) or choose live; one screen | current | 2026-10-25, Stephen |
+| [Q12](q012-course-view.md) | Courses screen: request counts per course, Not-in-catalog row, fix requests from the course side; catalog stays read-only | current | 2026-10-26, Stephen |

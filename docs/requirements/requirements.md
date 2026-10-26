@@ -71,7 +71,7 @@ Scope decided in [Q6](../decisions/q006-timebox-and-mvp-scope.md).
 | M3 | Per-student review status (not started / in progress / done / on hold) and a caseload filter | Turns the list into a work queue; covers S010 "on hold" | Low | In ([Q3](../decisions/q003-student-review-status.md)) |
 | M4 | Request source: from SIS vs added in app | Needed for any safe SIS sync; links the prototype to the design doc | Low | In (data only, small UI cue); sync rule in [Q2](../decisions/q002-request-ownership.md) |
 | M5 | Notes on a student or request | Captures why (retake, early AP) | Low | Maybe: fold into M2's reason |
-| M6 | Course demand tally across students | Shows how requests feed scheduling | Low | If time, after the sync demo ([Q9](../decisions/q009-sis-sync-demo.md)) |
+| M6 | Course view: request counts per course, fix requests from the course side | Shows how requests feed scheduling; finds bad codes in one place | Low-medium | In, core build ([Q12](../decisions/q012-course-view.md)) |
 | M7 | Change history / audit | Several staff edit the same list | Medium | Out; mention as next |
 | M8 | Prerequisite checks | S006 asks for it | High: needs transcript data we don't have | Out; explain why |
 | M9 | Schedule conflict detection | S009 asks for it | High: needs sections and periods | Out; this is the scheduler's job, explain why |
@@ -88,7 +88,7 @@ Scope decided in [Q6](../decisions/q006-timebox-and-mvp-scope.md).
 
 1. **Timebox:** 2 hours prototype, 1 hour SIS design, AI-accelerated ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
 2. **Validation:** judgment calls warn and are kept with a reason ([Q1](../decisions/q001-out-of-grade-courses.md)); data errors block only Done ([Q5](../decisions/q005-bad-sis-request-data.md)).
-3. **MVP scope:** M1-M4 in, M5 folded into M2, M6 if time, M7-M10 out ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
+3. **MVP scope:** M1-M4 in, M5 folded into M2, M6 in as the course view ([Q12](../decisions/q012-course-view.md)), M7-M10 out ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
 4. **AP role:** same screen; status filter covers oversight; sign-off deferred ([Q3](../decisions/q003-student-review-status.md)).
 5. **Complex students:** all handled through warnings and errors ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
 6. **SIS design format:** Markdown in the repo to start ([Q10](../decisions/q010-sis-design-format.md)).
