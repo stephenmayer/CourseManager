@@ -27,5 +27,5 @@ From the CTO 1:1 ([interview-feedback.md](../requirements/interview-feedback.md)
 ## Impacts (all updated in the same change)
 
 - [x] Requirements: `requirements/interview-feedback.md` (F4)
-- [ ] SIS sync design doc: not written yet; it must state this rule
+- [ ] SIS sync design doc: not written yet; it must state this rule (and Q14: runs are queue jobs)
 - [x] Decisions index row

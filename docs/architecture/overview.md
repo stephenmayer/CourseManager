@@ -87,3 +87,4 @@ Pilot vs scale, in one line each for the README: the ports let a pilot run on a 
 - Every write returns the student's full updated detail (requests, issues, status), so the UI never recomputes rules.
 - REST JSON API; frontend calls it through one client module so it can be mocked.
 - Request IDs are generated in-process; real IDs come with persistence.
+- SIS sync runs are jobs behind a small queue interface: in-process in the prototype, RabbitMQ in production ([Q14](../decisions/q014-sis-sync-on-queue.md)).

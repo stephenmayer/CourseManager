@@ -25,3 +25,4 @@ One file per decision (`q0NN-<slug>.md`, template in `.claude/process-kit/templa
 | [Q11](q011-student-preferences.md) | Both: students may arrive with picks (via the SIS) or choose live; one screen | current | 2026-10-25, Stephen |
 | [Q12](q012-course-view.md) | Courses screen: request counts per course, Not-in-catalog row, fix requests from the course side; catalog stays read-only | current | 2026-10-26, Stephen |
 | [Q13](q013-sis-sync-runs.md) | SIS syncs are versioned runs (Timely job states); failed runs write nothing; roll back in one action; no approval gate | current | 2026-10-27, Stephen |
+| [Q14](q014-sis-sync-on-queue.md) | SIS sync runs as jobs on RabbitMQ (Timely's queue) with a jobs view to monitor background work; prototype uses an in-process queue behind an interface | current | 2026-10-27, Stephen |
