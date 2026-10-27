@@ -22,6 +22,8 @@ Service ── rules (pure functions → issues)
    │
    ├── SisSource      read-only: students, catalog, SIS requests   ← seed today, SIS connector tomorrow
    └── RequestStore   read/write: requests, reasons, review status ← SQLite file today (Q8), Mongo tomorrow
+
+Designed, not built (Q15): SisSource gains a transcript feed; a GraduationRules config (per district) joins it.
 ```
 
 The two ports split the data by **who owns it**, which is the exercise's own split: the SIS owns students and the catalog; the app owns what counselors do. That one seam answers "how is the data layer abstracted so the source is easy to swap?" and is the same seam the SIS sync design hangs off ([Q2](../decisions/q002-request-ownership.md)).
@@ -34,6 +36,8 @@ The two ports split the data by **who owns it**, which is the exercise's own spl
 | Course | code, name, department, grades, is_ap | SIS (read-only) |
 | Request | id, student_id, course_code, type (priority/elective), source (sis/app), edited_in_app, reason | App |
 | Review | student_id, status (not started / in progress / on hold / done), hold_reason | App |
+| Transcript entry (Q15, not built) | student_id, course_code, school_year, grade_earned, credits | SIS (read-only) |
+| Graduation rule (Q15, not built) | district, subject area, credits required, named required courses | App config |
 | Issue (computed, never stored) | severity (error/warning), rule, message, request_id | Derived |
 
 Notes:
@@ -54,6 +58,8 @@ Each rule is a pure function `(student, requests, catalog) → issues`, run on e
 | Heavy AP load (more than 3 APs) | warning, kept with a reason | S006, S009 (5 each) | M2; threshold is an assumption to state |
 
 Status rules ([Q3](../decisions/q003-student-review-status.md)): Done is refused while any error remains; editing a Done student moves it to In progress; On hold requires a reason.
+
+Designed but not built ([Q15](../decisions/q015-history-and-grad-rules.md)): a graduation progress rule (rules minus earned minus requested credits) that replaces the Q4 core check once transcripts and rules exist, and enables prerequisite checks and a "fills a gap" catalog filter.
 
 Adding a rule = one function + its tests. That is the "generalize" story: graduation rules or prerequisites plug in the same way once the data exists.
 

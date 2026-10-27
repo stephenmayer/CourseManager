@@ -35,8 +35,8 @@ These are places where two parts of the document can't both be right. They matte
 | # | Missing | Why it matters | Question to ask |
 | --- | --- | --- | --- |
 | G1 | What the catalog's Grade(s) column means | Decides whether a grade check blocks, warns, or doesn't exist (C1, C6) | "Is Grade(s) who may take it, or who usually takes it? Can a counselor override it?" Assumed for now: warn, keep with a reason ([Q1](../decisions/q001-out-of-grade-courses.md)) |
-| G2 | Graduation requirements | Needed to check or suggest priority requests (C2) | "Do schools give you graduation requirements in a structured form, or do counselors carry them in their heads?" Assumed for now: label plus a core-subject warning ([Q4](../decisions/q004-priority-core-check.md)) |
-| G3 | Prerequisites | Three profiles depend on them (C3) | "Does the SIS have prerequisites and transcripts? Is checking them in scope for this tool?" |
+| G2 | Graduation requirements | Needed to check or suggest priority requests (C2) | "Do schools give you graduation requirements in a structured form, or do counselors carry them in their heads?" Assumed for now: label plus a core-subject warning ([Q4](../decisions/q004-priority-core-check.md)). Designed as a seam, needs history too ([Q15](../decisions/q015-history-and-grad-rules.md)) |
+| G3 | Prerequisites | Three profiles depend on them (C3) | "Does the SIS have prerequisites and transcripts? Is checking them in scope for this tool?" Transcript feed designed, not built ([Q15](../decisions/q015-history-and-grad-rules.md)) |
 | G4 | How many requests a student needs (min, max) | Lets us say a list is "complete" or "overloaded" | "Is there a target number of courses per student, e.g. one per period?" |
 | G5 | Course length and credits | A semester course and a year course aren't equal load | "Are all courses full-year? Do they carry credits?" |
 | G6 | Whether a course can be requested twice | S008 has SS402 twice | "Is a duplicate ever valid (e.g. a repeatable course), or always an error?" Assumed for now: always an error ([Q5](../decisions/q005-bad-sis-request-data.md)) |
