@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Courses</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
+</style>
+</helmet>
+<div style="position: relative; min-height: 1900px; background: {{t.bg}}; color: {{t.text}}; font-family: Inter, system-ui, sans-serif; font-size: 14px">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; padding: 0 32px; min-height: 60px; background: {{t.surface}}; border-bottom: 1px solid {{t.border}}">
+    <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{t.accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2"></path><path d="M8 7h8M8 11h6"></path></svg>
+      <span>CourseManager</span>
+    </div>
+    <nav aria-label="Main" style="display: flex; gap: 4px">
+      <a href="Main.dc.html" style="padding: 8px 14px; border-radius: 8px; font-weight: 500; color: {{t.muted}}">Students</a>
+      <a href="Courses.dc.html" aria-current="page" style="padding: 8px 14px; border-radius: 8px; font-weight: 600; background: {{t.accentSoft}}; color: {{t.accentText}}">Courses</a>
+    </nav>
+    <div style="flex-grow: 1"></div>
+    <span style="color: {{t.muted}}">2027–28 course requests · SIS data as of Oct 27, 6:00 AM</span>
+    <span style="font-weight: 500">Ms. Lee · Counselor</span>
+    <a href="{{mode.href}}" role="button" aria-label="{{mode.label}}" title="{{mode.label}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.border}}; color: {{t.text}}; font-weight: 500; text-decoration: none">
+      <sc-if value="{{mode.toDark}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></sc-if>
+      <sc-if value="{{mode.toLight}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+      <span>{{mode.text}}</span>
+    </a>
+  </header>
+
+  <main style="max-width: 1376px; margin: 0 auto; padding: 32px 32px 48px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700">Courses</h1>
+        <p style="margin: 0; color: {{t.muted}}">How many students requested each course. The catalog comes from the SIS and can't be edited here; requests can.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="search" style="font-size: 12px; font-weight: 600; color: {{t.muted}}">Find a course</label>
+        <input id="search" type="search" placeholder="Name or code" style="width: 280px; height: 44px; box-sizing: border-box; padding: 0 14px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <div style="flex: 1 1 100%; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+        <section aria-labelledby="nic-h" style="padding: 16px 20px; border-radius: 12px; background: {{t.errBg}}; border: 1px solid {{t.errBorder}}; display: flex; flex-direction: column; gap: 8px">
+          <h2 id="nic-h" style="margin: 0; font-size: 16px; font-weight: 700; color: {{t.errText}}">Not in catalog · 1 request</h2>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+            <span style="font-weight: 700; min-width: 72px">SS303</span>
+            <span style="flex-grow: 1">Requested by <a href="StudentErrors.dc.html" style="font-weight: 600; color: {{t.accentText}}">Aisha Johnson</a> (elective). This code isn't in the catalog, so it can't be scheduled.</span>
+            <button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Remove</button>
+          </div>
+        </section>
+
+        <sc-for list="{{depts}}" as="d" hint-placeholder-count="5">
+          <section style="border: 1px solid {{t.border}}; border-radius: 12px; background: {{t.surface}}; overflow-x: auto">
+            <h2 style="margin: 0; padding: 14px 16px 6px; font-size: 16px; font-weight: 700">{{d.name}} <span style="font-weight: 500; color: {{t.muted}}">· {{d.summary}}</span></h2>
+            <table style="width: 100%; min-width: 560px; border-collapse: collapse">
+              <thead>
+                <tr style="text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: {{t.muted}}">
+                  <th scope="col" style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; font-weight: 600; width: 96px">Code</th>
+                  <th scope="col" style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; font-weight: 600">Course</th>
+                  <th scope="col" style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; font-weight: 600; width: 80px">Grades</th>
+                  <th scope="col" style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; font-weight: 600; width: 80px; text-align: right">Priority</th>
+                  <th scope="col" style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; font-weight: 600; width: 80px; text-align: right">Elective</th>
+                  <th scope="col" style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; font-weight: 600; width: 80px; text-align: right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{d.courses}}" as="c" hint-placeholder-count="5">
+                  <tr style="{{c.rowStyle}}">
+                    <td style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; font-weight: 700">{{c.code}}</td>
+                    <td style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}">{{c.name}} <sc-if value="{{c.flag}}" hint-placeholder-val="{{false}}"><span style="{{c.flagStyle}}">{{c.flag}}</span></sc-if></td>
+                    <td style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; color: {{t.muted}}">{{c.grades}}</td>
+                    <td style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; text-align: right; {{c.pStyle}}">{{c.p}}</td>
+                    <td style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; text-align: right; {{c.eStyle}}">{{c.e}}</td>
+                    <td style="padding: 10px 16px; border-bottom: 1px solid {{t.border}}; text-align: right; font-weight: 600; {{c.totStyle}}">{{c.total}}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </section>
+        </sc-for>
+      </div>
+
+    </div>
+  </main>
+  <div style="position: absolute; inset: 0; background: {{t.scrim}}; display: flex; justify-content: center; align-items: flex-start; padding: 140px 16px 16px; box-sizing: border-box">
+      <div role="dialog" aria-modal="true" aria-labelledby="sel-h" style="position: relative; width: 100%; max-width: 560px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 14px; background: {{t.surface}}; border: 1px solid {{t.border}}; box-shadow: 0 24px 64px rgba(0,0,0,0.28)">
+        <button type="button" aria-label="Close" style="position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-size: 16px">✕</button>
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: {{t.muted}}; padding-right: 56px">REQUESTS FOR THIS COURSE</div>
+        <h2 id="sel-h" style="margin: 0; font-size: 22px; font-weight: 700">SS402 AP Government</h2>
+        <div style="color: {{t.muted}}">Social Studies · grade 12 · 3 requests (2 priority, 1 elective)</div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 10px; border: 1px solid {{t.border}}">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+            <a href="StudentErrors.dc.html" style="font-weight: 600; color: {{t.accentText}}; flex-grow: 1">Aisha Johnson</a>
+            <span style="{{pillP}}">Priority</span>
+          </div>
+          <div style="display: flex; gap: 8px"><button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Make elective</button><button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Remove</button></div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 10px; background: {{t.errBg}}; border: 1px solid {{t.errBorder}}">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+            <a href="StudentErrors.dc.html" style="font-weight: 600; color: {{t.accentText}}; flex-grow: 1">Aisha Johnson</a>
+            <span style="{{pillE}}">Elective</span>
+          </div>
+          <div style="color: {{t.errText}}"><b>Requested twice.</b> Aisha already has this as a priority. Remove this copy.</div>
+          <div style="display: flex; gap: 8px"><button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Remove</button></div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 10px; border: 1px solid {{t.border}}">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+            <span style="font-weight: 600; flex-grow: 1">Liam O'Brien</span>
+            <span style="{{pillP}}">Priority</span>
+          </div>
+          <div style="display: flex; gap: 8px"><button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Make elective</button><button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Remove</button></div>
+        </div>
+
+        <p style="margin: 0; font-size: 12px; color: {{t.muted}}">Changes here are the same as editing on the student's page, and reopen a student marked Done.</p>
+      </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dark = !!this.props.dark;
+    const t = dark ? {
+      bg: '#0F1115', surface: '#171A21', text: '#E8EAED', muted: '#A3AAB6', border: '#2A2F3A', borderStrong: '#4A5262',
+      accent: '#7AA2F7', accentSoft: '#1C2A47', accentText: '#A9C2FA', rowHi: '#1C2333', zero: '#5F6775',
+      scrim: 'rgba(0,0,0,0.6)', errBg: '#2A1715', errBorder: '#7A2E28', errText: '#FDA29B', neutralBg: '#242934', neutralText: '#C9CED6'
+    } : {
+      bg: '#F6F7F9', surface: '#FFFFFF', text: '#1A1D23', muted: '#5B6270', border: '#E2E5EA', borderStrong: '#B8BEC8',
+      accent: '#2457C5', accentSoft: '#EAF0FC', accentText: '#1D4AAA', rowHi: '#EAF0FC', zero: '#9AA1AD',
+      scrim: 'rgba(16,24,40,0.45)', errBg: '#FEF3F2', errBorder: '#F4A39B', errText: '#B42318', neutralBg: '#F0F2F5', neutralText: '#3F4652'
+    };
+    const pill = (bg, fg) => `display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; background: ${bg}; color: ${fg}`;
+    const pillP = pill(t.accentSoft, t.accentText);
+    const pillE = pill(t.neutralBg, t.neutralText);
+    const raw = [
+      ['Math', [['MTH101', 'Algebra I', '9', 3, 0], ['MTH102', 'Geometry', '9/10', 0, 0], ['MTH201', 'Algebra II', '10', 1, 0], ['MTH202', 'Pre-Calculus', '11', 2, 0], ['MTH301', 'Calculus', '11/12', 0, 0], ['MTH302', 'Statistics', '11/12', 1, 0], ['MTH401', 'AP Calculus AB', '12', 2, 0], ['MTH402', 'AP Statistics', '12', 0, 0]]],
+      ['English', [['ENG101', 'English 9', '9', 2, 0], ['ENG102', 'English 9 ELL Support', '9', 1, 0], ['ENG201', 'English 10', '10', 2, 0], ['ENG301', 'American Literature', '11', 2, 0], ['ENG302', 'Creative Writing', '11/12', 0, 0], ['ENG401', 'AP English Language', '12', 2, 0], ['ENG402', 'AP English Literature', '12', 1, 0], ['ENG403', 'Senior Seminar', '12', 1, 0]]],
+      ['Social Studies', [['SS101', 'World History', '9', 2, 0], ['SS201', 'U.S. History', '10', 2, 0], ['SS301', 'Civics & Government', '11', 2, 0], ['SS302', 'Economics', '11/12', 0, 2], ['SS401', 'AP U.S. History', '11/12', 1, 0], ['SS402', 'AP Government', '12', 2, 1, 'Requested twice'], ['SS403', 'Psychology', '11/12', 0, 0]]],
+      ['Science', [['SCI101', 'Biology', '9', 2, 0], ['SCI201', 'Chemistry', '10', 2, 0], ['SCI301', 'Physics', '11', 2, 0], ['SCI302', 'Environmental Science', '11/12', 0, 0], ['SCI401', 'AP Biology', '11/12', 1, 0], ['SCI402', 'AP Chemistry', '12', 1, 0], ['SCI403', 'Anatomy & Physiology', '12', 0, 2]]],
+      ['Arts & Tech', [['AT101', 'Introduction to Computing', '9/10', 0, 1], ['AT102', 'Visual Arts I', '9/10', 0, 0], ['AT201', 'Web Design', '10/11', 0, 0], ['AT202', 'Music Theory', '10/11', 0, 1], ['AT301', 'AP Computer Science A', '11/12', 0, 3], ['AT302', 'Digital Media & Film', '11/12', 0, 1], ['AT303', 'Advanced Visual Arts', '11/12', 0, 1]]]
+    ];
+    const num = (n) => (n === 0 ? `color: ${t.zero}` : '');
+    const depts = raw.map(([name, list]) => {
+      const courses = list.map(([code, cname, grades, p, e, flag]) => ({
+        code, name: cname, grades, p, e, total: p + e,
+        pStyle: num(p), eStyle: num(e), totStyle: num(p + e),
+        flag: flag || '', flagStyle: pill(t.errBg, t.errText),
+        rowStyle: code === 'SS402' ? `background: ${t.rowHi}; box-shadow: inset 3px 0 0 ${t.accent}` : ''
+      }));
+      const reqs = courses.reduce((a, c) => a + c.total, 0);
+      const used = courses.filter((c) => c.total > 0).length;
+      return { name, courses, summary: `${reqs} requests across ${used} of ${courses.length} courses` };
+    });
+    const mode = { href: dark ? '#' : '#', label: dark ? 'Switch to light mode' : 'Switch to dark mode', text: dark ? 'Light' : 'Dark', toDark: !dark, toLight: dark };
+    return { t, mode, depts, pillP, pillE };
+  }
+}
+</script>
+</body>
+</html>
