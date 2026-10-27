@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Did you mean (add-on)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}table{border-collapse:collapse}</style>
+</helmet>
+<div style="min-height: 900px; background: #F6F7F9; color: #1A1D23; font-family: Inter, system-ui, sans-serif; font-size: 14px">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; padding: 0 32px; min-height: 60px; background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+    <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2457C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2"></path><path d="M8 7h8M8 11h6"></path></svg>
+      <span>CourseManager</span>
+    </div>
+    <nav aria-label="Main" style="display: flex; gap: 4px">
+      <a href="Main.dc.html" aria-current="page" style="padding: 8px 14px; border-radius: 8px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">Students</a>
+      <a href="Courses.dc.html" style="padding: 8px 14px; border-radius: 8px; font-weight: 500; color: #5B6270">Courses</a>
+    </nav>
+    <div style="flex-grow: 1"></div>
+    <span style="color: #5B6270">2027–28 course requests · SIS data as of Oct 27, 6:00 AM</span>
+    <span style="font-weight: 500">Ms. Lee · Counselor</span>
+  </header>
+  <div role="note" style="display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 12px 32px; background: #F4F3FF; border-bottom: 1px solid #7A5AF8; color: #3E1C96">
+    <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #7A5AF8; color: #FFFFFF">Add-on · designed, not built</span>
+    <span>Suggested fixes for unknown or duplicate SIS course codes, confirmed by the counselor (Q5 option D, deferred).</span>
+  </div>
+  <main style="max-width: 1240px; margin: 0 auto; padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 20px">
+    <a href="StudentErrors.dc.html" style="color: #1D4AAA; font-weight: 500">← Aisha Johnson</a>
+    <section aria-labelledby="dy-h" style="display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+      <h1 id="dy-h" style="margin: 0; font-size: 22px; font-weight: 700">Aisha Johnson · Electives with suggested fixes</h1>
+      <p style="margin: 0; padding: 12px 14px; border-radius: 8px; background: #F0F2F5; line-height: 1.5"><span style="font-size: 12px; font-weight: 600; color: #5B6270">FROM SIS PROFILE </span>Interested in <b>Psychology</b> and <b>Economics</b> as final electives.</p>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 10px; background: #FEF3F2; border: 1px solid #F4A39B">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+          <span style="font-weight: 700; min-width: 72px">SS303</span>
+          <span style="flex-grow: 1"><span style="color: #5B6270">Unknown course</span></span>
+          <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F0F2F5; color: #3F4652">From SIS</span>
+          <button type="button" aria-label="Remove SS303" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; font: inherit">✕</button>
+        </div>
+        <div style="color: #B42318"><b>SS303 isn't in the course catalog.</b> It can't be scheduled.</div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px; background: #FFFFFF; border: 1px solid #E2E5EA">
+          <span style="flex-grow: 1"><b>Did you mean SS302 Economics?</b> <span style="color: #5B6270">One digit off, and Economics is in Aisha's profile.</span></span>
+          <button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: none; background: #2457C5; color: #FFFFFF; font: inherit; font-weight: 600">Replace with SS302</button>
+          <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Not this</button>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 10px; background: #FEF3F2; border: 1px solid #F4A39B">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+          <span style="font-weight: 700; min-width: 72px">SS402</span>
+          <span style="flex-grow: 1">AP Government <span style="color: #5B6270">· elective</span></span>
+          <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F0F2F5; color: #3F4652">From SIS</span>
+          <button type="button" aria-label="Remove the elective copy of SS402" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; font: inherit">✕</button>
+        </div>
+        <div style="color: #B42318"><b>AP Government is already on Aisha's list as a priority.</b> A course can only be requested once.</div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px; background: #FFFFFF; border: 1px solid #E2E5EA">
+          <span style="flex-grow: 1"><b>Did you mean SS403 Psychology?</b> <span style="color: #5B6270">One digit off, and Psychology is in Aisha's profile.</span></span>
+          <button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: none; background: #2457C5; color: #FFFFFF; font: inherit; font-weight: 600">Replace with SS403</button>
+          <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Not this</button>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 12px; color: #5B6270">A suggestion is a guess for the counselor to confirm. Nothing changes until they choose Replace. The suggestion comes from course codes one digit away that match words in the profile.</p>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

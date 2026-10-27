@@ -29,3 +29,14 @@ Design notes (choices made during review, 2026-10-27):
 - No "caseload": one shared list in the prototype (gaps G11).
 - Light/dark toggle in the header; defaults to the system setting.
 - Check copy is plain language (interview feedback F6).
+
+## Add-ons: designed, not built (not yet reviewed by Stephen)
+
+Shown to the reviewer to explain where the product goes next. Each board carries an "Add-on · designed, not built" banner. Sample data on these boards is illustrative, not from the exercise.
+
+| Board | Add-on | Decision |
+| --- | --- | --- |
+| `AddonJobs.dc.html` | Sync jobs: runs with Timely job states, cancel, run detail, roll back, error report | Q13, Q14 |
+| `AddonGradProgress.dc.html` | Graduation progress from a transcript plus district rules; "fills a gap" filter; rules setup | Q15 |
+| `AddonAlternates.dc.html` | Ranked backups under electives; backups counted apart on Courses | Q16 |
+| `AddonDidYouMean.dc.html` | Suggested fix for unknown or duplicate SIS codes, confirmed by the counselor | Q5 option D |
