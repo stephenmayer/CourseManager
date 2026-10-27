@@ -66,8 +66,8 @@ Adding a rule = one function + its tests. That is the "generalize" story: gradua
 ## 4. Screens (detail comes in the design step)
 
 1. **Student list:** name, grade, status, request count, error/warning counts, profile flag; filter by status; search by name.
-2. **Student detail:** profile, requests grouped Priority then Elective, each with source and any issue; add from catalog (grade checkboxes 9-12, the student's grade checked by default); remove; switch P/E; give a reason; set status.
-3. **Courses** ([Q12](../decisions/q012-course-view.md)): every course with request counts by department, plus a "Not in catalog" row; select a course to see who requested it and remove, switch P/E or open the student. Catalog stays read-only.
+2. **Student detail:** profile, requests grouped Priority then Elective, each with source and any issue; add from catalog (grade checkboxes 9-12, the student's grade checked by default); remove; switch P/E; give a reason; set status; select a course code to open the same course dialog as the Courses screen.
+3. **Courses** ([Q12](../decisions/q012-course-view.md)): every course with request counts by department, plus a "Not in catalog" row; select a course to open a dialog showing who requested it, to remove, switch P/E or open the student. Catalog stays read-only.
 
 ## 5. Testing strategy
 
