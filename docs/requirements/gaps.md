@@ -85,6 +85,7 @@ These are places where two parts of the document can't both be right. They matte
 | G29 | Whether to handle the complex cases | The note says they "exercise judgment" but can be skipped | Ours to decide (requirements.md Q5) |
 | G30 | Audience for the design doc | "Engineering team and product partner": two audiences with different needs | Ours to decide: write the decisions for product, the flow for engineers |
 | G31 | What "new input" will come in the follow-up | We should be ready to iterate live | Ours to prepare: keep the design modular around the decisions most likely to flip (G21, G23, G24) |
+| G32 | Open slots, alternates, group requests | Every request is one course code; nothing lets the optimizer choose (raised by Stephen 2026-10-27). The prompt also never gives a course or period load per student | "Do schools give the optimizer alternates or 'any one from this group' requests, and does the SIS carry them? How many courses must a student request?" Not built; follow-up question |
 
 ## 3. Types of questions, and when to ask each
 
