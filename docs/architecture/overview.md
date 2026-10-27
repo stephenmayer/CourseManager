@@ -36,6 +36,7 @@ The two ports split the data by **who owns it**, which is the exercise's own spl
 | Course | code, name, department, grades, is_ap | SIS (read-only) |
 | Request | id, student_id, course_code, type (priority/elective), source (sis/app), edited_in_app, reason | App |
 | Review | student_id, status (not started / in progress / on hold / done), hold_reason | App |
+| Request alternates (Q16, not built) | alternate_for (request id), rank | App |
 | Transcript entry (Q15, not built) | student_id, course_code, school_year, grade_earned, credits | SIS (read-only) |
 | Graduation rule (Q15, not built) | district, subject area, credits required, named required courses | App config |
 | Issue (computed, never stored) | severity (error/warning), rule, message, request_id | Derived |
