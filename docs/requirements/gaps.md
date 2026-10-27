@@ -86,6 +86,7 @@ These are places where two parts of the document can't both be right. They matte
 | G30 | Audience for the design doc | "Engineering team and product partner": two audiences with different needs | Ours to decide: write the decisions for product, the flow for engineers |
 | G31 | What "new input" will come in the follow-up | We should be ready to iterate live | Ours to prepare: keep the design modular around the decisions most likely to flip (G21, G23, G24) |
 | G32 | Open slots, alternates, group requests | Every request is one course code; nothing lets the optimizer choose (raised by Stephen 2026-10-27). The prompt also never gives a course or period load per student | "Do schools give the optimizer alternates or 'any one from this group' requests, and does the SIS carry them? How many courses must a student request?" Alternates designed, not built ([Q16](../decisions/q016-alternate-requests.md)); group requests a follow-up question |
+| G33 | Students missing from the SIS (late transfers) | Students are read-only from the SIS, so a counselor can't plan for someone not yet enrolled (raised by Stephen 2026-10-27) | "How fast do new enrollments reach the SIS, and do counselors plan before that?" Provisional student, matched on sync, designed not built ([Q17](../decisions/q017-provisional-students.md)) |
 
 ## 3. Types of questions, and when to ask each
 

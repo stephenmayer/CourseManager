@@ -40,3 +40,4 @@ Shown to the reviewer to explain where the product goes next. Each board carries
 | `AddonGradProgress.dc.html` | Graduation progress from a transcript plus district rules; "fills a gap" filter; rules setup | Q15 |
 | `AddonAlternates.dc.html` | Ranked backups under electives; backups counted apart on Courses | Q16 |
 | `AddonDidYouMean.dc.html` | Suggested fix for unknown or duplicate SIS codes, confirmed by the counselor | Q5 option D |
+| `AddonProvisional.dc.html` | Students not in the SIS yet: provisional record, matched on sync with counselor confirmation | Q17 |

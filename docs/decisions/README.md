@@ -28,3 +28,4 @@ One file per decision (`q0NN-<slug>.md`, template in `.claude/process-kit/templa
 | [Q14](q014-sis-sync-on-queue.md) | SIS sync runs as jobs on RabbitMQ (Timely's queue) with a jobs view to monitor background work; prototype uses an in-process queue behind an interface | current | 2026-10-27, Stephen |
 | [Q15](q015-history-and-grad-rules.md) | Student history (transcript feed) and graduation rules are designed as seams, not built; Q4 core check holds the place | current | 2026-10-27, Stephen |
 | [Q16](q016-alternate-requests.md) | Alternate requests designed (alternate_for + rank on electives), not built; ready to add live in the follow-up | current | 2026-10-27, Stephen |
+| [Q17](q017-provisional-students.md) | Students missing from the SIS get a provisional record matched on sync with counselor confirmation; designed as an add-on, not built | current | 2026-10-27, Stephen |

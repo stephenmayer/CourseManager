@@ -8,7 +8,7 @@ updated: 2026-10-27
 
 # Site map
 
-Solid boxes are in the core build. Dashed boxes are add-ons that are designed but not built (Q5 option D, Q14, Q15, Q16). Every screen shares one header: Students, Courses, the SIS data date, the signed-in name and the light/dark toggle.
+Solid boxes are in the core build. Dashed boxes are add-ons that are designed but not built (Q5 option D, Q14, Q15, Q16, Q17). Every screen shares one header: Students, Courses, the SIS data date, the signed-in name and the light/dark toggle.
 
 ![Site map](img/site-map.png)
 
@@ -34,6 +34,7 @@ flowchart TD
         GP["Graduation progress panel<br/>on Student detail · 'fills a gap' filter"]
         ALT["Alternates<br/>ranked backups under each elective"]
         DYM["'Did you mean?' hint<br/>on unknown course errors"]
+        PROV["Students not in SIS yet<br/>add provisional · confirm match on sync"]
     end
 
     H -.-> JOBS
@@ -42,9 +43,11 @@ flowchart TD
     SD -.-> ALT
     SD -.-> DYM
     RULES -.-> GP
+    SL -.-> PROV
+    JOBS -.-> PROV
 
     classDef addon stroke-dasharray: 6 4,fill:#F6F7F9,color:#3F4652;
-    class JOBS,RULES,GP,ALT,DYM addon;
+    class JOBS,RULES,GP,ALT,DYM,PROV addon;
 ```
 
 | Screen or dialog | Reached from | Decisions |
@@ -56,3 +59,4 @@ flowchart TD
 | Sync jobs (add-on) | Header, for an admin | Q13, Q14 |
 | Graduation rules setup (add-on) | Header, for a district admin | Q15 |
 | Graduation progress, Alternates, Did you mean (add-ons) | Inside Student detail | Q15, Q16, Q5 D |
+| Students not in SIS yet (add-on) | Student list; flagged on Sync jobs | Q17 |
