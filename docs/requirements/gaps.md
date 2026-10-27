@@ -49,7 +49,7 @@ These are places where two parts of the document can't both be right. They matte
 | # | Missing | Why it matters | Question to ask |
 | --- | --- | --- | --- |
 | G10 | Counselor vs assistant principal: what's different | Decides whether there are roles, permissions, or just one screen | "Does an AP approve a counselor's work, or do both just edit?" |
-| G11 | Caseloads | A counselor sees their students, not the whole school *(inferred)* | "Is each student assigned to a counselor? Do counselors see others' students?" |
+| G11 | Caseloads | A counselor sees their students, not the whole school *(inferred)* | "Is each student assigned to a counselor? Do counselors see others' students?" Stephen 2026-10-27: no caseload in the prototype (one shared list, no login). Assumed for production: assignment comes from the SIS as a read-only student field, not managed in the app; confirm with Timely |
 | G12 | What "done" means, and is there a deadline | Decides whether we need a status per student and a progress view | "How does a counselor know they've finished? Who checks?" Assumed for now: counselor sets status ([Q3](../decisions/q003-student-review-status.md)) |
 | G13 | What happens after requests | Tells us when lists lock and who consumes them | "Do requests go into Timely's scheduler, back to the SIS, or both? When are they frozen?" |
 | G14 | Where electives come from | "Student interest" implies student input, but students have no access | "Do students pick electives somewhere else (paper, SIS portal), and does that arrive as requests?" Answered: both, picks made beforehand arrive via the SIS ([Q11](../decisions/q011-student-preferences.md)) |
