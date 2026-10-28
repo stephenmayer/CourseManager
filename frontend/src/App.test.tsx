@@ -13,6 +13,7 @@ vi.mock("./api/client", async (importOriginal) => {
     api: {
       currentImport: vi.fn(),
       courses: vi.fn(() => new Promise(() => {})),
+      courseRequests: vi.fn(() => new Promise(() => {})),
       student: vi.fn(),
       catalog: vi.fn(),
     },
@@ -184,4 +185,37 @@ test("with storage throwing the app still renders in the system theme and toggle
   expect(theme()).toBe("dark");
   fireEvent.click(screen.getByRole("button", { name: "Switch to light mode" }));
   expect(theme()).toBe("light");
+});
+
+test("on a student page a course code opens the course dialog", async () => {
+  student.mockResolvedValue({
+    id: "S003",
+    name: "Jordan Williams",
+    grade: 10,
+    profile: "Retaking Algebra I.",
+    status: "in_progress",
+    hold_reason: null,
+    requests: [
+      {
+        id: "r-mth101",
+        course_code: "MTH101",
+        course_name: "Algebra I",
+        department: "Math",
+        grades: [9],
+        is_ap: false,
+        type: "priority",
+        source: "sis",
+        edited_in_app: false,
+        reason: null,
+      },
+    ],
+    issues: [],
+  });
+  await renderAt("/students/S003");
+
+  fireEvent.click(screen.getByRole("button", { name: "MTH101" }));
+  await act(async () => {});
+
+  expect(screen.getByRole("dialog")).toHaveTextContent("Requests for this course");
+  expect(api.courseRequests).toHaveBeenCalledWith("MTH101");
 });
