@@ -124,7 +124,7 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
     try {
       await action();
       onChange();
-      reload();
+      await reload();
     } catch (e) {
       setError(errorText(e));
     } finally {

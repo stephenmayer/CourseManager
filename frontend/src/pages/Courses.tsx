@@ -103,7 +103,15 @@ function DepartmentTable({
   );
 }
 
-function NotInCatalog({ rows, onRemove }: { rows: CourseRequest[]; onRemove: (id: string) => void }) {
+function NotInCatalog({
+  rows,
+  busy,
+  onRemove,
+}: {
+  rows: CourseRequest[];
+  busy: boolean;
+  onRemove: (id: string) => void;
+}) {
   return (
     <section aria-labelledby="not-in-catalog" className="not-in-catalog">
       <h2 id="not-in-catalog">Not in catalog · {plural(rows.length, "request")}</h2>
@@ -117,7 +125,7 @@ function NotInCatalog({ rows, onRemove }: { rows: CourseRequest[]; onRemove: (id
             </Link>{" "}
             ({row.request.type}). This code isn't in the catalog, so it can't be scheduled.
           </span>
-          <button type="button" className="button" onClick={() => onRemove(row.request.id)}>
+          <button type="button" className="button" disabled={busy} onClick={() => onRemove(row.request.id)}>
             Remove
           </button>
         </div>
@@ -129,17 +137,21 @@ function NotInCatalog({ rows, onRemove }: { rows: CourseRequest[]; onRemove: (id
 export default function CoursesPage() {
   const [load, reload] = useLoad(fetchCourses);
   const [writeError, setWriteError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const selected = searchParams.get("course");
 
   async function remove(requestId: string) {
+    setBusy(true);
     setWriteError(null);
     try {
       await api.removeRequest(requestId);
-      reload();
+      await reload();
     } catch (e) {
       setWriteError(errorText(e));
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -176,7 +188,7 @@ export default function CoursesPage() {
       {load.state === "loading" && <p className="muted">Loading courses…</p>}
       {load.state === "failed" && <ErrorText message={load.message} />}
       <ErrorText message={writeError} />
-      {unknown.length > 0 && <NotInCatalog rows={unknown} onRemove={(id) => void remove(id)} />}
+      {unknown.length > 0 && <NotInCatalog rows={unknown} busy={busy} onRemove={(id) => void remove(id)} />}
       {tables.map((d) => (
         <DepartmentTable
           key={d.name}
@@ -184,7 +196,7 @@ export default function CoursesPage() {
           all={d.all}
           shown={d.shown}
           selected={selected}
-          onOpen={(code) => setSearchParams({ course: code })}
+          onOpen={(code) => setSearchParams({ course: code }, { replace: true })}
         />
       ))}
       {data && tables.length === 0 && unknown.length === 0 && <p>No courses match "{query.trim()}".</p>}
@@ -193,8 +205,8 @@ export default function CoursesPage() {
         <CourseDialog
           key={selected}
           code={selected}
-          onClose={() => setSearchParams({})}
-          onChange={reload}
+          onClose={() => setSearchParams({}, { replace: true })}
+          onChange={() => void reload()}
         />
       )}
     </div>

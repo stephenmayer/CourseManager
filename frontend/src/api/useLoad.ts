@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ApiError } from "./client";
 
@@ -9,28 +9,34 @@ export function errorText(error: unknown): string {
 }
 
 /**
- * Runs `fetcher` on mount and whenever it changes (memoize it with useCallback), and
- * again on `reload()`. A response that arrives after unmount or a newer run is dropped.
+ * Runs `fetcher` on mount and whenever it changes (memoize it with useCallback). `reload()`
+ * runs it again and resolves once the new result is on screen, so callers can keep their
+ * controls disabled until then. A response that arrives after unmount is dropped.
  */
-export function useLoad<T>(fetcher: () => Promise<T>): [Load<T>, () => void] {
+export function useLoad<T>(fetcher: () => Promise<T>): [Load<T>, () => Promise<void>] {
   const [load, setLoad] = useState<Load<T>>({ state: "loading" });
-  const [version, setVersion] = useState(0);
+  const live = useRef(true);
+
+  const run = useCallback(
+    () =>
+      fetcher().then(
+        (data) => {
+          if (live.current) setLoad({ state: "ready", data });
+        },
+        (e: unknown) => {
+          if (live.current) setLoad({ state: "failed", message: errorText(e) });
+        },
+      ),
+    [fetcher],
+  );
 
   useEffect(() => {
-    let live = true;
-    fetcher().then(
-      (data) => {
-        if (live) setLoad({ state: "ready", data });
-      },
-      (e: unknown) => {
-        if (live) setLoad({ state: "failed", message: errorText(e) });
-      },
-    );
+    live.current = true;
+    void run();
     return () => {
-      live = false;
+      live.current = false;
     };
-  }, [fetcher, version]);
+  }, [run]);
 
-  const reload = useCallback(() => setVersion((v) => v + 1), []);
-  return [load, reload];
+  return [load, run];
 }
