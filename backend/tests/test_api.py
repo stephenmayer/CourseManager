@@ -100,7 +100,20 @@ def test_courses_counts_and_not_in_catalog(client: TestClient) -> None:
     assert ss402["name"] == "AP Government"
     unrequested = next(c for c in body["courses"] if c["code"] == "MTH102")
     assert unrequested["total"] == 0
-    assert body["not_in_catalog"] == [{"code": "SS303", "priority": 0, "elective": 1, "total": 1}]
+    assert body["not_in_catalog"] == [
+        {"code": "SS303", "priority": 0, "elective": 1, "total": 1, "duplicates": 0}
+    ]
+
+
+def test_courses_count_duplicate_copies(client: TestClient) -> None:
+    """The Courses screen flags "Requested twice" from this count (Q12)."""
+    body = client.get("/api/courses").json()
+    duplicates = {c["code"]: c["duplicates"] for c in body["courses"] if c["duplicates"]}
+    assert duplicates == {"SS402": 1}
+
+    client.delete(f"/api/requests/{request_id(client, 'S008', 'SS402', 'elective')}")
+    after = client.get("/api/courses").json()
+    assert not any(c["duplicates"] for c in after["courses"])
 
 
 def test_course_requests_for_the_dialog(client: TestClient) -> None:
@@ -113,6 +126,7 @@ def test_course_requests_for_the_dialog(client: TestClient) -> None:
     ]
     assert [i["rule"] for i in rows[1]["issues"]] == ["duplicate_course"]
     assert rows[0]["issues"] == []
+    assert [r["student_grade"] for r in rows] == [12, 12, 12]
 
 
 def test_course_requests_for_an_unknown_code(client: TestClient) -> None:

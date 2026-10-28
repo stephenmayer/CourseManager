@@ -6,13 +6,13 @@ added), on every screen, so order-dependent checks ("the first copy", "the last 
 at the same request everywhere. Screens sort for display afterwards.
 """
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Callable
 from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
 
 from app.models import Course, CourseCounts, Request, RequestType, ReviewStatus, SisImport, Student
-from app.rules import Issue, check_student, first_name
+from app.rules import Issue, check_student, duplicate_course, first_name
 from app.sis.reader import SisSource
 from app.store import UNSET, HoldReasonRequired, RequestStore, Unset
 
@@ -66,6 +66,7 @@ class StudentRow:
 class CatalogCourseRow:
     course: Course
     counts: CourseCounts
+    duplicates: int = 0  # copies the duplicate_course rule flags ("Requested twice")
 
 
 @dataclass(frozen=True)
@@ -74,6 +75,7 @@ class UnknownCourseRow:
 
     code: str
     counts: CourseCounts
+    duplicates: int = 0
 
 
 @dataclass(frozen=True)
@@ -150,15 +152,28 @@ class CourseService:
         """
         counts = self.store.counts_by_course()
         catalog = self._catalog()
+        duplicates = self._duplicates_by_course(catalog)
         in_catalog = [
-            CatalogCourseRow(c, counts.get(c.code, CourseCounts(0, 0))) for c in catalog.values()
+            CatalogCourseRow(c, counts.get(c.code, CourseCounts(0, 0)), duplicates[c.code])
+            for c in catalog.values()
         ]
         not_in_catalog = [
-            UnknownCourseRow(code, count)
+            UnknownCourseRow(code, count, duplicates[code])
             for code, count in sorted(counts.items())
             if code not in catalog
         ]
         return in_catalog, not_in_catalog
+
+    def _duplicates_by_course(self, catalog: dict[str, Course]) -> Counter[str]:
+        """How many copies of each course the duplicate_course rule flags, across students."""
+        by_student = self._active_by_student()
+        codes = {r.id: r.course_code for requests in by_student.values() for r in requests}
+        flagged: Counter[str] = Counter()
+        for student in self.sis.students():
+            for issue in duplicate_course(student, by_student.get(student.id, []), catalog):
+                if issue.request_id is not None:
+                    flagged[codes[issue.request_id]] += 1
+        return flagged
 
     def course_requests(self, course_code: str) -> list[CourseRequest]:
         catalog = self._catalog()
