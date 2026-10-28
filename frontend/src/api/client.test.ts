@@ -15,6 +15,15 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
+// Like stubFetch, but the mock's calls keep the RequestInit for assertions.
+function stubFetchCalls(body: unknown) {
+  const fetchMock = vi.fn<(input: string, init?: RequestInit) => Promise<Response>>(async () =>
+    jsonResponse(body),
+  );
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -70,8 +79,7 @@ test("a success response that isn't JSON surfaces a plain message", async () => 
 });
 
 test("sendJson sends a JSON body with the method and returns the parsed body", async () => {
-  const fetchMock = vi.fn(async (_input: string, _init?: RequestInit) => jsonResponse({ id: "S001" }));
-  vi.stubGlobal("fetch", fetchMock);
+  const fetchMock = stubFetchCalls({ id: "S001" });
 
   await expect(sendJson("PATCH", "/requests/r1", { type: "elective" })).resolves.toEqual({
     id: "S001",
@@ -84,8 +92,7 @@ test("sendJson sends a JSON body with the method and returns the parsed body", a
 });
 
 test("sendJson without a body sends none", async () => {
-  const fetchMock = vi.fn(async (_input: string, _init?: RequestInit) => jsonResponse({ id: "S001" }));
-  vi.stubGlobal("fetch", fetchMock);
+  const fetchMock = stubFetchCalls({ id: "S001" });
 
   await api.removeRequest("r1");
 
@@ -116,8 +123,7 @@ test.each([
 });
 
 test("updateRequest patches only the fields given", async () => {
-  const fetchMock = vi.fn(async (_input: string, _init?: RequestInit) => jsonResponse({}));
-  vi.stubGlobal("fetch", fetchMock);
+  const fetchMock = stubFetchCalls({});
 
   await api.updateRequest("r7", { type: "priority" });
 

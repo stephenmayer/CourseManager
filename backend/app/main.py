@@ -101,6 +101,7 @@ class CourseCountOut(BaseModel):
     priority: int
     elective: int
     total: int
+    duplicates: int
 
 
 class CatalogCourseCountOut(CourseCountOut):
@@ -118,6 +119,7 @@ class CoursesOut(BaseModel):
 class CourseRequestOut(BaseModel):
     student_id: str
     student_name: str
+    student_grade: int
     request: RequestOut
     issues: list[IssueOut]
 
@@ -201,7 +203,13 @@ def detail_out(detail: StudentDetail) -> StudentDetailOut:
 
 def count_out(row: CourseRow) -> CourseCountOut:
     c = row.counts
-    return CourseCountOut(code=row.code, priority=c.priority, elective=c.elective, total=c.total)
+    return CourseCountOut(
+        code=row.code,
+        priority=c.priority,
+        elective=c.elective,
+        total=c.total,
+        duplicates=row.duplicates,
+    )
 
 
 # Routes. They are `async def` on purpose: they run one at a time on the event loop,
@@ -302,6 +310,7 @@ async def course_requests(course_code: str, service: Service) -> list[CourseRequ
         CourseRequestOut(
             student_id=row.student.id,
             student_name=row.student.name,
+            student_grade=row.student.grade,
             request=request_out(row.request),
             issues=[issue_out(i) for i in row.issues],
         )
