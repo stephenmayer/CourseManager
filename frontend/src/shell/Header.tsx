@@ -82,6 +82,9 @@ export default function Header({ theme, onToggleTheme }: { theme: Theme; onToggl
         <NavItem to="/courses" match={["/courses/*"]}>
           Courses
         </NavItem>
+        <NavItem to="/settings" match={["/settings"]}>
+          Settings
+        </NavItem>
       </nav>
       <div className="app-header-spacer" />
       <span className="muted">2027–28 course requests · {sisDateLabel}</span>

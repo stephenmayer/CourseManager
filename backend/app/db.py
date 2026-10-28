@@ -68,10 +68,23 @@ SCHEMA = [
   updated_at  TEXT NOT NULL,
   CHECK (status <> 'on_hold' OR hold_reason IS NOT NULL)
 )""",
+    """CREATE TABLE check_setting (
+  rule       TEXT PRIMARY KEY,
+  enabled    INTEGER NOT NULL,
+  updated_at TEXT NOT NULL
+)""",
 ]
 
 # Children before parents, so foreign keys never block the drop.
-TABLES = ["request", "review", "sis_request", "sis_course", "sis_student", "sis_import"]
+TABLES = [
+    "check_setting",
+    "request",
+    "review",
+    "sis_request",
+    "sis_course",
+    "sis_student",
+    "sis_import",
+]
 
 
 def now() -> str:

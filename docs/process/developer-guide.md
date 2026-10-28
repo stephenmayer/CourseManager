@@ -42,7 +42,9 @@ The API keeps its data in `backend/data/coursemanager.sqlite3` (override with `C
 | `GET /catalog` | The current catalog |
 | `GET /courses` | `{courses: [catalog course + priority, elective, total], not_in_catalog: [{code, priority, elective, total}]}` |
 | `GET /courses/{code}/requests` | For the course dialog: `[{student_id, student_name, request, issues}]` |
-| `POST /reset` | Re-seed |
+| `GET /checks` | The Settings screen's checks (Q20): `[{rule, name, description, note, severity, enabled, locked, student_count}]` in rule order |
+| `PUT /checks/{rule}` | `{enabled}` switches a warning on or off for everyone; returns the list; 409 for an error (always on) |
+| `POST /reset` | Re-seed; every check back on |
 
 ## Test first
 

@@ -5,7 +5,7 @@ plus its tests. A rule only names the request an issue sits on; check_student ma
 warning kept when that request has a reason, so every warning rule gets that for free.
 """
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from typing import Literal
 
@@ -147,17 +147,76 @@ def ap_load(student: Student, requests: list[Request], catalog: Catalog) -> list
 
 
 Rule = Callable[[Student, list[Request], Catalog], list[Issue]]
-RULES: list[Rule] = [unknown_course, duplicate_course, out_of_grade, core_subject, ap_load]
 
 
-def check_student(student: Student, requests: list[Request], catalog: Catalog) -> list[Issue]:
-    """All issues for one student's active requests: errors first, then warnings."""
+@dataclass(frozen=True)
+class Check:
+    """A rule as the Settings screen shows it (Q20). Errors are locked on (Q5)."""
+
+    id: str  # the `rule` on its issues
+    rule: Rule
+    severity: Severity
+    name: str
+    description: str
+    note: str | None = None
+
+    @property
+    def locked(self) -> bool:
+        return self.severity == "error"
+
+
+CHECKS: list[Check] = [
+    Check(
+        "unknown_course",
+        unknown_course,
+        "error",
+        "Unknown course",
+        "A requested course code isn't in the course catalog.",
+    ),
+    Check(
+        "duplicate_course",
+        duplicate_course,
+        "error",
+        "Course requested twice",
+        "The same course is on a student's list more than once.",
+    ),
+    Check(
+        "out_of_grade",
+        out_of_grade,
+        "warning",
+        "Course outside its grade",
+        "A course listed for other grades, like a grade 9 retake for a grade 10 student.",
+    ),
+    Check(
+        "core_subject",
+        core_subject,
+        "warning",
+        "No priority course in a core subject",
+        "Grades 9 to 11 need a priority course in Math, English, Social Studies and Science;"
+        " grade 12 in English.",
+        "Our assumption until the school's graduation rules are added.",
+    ),
+    Check(
+        "ap_load",
+        ap_load,
+        "warning",
+        "Heavy AP load",
+        f"More than {AP_LIMIT} AP courses in one year.",
+    ),
+]
+RULES: list[Rule] = [check.rule for check in CHECKS]
+
+
+def check_student(
+    student: Student, requests: list[Request], catalog: Catalog, rules: Sequence[Rule] = RULES
+) -> list[Issue]:
+    """All issues from `rules` for one student's active requests: errors first, then warnings."""
     reasons = {r.id: r.reason for r in requests}
     issues = [
         replace(issue, kept=bool(reasons.get(issue.request_id or "")))
         if issue.severity == "warning"
         else issue
-        for rule in RULES
+        for rule in rules
         for issue in rule(student, requests, catalog)
     ]
     return sorted(issues, key=lambda issue: issue.severity != "error")

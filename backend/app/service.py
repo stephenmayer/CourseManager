@@ -12,7 +12,7 @@ from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
 
 from app.models import Course, CourseCounts, Request, RequestType, ReviewStatus, SisImport, Student
-from app.rules import Issue, check_student, duplicate_course, first_name
+from app.rules import CHECKS, Check, Issue, Rule, check_student, duplicate_course, first_name
 from app.sis.reader import SisSource
 from app.store import UNSET, HoldReasonRequired, RequestStore, Unset
 
@@ -85,6 +85,13 @@ class CourseRequest:
     issues: list[Issue]  # the issues that sit on this request
 
 
+@dataclass(frozen=True)
+class CheckRow:
+    check: Check
+    enabled: bool
+    student_count: int  # students it flags now, counted even while it is off
+
+
 Atomic = Callable[[], AbstractContextManager[object]]
 
 
@@ -113,10 +120,11 @@ class CourseService:
         catalog = self._catalog()
         by_student = self._active_by_student()
         reviews = self.store.list_reviews()
+        rules = self._rules()
         rows = []
         for student in self.sis.students():
             requests = by_student.get(student.id, [])
-            issues = check_student(student, requests, catalog)
+            issues = check_student(student, requests, catalog, rules)
             review = reviews.get(student.id) or self.store.get_review(student.id)
             rows.append(
                 StudentRow(
@@ -141,7 +149,7 @@ class CourseService:
             status=review.status,
             hold_reason=review.hold_reason,
             requests=[RequestView(r, catalog.get(r.course_code)) for r in shown],
-            issues=check_student(student, requests, catalog),
+            issues=check_student(student, requests, catalog, self._rules()),
         )
 
     def courses(self) -> tuple[list[CatalogCourseRow], list[UnknownCourseRow]]:
@@ -180,12 +188,13 @@ class CourseService:
         requests = self.store.list_active(course_code=course_code)
         if course_code not in catalog and not requests:
             raise NotFound(f"No course with code {course_code}.")
+        rules = self._rules()
         issues_by_student: dict[str, tuple[Student, list[Issue]]] = {}
         for student_id in {r.student_id for r in requests}:
             student = self._student(student_id)
             issues_by_student[student_id] = (
                 student,
-                check_student(student, self.store.list_active(student_id), catalog),
+                check_student(student, self.store.list_active(student_id), catalog, rules),
             )
         rows = []
         for request in requests:
@@ -200,6 +209,21 @@ class CourseService:
         return sorted(
             rows, key=lambda row: (row.student.name, row.request.request.type != "priority")
         )
+
+    def checks(self) -> list[CheckRow]:
+        """Every check, whether it is on, and how many students it flags now (Q20)."""
+        catalog = self._catalog()
+        by_student = self._active_by_student()
+        students = self.sis.students()
+        disabled = self.store.disabled_checks()
+        return [
+            CheckRow(
+                check,
+                check.id not in disabled,
+                sum(bool(check.rule(s, by_student.get(s.id, []), catalog)) for s in students),
+            )
+            for check in CHECKS
+        ]
 
     # Writes
 
@@ -254,6 +278,17 @@ class CourseService:
             raise Invalid("Say why the student is on hold.") from None
         return replace(detail, status=review.status, hold_reason=review.hold_reason)
 
+    def set_check(self, rule: str, enabled: bool) -> list[CheckRow]:
+        """Switch a warning on or off for everyone. Errors stay on (Q5). Not a request edit,
+        so no student is reopened (Q3)."""
+        check = next((c for c in CHECKS if c.id == rule), None)
+        if check is None:
+            raise NotFound(f"No check called {rule}.")
+        if check.locked and not enabled:
+            raise Conflict(f"{check.name} is always on.")
+        self.store.set_check(rule, enabled)
+        return self.checks()
+
     def reset(self) -> SisImport:
         self.reseed()
         return self.sis.current_import()
@@ -286,6 +321,11 @@ class CourseService:
         for request in self.store.list_active():
             grouped[request.student_id].append(request)
         return grouped
+
+    def _rules(self) -> list[Rule]:
+        """The switched-on rules, in rule order (Q20)."""
+        disabled = self.store.disabled_checks()
+        return [check.rule for check in CHECKS if check.id not in disabled]
 
     def _catalog(self) -> dict[str, Course]:
         return {course.code: course for course in self.sis.catalog()}

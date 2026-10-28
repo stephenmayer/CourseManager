@@ -1,4 +1,4 @@
-"""RequestStore: the app-owned data (requests and reviews). SQLite today (Q8)."""
+"""RequestStore: the app-owned data (requests, reviews, check settings). SQLite today (Q8)."""
 
 import sqlite3
 from typing import Final, Protocol
@@ -39,6 +39,8 @@ class RequestStore(Protocol):
     def set_review(
         self, student_id: str, status: ReviewStatus, hold_reason: str | None = None
     ) -> Review: ...
+    def disabled_checks(self) -> set[str]: ...
+    def set_check(self, rule: str, enabled: bool) -> None: ...
 
 
 ACTIVE = "removed_at IS NULL"
@@ -145,6 +147,19 @@ class SqliteRequestStore:
             (student_id, status, hold_reason if status == "on_hold" else None, now()),
         )
         return self.get_review(student_id)
+
+    def disabled_checks(self) -> set[str]:
+        """Rule ids switched off on the Settings screen (Q20); no row means on."""
+        rows = self.conn.execute("SELECT rule FROM check_setting WHERE NOT enabled").fetchall()
+        return {row["rule"] for row in rows}
+
+    def set_check(self, rule: str, enabled: bool) -> None:
+        self.conn.execute(
+            "INSERT INTO check_setting (rule, enabled, updated_at) VALUES (?, ?, ?)"
+            " ON CONFLICT (rule) DO UPDATE SET enabled = excluded.enabled,"
+            " updated_at = excluded.updated_at",
+            (rule, int(enabled), now()),
+        )
 
     def _write(self, sql: str, args: tuple[object, ...], request_id: str) -> Request:
         """Run one UPDATE on a request and return it; KeyError if the id is unknown."""
