@@ -1390,12 +1390,10 @@ a:hover {
   cursor: progress;
 }
 
-.check-error {
+.check-row .error-text {
   grid-column: 1 / -1;
-  margin: 0;
   font-size: 13px;
   font-weight: 500;
-  color: var(--err-text);
 }
 
 .check-footnote {

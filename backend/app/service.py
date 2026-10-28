@@ -12,7 +12,16 @@ from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
 
 from app.models import Course, CourseCounts, Request, RequestType, ReviewStatus, SisImport, Student
-from app.rules import CHECKS, Check, Issue, Rule, check_student, duplicate_course, first_name
+from app.rules import (
+    CHECKS,
+    RULES,
+    Check,
+    Issue,
+    Rule,
+    check_student,
+    duplicate_course,
+    first_name,
+)
 from app.sis.reader import SisSource
 from app.store import UNSET, HoldReasonRequired, RequestStore, Unset
 
@@ -214,16 +223,12 @@ class CourseService:
         """Every check, whether it is on, and how many students it flags now (Q20)."""
         catalog = self._catalog()
         by_student = self._active_by_student()
-        students = self.sis.students()
+        flagged: Counter[str] = Counter()
+        for student in self.sis.students():
+            issues = check_student(student, by_student.get(student.id, []), catalog, RULES)
+            flagged.update({issue.rule for issue in issues})
         disabled = self.store.disabled_checks()
-        return [
-            CheckRow(
-                check,
-                check.id not in disabled,
-                sum(bool(check.rule(s, by_student.get(s.id, []), catalog)) for s in students),
-            )
-            for check in CHECKS
-        ]
+        return [CheckRow(check, check.id not in disabled, flagged[check.id]) for check in CHECKS]
 
     # Writes
 

@@ -4,11 +4,11 @@ import { type ReactNode, useId, useState } from "react";
 
 import { api, type Check } from "../api/client";
 import { useLoad } from "../api/useLoad";
+import { plural } from "../courses/format";
 import ErrorText from "../shell/ErrorText";
 
 function flags(count: number): string {
-  if (count === 0) return "Flags no students now";
-  return `Flags ${count} student${count === 1 ? "" : "s"} now`;
+  return count === 0 ? "Flags no students now" : `Flags ${plural(count, "student")} now`;
 }
 
 function LockIcon() {
@@ -30,6 +30,11 @@ function LockIcon() {
   );
 }
 
+const SEVERITY = {
+  error: { pill: "pill-error", label: "Error" },
+  warning: { pill: "pill-warning", label: "Warning" },
+} as const;
+
 interface RowProps {
   check: Check;
   saving: boolean;
@@ -39,14 +44,12 @@ interface RowProps {
 
 function CheckRow({ check, saving, error, onToggle }: RowProps) {
   const off = !check.enabled;
+  const severity = SEVERITY[check.severity];
   return (
     <div className={`check-row${off ? " off" : ""}`}>
       <div className="check-text">
         <div className="check-name">
-          {check.name}{" "}
-          <span className={`pill ${check.severity === "error" ? "pill-error" : "pill-warning"}`}>
-            {check.severity === "error" ? "Error" : "Warning"}
-          </span>
+          {check.name} <span className={`pill ${severity.pill}`}>{severity.label}</span>
         </div>
         <div className="check-desc">
           {check.description}
@@ -73,11 +76,7 @@ function CheckRow({ check, saving, error, onToggle }: RowProps) {
           />
         </div>
       )}
-      {error && (
-        <p role="alert" className="check-error">
-          {error}
-        </p>
-      )}
+      <ErrorText message={error} />
     </div>
   );
 }
@@ -106,20 +105,13 @@ export default function SettingsPage() {
   const toggle = (check: Check) => {
     setSaving(check.rule);
     setError(null);
-    api.setCheck(check.rule, !check.enabled).then(
-      (list) => {
-        setSaved(list);
-        setSaving(null);
-      },
-      () => {
+    api
+      .setCheck(check.rule, !check.enabled)
+      .then(setSaved, () => {
         const state = check.enabled ? "on" : "off";
-        setError({
-          rule: check.rule,
-          message: `Couldn't save. ${check.name} is still ${state}. Try again.`,
-        });
-        setSaving(null);
-      },
-    );
+        setError({ rule: check.rule, message: `Couldn't save. ${check.name} is still ${state}. Try again.` });
+      })
+      .finally(() => setSaving(null));
   };
 
   const rows = (severity: Check["severity"]) =>
