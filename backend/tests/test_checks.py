@@ -1,9 +1,11 @@
 """Q20: the Checks screen switches each warning on or off for the whole tool; errors stay on."""
 
+from sqlite3 import Connection
 from typing import Any
 
 from fastapi.testclient import TestClient
 
+from app.store import SqliteRequestStore
 from tests.test_api import request_id, set_status, student
 
 
@@ -140,3 +142,12 @@ def test_reset_switches_every_check_back_on(client: TestClient) -> None:
     client.post("/api/reset")
 
     assert all(c["enabled"] for c in checks(client).values())
+
+
+def test_a_stored_off_row_cannot_switch_an_error_off(client: TestClient, conn: Connection) -> None:
+    """Q5: errors stay on even if a row says otherwise (written directly, or a rule that later
+    became an error)."""
+    SqliteRequestStore(conn).set_check("unknown_course", False)
+
+    assert rules_on(client, "S008") == ["duplicate_course", "unknown_course"]
+    assert checks(client)["unknown_course"]["enabled"] is True

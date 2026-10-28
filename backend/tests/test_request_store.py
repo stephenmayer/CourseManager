@@ -178,3 +178,21 @@ def test_ensure_seeded_loads_an_empty_file_once(tmp_path: Path) -> None:
 
     assert SqliteRequestStore(second).get_review("S001").status == "done"
     second.close()
+
+
+def test_ensure_seeded_adds_check_settings_to_an_older_file(tmp_path: Path) -> None:
+    """A database made before Q20 has no check_setting table; startup adds it, keeping data."""
+    path = tmp_path / "old.sqlite3"
+    old = connect(path)
+    ensure_seeded(old, SeedFileSource())
+    SqliteRequestStore(old).set_review("S001", "done")
+    old.execute("DROP TABLE check_setting")
+    old.close()
+
+    reopened = connect(path)
+    ensure_seeded(reopened, SeedFileSource())
+
+    store = SqliteRequestStore(reopened)
+    assert store.disabled_checks() == set()
+    assert store.get_review("S001").status == "done"
+    reopened.close()

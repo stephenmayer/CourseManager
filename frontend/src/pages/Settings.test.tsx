@@ -153,6 +153,15 @@ test("the switch is disabled while its save is in flight", async () => {
   expect(toggle).toBeDisabled();
 });
 
+test("every switch waits while one save is in flight, so saves land in order", async () => {
+  mocked.setCheck.mockReturnValue(new Promise(() => {}));
+  await renderPage();
+
+  fireEvent.click(within(rowFor("Heavy AP load")).getByRole("switch"));
+
+  for (const toggle of screen.getAllByRole("switch")) expect(toggle).toBeDisabled();
+});
+
 test("when the checks can't be loaded the page says so", async () => {
   mocked.checks.mockRejectedValue(new ApiError("Can't reach the CourseManager server."));
   await renderPage();
