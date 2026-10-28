@@ -41,3 +41,4 @@ Shown to the reviewer to explain where the product goes next. Each board carries
 | `AddonAlternates.dc.html` | Ranked backups under electives; backups counted apart on Courses | Q16 |
 | `AddonDidYouMean.dc.html` | Suggested fix for unknown or duplicate SIS codes, confirmed by the counselor | Q5 option D |
 | `AddonProvisional.dc.html` | Students not in the SIS yet: provisional record, matched on sync with counselor confirmation | Q17 |
+| `AddonSisConflict.dc.html` | SIS changes to review: a later import disagrees with the counselor's edit; side-by-side SIS before / yours / SIS now; keep mine or use SIS; blocks Done (proposal) | Q2, Q18, Q19 |
