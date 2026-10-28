@@ -139,7 +139,7 @@ CREATE TABLE sis_request (
 ```
 
 - **An import is a Q13 sync run.** The table replaces the earlier `sync_run`. Its states are Timely's job states (Q13, Q14).
-- **One row per student per import is history, not duplicates.** The app reads only the current import; requests and reviews key on the SIS student ID, never on an import's copy. Storage grows as students × imports (about 730,000 rows a year for 2,000 students synced nightly). At scale, store a new row only when a record changes, with valid-from and valid-to import IDs; the prototype keeps full snapshots.
+- **One row per student per import is history, not duplicates.** The app reads only the current import; requests and reviews key on the SIS student ID, never on an import's copy. Storage grows as students × imports (about 730,000 rows a year for 2,000 students synced nightly). Full snapshots are kept in production too (Stephen, 2026-10-28; [SIS design D4](../sis-sync-design.md#2-key-decisions)); retention bounds the growth.
 - **An errored import is never marked current**, so a failed run changes nothing anyone sees.
 - **The sis_key is student + course + an occurrence counter** when the SIS sends no request ID. Type is not part of the key, so a SIS change from priority to elective is a type change on the same request. The counter (`1`, `2`) only separates duplicates like Aisha's two SS402 rows, which are already errors (Q5); if the SIS reorders duplicates, they may swap keys, which is acceptable for rows that block Done anyway.
 - **`sis_import.id` is the internal version ID.** Every request records the import it last agreed with (`base_import_id`).
