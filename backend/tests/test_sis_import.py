@@ -2,7 +2,8 @@ from sqlite3 import Connection
 
 import pytest
 
-from app.db import connect, reset
+from app.db import connect
+from app.seed import reset
 from app.sis.export import RawExport
 from app.sis.loader import load_import
 from app.sis.reader import SqliteSisSource

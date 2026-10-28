@@ -3,15 +3,16 @@ import sqlite3
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
-from app.db import connect, ensure_seeded, reset
-from app.models import Course, ReviewStatus, SisImport
-from app.rules import Issue
+from app.db import connect
+from app.models import RequestSource, RequestType, ReviewStatus
+from app.rules import Severity
+from app.seed import ensure_seeded, reset
 from app.service import (
     CourseRow,
     CourseService,
@@ -25,19 +26,22 @@ from app.store import UNSET, SqliteRequestStore
 
 DEFAULT_DB = Path(__file__).resolve().parents[1] / "data" / "coursemanager.sqlite3"
 
-RequestTypeIn = Literal["priority", "elective"]
+
+# Response shapes. Models that mirror a domain dataclass read it directly (from_attributes),
+# so a new field is added in two places, not three.
 
 
-# Response shapes
+class FromDomain(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
 
 
-class ImportOut(BaseModel):
+class ImportOut(FromDomain):
     id: int
     received_at: str
     source: str
 
 
-class CourseOut(BaseModel):
+class CourseOut(FromDomain):
     code: str
     name: str
     department: str
@@ -52,14 +56,14 @@ class RequestOut(BaseModel):
     department: str | None
     grades: list[int] | None
     is_ap: bool | None
-    type: str
-    source: str
+    type: RequestType
+    source: RequestSource
     edited_in_app: bool
     reason: str | None
 
 
-class IssueOut(BaseModel):
-    severity: str
+class IssueOut(FromDomain):
+    severity: Severity
     rule: str
     message: str
     detail: str
@@ -68,23 +72,21 @@ class IssueOut(BaseModel):
     kept: bool
 
 
-class StudentDetailOut(BaseModel):
+class StudentOut(BaseModel):
     id: str
     name: str
     grade: int
     profile: str
     status: ReviewStatus
+
+
+class StudentDetailOut(StudentOut):
     hold_reason: str | None
     requests: list[RequestOut]
     issues: list[IssueOut]
 
 
-class StudentRowOut(BaseModel):
-    id: str
-    name: str
-    grade: int
-    profile: str
-    status: ReviewStatus
+class StudentRowOut(StudentOut):
     priority_count: int
     elective_count: int
     error_count: int
@@ -127,11 +129,11 @@ class CourseRequestOut(BaseModel):
 
 class AddRequestIn(BaseModel):
     course_code: str
-    type: RequestTypeIn = "elective"  # the design adds as elective; switch on the list
+    type: RequestType = "elective"  # the design adds as elective; switch on the list
 
 
 class UpdateRequestIn(BaseModel):
-    type: RequestTypeIn | None = None
+    type: RequestType | None = None
     reason: str | None = Field(default=None, description="Omit to leave unchanged; null clears")
 
 
@@ -141,20 +143,6 @@ class ReviewIn(BaseModel):
 
 
 # Mapping
-
-
-def import_out(sis_import: SisImport) -> ImportOut:
-    return ImportOut(id=sis_import.id, received_at=sis_import.received_at, source=sis_import.source)
-
-
-def course_out(course: Course) -> CourseOut:
-    return CourseOut(
-        code=course.code,
-        name=course.name,
-        department=course.department,
-        grades=course.grades,
-        is_ap=course.is_ap,
-    )
 
 
 def request_out(view: RequestView) -> RequestOut:
@@ -173,18 +161,6 @@ def request_out(view: RequestView) -> RequestOut:
     )
 
 
-def issue_out(issue: Issue) -> IssueOut:
-    return IssueOut(
-        severity=issue.severity,
-        rule=issue.rule,
-        message=issue.message,
-        detail=issue.detail,
-        request_id=issue.request_id,
-        related_request_id=issue.related_request_id,
-        kept=issue.kept,
-    )
-
-
 def detail_out(detail: StudentDetail) -> StudentDetailOut:
     s = detail.student
     return StudentDetailOut(
@@ -195,7 +171,7 @@ def detail_out(detail: StudentDetail) -> StudentDetailOut:
         status=detail.status,
         hold_reason=detail.hold_reason,
         requests=[request_out(v) for v in detail.requests],
-        issues=[issue_out(i) for i in detail.issues],
+        issues=[IssueOut.model_validate(i) for i in detail.issues],
     )
 
 
@@ -225,7 +201,7 @@ async def health() -> dict[str, str]:
 
 @api.get("/sis/current-import")
 async def current_import(service: Service) -> ImportOut:
-    return import_out(service.current_import())
+    return ImportOut.model_validate(service.current_import())
 
 
 @api.get("/students")
@@ -277,7 +253,7 @@ async def set_review(student_id: str, body: ReviewIn, service: Service) -> Stude
 
 @api.get("/catalog")
 async def catalog(service: Service) -> list[CourseOut]:
-    return [course_out(c) for c in service.catalog()]
+    return [CourseOut.model_validate(c) for c in service.catalog()]
 
 
 @api.get("/courses")
@@ -286,8 +262,14 @@ async def courses(service: Service) -> CoursesOut:
     return CoursesOut(
         courses=[
             CatalogCourseCountOut(
-                **count_out(row).model_dump(),
-                **course_out(row.course).model_dump(exclude={"code"}),
+                code=row.code,
+                name=row.course.name,
+                department=row.course.department,
+                grades=row.course.grades,
+                is_ap=row.course.is_ap,
+                priority=row.counts.priority,
+                elective=row.counts.elective,
+                total=row.counts.total,
             )
             for row in in_catalog
             if row.course is not None
@@ -303,7 +285,7 @@ async def course_requests(course_code: str, service: Service) -> list[CourseRequ
             student_id=row.student.id,
             student_name=row.student.name,
             request=request_out(row.request),
-            issues=[issue_out(i) for i in row.issues],
+            issues=[IssueOut.model_validate(i) for i in row.issues],
         )
         for row in service.course_requests(course_code)
     ]
@@ -311,7 +293,7 @@ async def course_requests(course_code: str, service: Service) -> list[CourseRequ
 
 @api.post("/reset")
 async def reset_data(service: Service) -> ImportOut:
-    return import_out(service.reset())
+    return ImportOut.model_validate(service.reset())
 
 
 # App

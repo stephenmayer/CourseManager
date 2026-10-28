@@ -1,11 +1,12 @@
 """The checks: pure functions (student, active requests, catalog) -> issues (overview §3).
 
 Run on every read and never stored. Adding a rule = one function here, added to RULES,
-plus its tests.
+plus its tests. A rule only names the request an issue sits on; check_student marks a
+warning kept when that request has a reason, so every warning rule gets that for free.
 """
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Literal
 
 from app.models import Course, Request, Student
@@ -34,7 +35,7 @@ class Issue:
     detail: str
     request_id: str | None = None
     related_request_id: str | None = None
-    kept: bool = False  # a warning whose request carries a reason (Q1)
+    kept: bool = False  # a warning whose request carries a reason (Q1); set by check_student
 
 
 def unknown_course(student: Student, requests: list[Request], catalog: Catalog) -> list[Issue]:
@@ -101,7 +102,6 @@ def out_of_grade(student: Student, requests: list[Request], catalog: Catalog) ->
                 ),
                 detail=KEEP_IT,
                 request_id=r.id,
-                kept=bool(r.reason),
             )
         )
     return issues
@@ -142,7 +142,6 @@ def ap_load(student: Student, requests: list[Request], catalog: Catalog) -> list
             message=f"{len(aps)} AP courses is a heavy load for one year.",
             detail=KEEP_IT,
             request_id=last.id,
-            kept=bool(last.reason),
         )
     ]
 
@@ -153,7 +152,14 @@ RULES: list[Rule] = [unknown_course, duplicate_course, out_of_grade, core_subjec
 
 def check_student(student: Student, requests: list[Request], catalog: Catalog) -> list[Issue]:
     """All issues for one student's active requests: errors first, then warnings."""
-    issues = [issue for rule in RULES for issue in rule(student, requests, catalog)]
+    reasons = {r.id: r.reason for r in requests}
+    issues = [
+        replace(issue, kept=bool(reasons.get(issue.request_id or "")))
+        if issue.severity == "warning"
+        else issue
+        for rule in RULES
+        for issue in rule(student, requests, catalog)
+    ]
     return sorted(issues, key=lambda issue: issue.severity != "error")
 
 

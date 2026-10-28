@@ -3,7 +3,8 @@ from sqlite3 import Connection
 
 import pytest
 
-from app.db import connect, reset
+from app.db import connect
+from app.seed import reset
 from app.sis.export import SeedFileSource
 
 

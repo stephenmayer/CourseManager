@@ -121,13 +121,14 @@ class CourseService:
         like every other read, so they always agree with the student list (S16).
         """
         counts = self.store.counts_by_course()
-        catalog = self.sis.catalog()
-        known = {course.code for course in catalog}
-        in_catalog = [CourseRow(c.code, c, counts.get(c.code, CourseCounts(0, 0))) for c in catalog]
+        catalog = self._catalog()
+        in_catalog = [
+            CourseRow(c.code, c, counts.get(c.code, CourseCounts(0, 0))) for c in catalog.values()
+        ]
         not_in_catalog = [
             CourseRow(code, None, count)
             for code, count in sorted(counts.items())
-            if code not in known
+            if code not in catalog
         ]
         return in_catalog, not_in_catalog
 
