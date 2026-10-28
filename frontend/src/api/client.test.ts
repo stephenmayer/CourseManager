@@ -43,6 +43,14 @@ test("currentImport reads the current SIS import", async () => {
   expect(fetchMock).toHaveBeenCalledWith("/api/sis/current-import", expect.anything());
 });
 
+test("students reads the student list", async () => {
+  const list = { sis_as_of: "2026-10-28T13:05:00Z", students: [] };
+  const fetchMock = stubFetch(async () => jsonResponse(list));
+
+  await expect(api.students()).resolves.toEqual(list);
+  expect(fetchMock).toHaveBeenCalledWith("/api/students", expect.anything());
+});
+
 test("an error response surfaces the server's plain message", async () => {
   stubFetch(async () => jsonResponse({ detail: "Student S999 was not found." }, 404));
 

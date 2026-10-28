@@ -12,6 +12,7 @@ vi.mock("./api/client", async (importOriginal) => {
     // Screens' own reads never settle here unless a test says so; their tests cover them.
     api: {
       currentImport: vi.fn(),
+      students: vi.fn(),
       courses: vi.fn(() => new Promise(() => {})),
       courseRequests: vi.fn(() => new Promise(() => {})),
       student: vi.fn(),
@@ -23,6 +24,7 @@ vi.mock("./api/client", async (importOriginal) => {
 const currentImport = vi.mocked(api.currentImport);
 const student = vi.mocked(api.student);
 const catalog = vi.mocked(api.catalog);
+const students = vi.mocked(api.students);
 
 function systemPrefersDark(dark: boolean) {
   vi.stubGlobal(
@@ -67,6 +69,7 @@ beforeEach(() => {
     issues: [],
   });
   catalog.mockResolvedValue([]);
+  students.mockResolvedValue({ sis_as_of: "2026-10-28T13:05:00Z", students: [] });
   systemPrefersDark(false);
 });
 

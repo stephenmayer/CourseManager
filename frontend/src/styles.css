@@ -1016,3 +1016,222 @@ a:hover {
   color: var(--accent-text);
   font-weight: 600;
 }
+
+/* Student list (Main.dc.html). Scoped so other screens' classes can't collide. */
+.student-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.student-list .page-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.student-list .page-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+}
+
+.student-list .page-title p {
+  margin: 0;
+}
+
+.student-list .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.student-list .field label,
+.student-list .chip-row-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.student-list .field input {
+  width: 280px;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.student-list .filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.student-list .chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.student-list .chip-row-label {
+  min-width: 64px;
+}
+
+.student-list .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.student-list .chip[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.student-list .chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tone-fg);
+}
+
+.student-list .table-frame {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.student-list .data-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+}
+
+.student-list .data-table th {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.student-list .data-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.student-list .data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.student-list .data-table tbody tr:hover {
+  background: var(--row-hi);
+}
+
+.student-list .student-link {
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+.student-list .cell-sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.student-list .profile-cell {
+  max-width: 320px;
+}
+
+.student-list .link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.student-list .link-button:hover {
+  text-decoration: underline;
+}
+
+.student-list .empty-row {
+  text-align: center;
+  color: var(--muted);
+}
+
+.student-list .pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+}
+
+/* One tone per meaning, shared by pills and chip dots. */
+.student-list .tone-error {
+  --tone-bg: var(--err-bg);
+  --tone-fg: var(--err-text);
+}
+
+.student-list .tone-warn {
+  --tone-bg: var(--warn-bg);
+  --tone-fg: var(--warn-text);
+}
+
+.student-list .tone-ok,
+.student-list .status-done {
+  --tone-bg: var(--ok-bg);
+  --tone-fg: var(--ok-text);
+}
+
+.student-list .status-not_started {
+  --tone-bg: var(--neutral-bg);
+  --tone-fg: var(--neutral-text);
+}
+
+.student-list .status-in_progress {
+  --tone-bg: var(--accent-soft);
+  --tone-fg: var(--accent-text);
+}
+
+.student-list .status-on_hold {
+  --tone-bg: var(--hold-bg);
+  --tone-fg: var(--hold-text);
+}
+
+.student-list .error-text {
+  margin: 0;
+  color: var(--err-text);
+}
+
+.student-list .footnote {
+  margin: 0;
+  font-size: 12px;
+}
