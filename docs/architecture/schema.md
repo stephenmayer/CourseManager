@@ -174,6 +174,13 @@ CREATE TABLE review (
   updated_at  TEXT NOT NULL,
   CHECK (status <> 'on_hold' OR hold_reason IS NOT NULL)   -- Q3
 );
+
+-- Q20: a row only for a check someone switched off or back on; no row means on
+CREATE TABLE check_setting (
+  rule       TEXT PRIMARY KEY,   -- a rule id from app/rules.py, e.g. 'core_subject'
+  enabled    INTEGER NOT NULL,
+  updated_at TEXT NOT NULL
+);
 ```
 
 Choices worth reviewing:
@@ -190,7 +197,7 @@ Choices worth reviewing:
 
 | Derived | Computed from | Used by |
 | --- | --- | --- |
-| Issues (errors and warnings) | Current-import student and catalog + active requests, via the pure rule functions (overview §3) | Student detail, check pills, Done gate, checks filter |
+| Issues (errors and warnings) | Current-import student and catalog + active requests, via the switched-on rule functions (overview §3, Q20) | Student detail, check pills, Done gate, checks filter |
 | Student list row | Student + review + request counts + issue counts | Screen 1 |
 | Course counts (P, E, total) and the "Not in catalog" row | Active requests grouped by course and type, joined to the current catalog in code | Screen 3 (Q12) |
 | Course dialog list | Active requests for one course code, with student names | Course dialog |

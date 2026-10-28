@@ -64,6 +64,8 @@ Each rule is a pure function `(student, requests, catalog) → issues`, run on e
 | No priority course in a core subject | warning | none until one is removed | [Q4](../decisions/q004-priority-core-check.md) |
 | Heavy AP load (more than 3 APs) | warning, kept with a reason | S006, S009 (5 each) | M2; threshold is an assumption to state |
 
+Checks on and off ([Q20](../decisions/q020-checks-on-off.md)): a Checks screen switches each warning off for the whole tool; the two errors stay on. The service passes only the switched-on rules to `check_student`, so the rules stay pure and nothing is stored about issues. Reset turns every check back on.
+
 Status rules ([Q3](../decisions/q003-student-review-status.md)): Done is refused while any error remains; editing a Done student moves it to In progress; On hold requires a reason.
 
 Designed but not built ([Q15](../decisions/q015-history-and-grad-rules.md)): a graduation progress rule (rules minus earned minus requested credits) that replaces the Q4 core check once transcripts and rules exist, and enables prerequisite checks and a "fills a gap" catalog filter.

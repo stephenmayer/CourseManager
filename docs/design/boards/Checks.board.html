@@ -1,0 +1,314 @@
+<title>Checks Screen Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: a review board. Board chrome on top, then app frames drawn with the app's own tokens
+   (frontend/src/styles.css), each frame pinned to light or dark, then the copy and the one open choice. */
+:root {
+  --b-bg: #eef0f4;
+  --b-surface: #ffffff;
+  --b-text: #1a1d23;
+  --b-muted: #5b6270;
+  --b-border: #d9dde4;
+  --b-accent: #2457c5;
+  --b-accent-soft: #eaf0fc;
+  --font: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --b-bg: #0b0d11; --b-surface: #151820; --b-text: #e8eaed; --b-muted: #a3aab6;
+    --b-border: #2a2f3a; --b-accent: #7aa2f7; --b-accent-soft: #1c2a47; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --b-bg: #0b0d11; --b-surface: #151820; --b-text: #e8eaed; --b-muted: #a3aab6;
+  --b-border: #2a2f3a; --b-accent: #7aa2f7; --b-accent-soft: #1c2a47; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--b-bg); color: var(--b-text); font-family: var(--font); font-size: 14px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.board { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+.board-head { display: flex; flex-direction: column; gap: 8px; max-width: 760px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--b-muted); }
+h1 { font-size: 28px; line-height: 1.2; margin: 0; text-wrap: balance; }
+h2 { font-size: 18px; margin: 0; text-wrap: balance; }
+.board p { margin: 0; }
+.lede { color: var(--b-muted); font-size: 15px; }
+.section { display: flex; flex-direction: column; gap: 14px; }
+.section-head { display: flex; flex-direction: column; gap: 4px; max-width: 760px; }
+.section-head p { color: var(--b-muted); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr)); gap: 24px; }
+.states { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 24px; align-items: start; }
+.caption { font-size: 13px; color: var(--b-muted); display: flex; gap: 8px; align-items: baseline; }
+.caption b { color: var(--b-text); font-weight: 600; }
+.frame-wrap { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.notes { background: var(--b-surface); border: 1px solid var(--b-border); border-radius: 10px; padding: 20px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; }
+.notes h3 { font-size: 14px; margin: 0 0 8px; }
+.notes ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.copy-table-wrap { overflow-x: auto; background: var(--b-surface); border: 1px solid var(--b-border); border-radius: 10px; }
+.copy-table { border-collapse: collapse; width: 100%; min-width: 640px; }
+.copy-table th, .copy-table td { text-align: left; padding: 10px 16px; border-bottom: 1px solid var(--b-border); vertical-align: top; }
+.copy-table th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--b-muted); font-weight: 600; }
+.copy-table tr:last-child td { border-bottom: 0; }
+.copy-table td:first-child { color: var(--b-muted); white-space: nowrap; }
+.choice { background: var(--b-accent-soft); border: 1px solid var(--b-border); border-radius: 10px; padding: 18px 22px; display: flex; flex-direction: column; gap: 8px; max-width: 860px; }
+
+/* ---------- App frames: the app's tokens, pinned per frame ---------- */
+.app {
+  --bg: #f6f7f9; --surface: #ffffff; --text: #1a1d23; --muted: #5b6270; --border: #e2e5ea; --border-strong: #b8bec8;
+  --accent: #2457c5; --accent-soft: #eaf0fc; --accent-text: #1d4aaa; --err-bg: #fef3f2; --err-text: #b42318;
+  --warn-bg: #fff6e5; --warn-text: #93370d; --neutral-bg: #f0f2f5; --neutral-text: #3f4652;
+  --on-accent: #ffffff; --disabled-bg: #e2e5ea; --disabled-text: #6b7280; --zero: #9aa1ad;
+  color-scheme: light;
+  background: var(--bg); color: var(--text); border: 1px solid var(--b-border); border-radius: 12px; overflow: hidden;
+  font-size: 14px; min-width: 0;
+}
+.app.dark {
+  --bg: #0f1115; --surface: #171a21; --text: #e8eaed; --muted: #a3aab6; --border: #2a2f3a; --border-strong: #4a5262;
+  --accent: #7aa2f7; --accent-soft: #1c2a47; --accent-text: #a9c2fa; --err-bg: #3a1d1b; --err-text: #fda29b;
+  --warn-bg: #3a2a12; --warn-text: #fec84b; --neutral-bg: #242934; --neutral-text: #c9ced6;
+  --on-accent: #0f1115; --disabled-bg: #242934; --disabled-text: #7d8594; --zero: #5f6775;
+  color-scheme: dark;
+}
+.app-header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 10px 24px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; }
+.logo svg { color: var(--accent); }
+.nav { display: flex; gap: 4px; }
+.nav span { padding: 7px 12px; border-radius: 8px; color: var(--muted); font-weight: 500; }
+.nav span[aria-current] { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+.spacer { flex-grow: 1; }
+.hdr-muted { color: var(--muted); font-size: 13px; }
+.app-main { padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.app-title { display: flex; flex-direction: column; gap: 4px; }
+.app-title h3 { font-size: 22px; margin: 0; }
+.app-title p { margin: 0; color: var(--muted); max-width: 68ch; }
+.group { display: flex; flex-direction: column; gap: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.group-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); flex-wrap: wrap; }
+.group-head small { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 13px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 20px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.row:last-child { border-bottom: 0; }
+.row-name { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 600; }
+.row-desc { color: var(--muted); max-width: 64ch; }
+.row-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.row-meta { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.row.off .row-name, .row.off .row-desc { color: var(--disabled-text); }
+.pill { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.pill.err { background: var(--err-bg); color: var(--err-text); }
+.pill.warn { background: var(--warn-bg); color: var(--warn-text); }
+.pill.neutral { background: var(--neutral-bg); color: var(--neutral-text); }
+.lock { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+.switch-cell { display: flex; align-items: center; gap: 10px; }
+.switch-label { font-size: 13px; font-weight: 600; min-width: 24px; color: var(--text); }
+.row.off .switch-label { color: var(--muted); }
+.switch { position: relative; width: 44px; height: 26px; border-radius: 999px; border: 0; padding: 0; cursor: pointer; background: var(--border-strong); flex: none; }
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); transition: transform 0.15s; }
+.switch[aria-checked="true"]::after { transform: translateX(18px); }
+.switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.switch[disabled] { opacity: 0.6; cursor: progress; }
+.row-error { grid-column: 1 / -1; color: var(--err-text); font-size: 13px; font-weight: 500; }
+.footnote { color: var(--muted); font-size: 13px; }
+.skeleton { height: 14px; border-radius: 6px; background: var(--neutral-bg); }
+.narrow { max-width: 390px; }
+.narrow .app-header { padding: 10px 16px; }
+.narrow .app-main { padding: 18px 16px; }
+.narrow .row { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+@media (prefers-reduced-motion: reduce) { .switch::after { transition: none; } }
+</style>
+
+<div class="board">
+  <header class="board-head">
+    <span class="eyebrow">Design board · Q20 · issue 1.12 · for Stephen's approval</span>
+    <h1>Screen 4: Checks</h1>
+    <p class="lede">A Checks page in the header turns each warning on or off for everyone using the tool. The two data errors stay on. Nothing is built until you approve this board. The switches on the frames work, so you can try them.</p>
+  </header>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Mid-use: the core-subject check is switched off</h2>
+      <p>Seed data as of Oct 27. Student counts are what each check flags right now, so you can see who a switch affects before you flip it.</p>
+    </div>
+    <div class="pair">
+      <div class="frame-wrap">
+        <div class="caption"><b>Light</b> 1240 wide</div>
+        <div class="app" data-frame></div>
+      </div>
+      <div class="frame-wrap">
+        <div class="caption"><b>Dark</b> same state</div>
+        <div class="app dark" data-frame></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Other states</h2>
+      <p>Loading, a switch that fails to save, and the smallest width.</p>
+    </div>
+    <div class="states">
+      <div class="frame-wrap">
+        <div class="caption"><b>Loading</b> before the checks arrive</div>
+        <div class="app">
+          <div class="app-main">
+            <div class="app-title"><h3>Checks</h3><p>Loading checks…</p></div>
+            <div class="group">
+              <div class="group-head">Errors</div>
+              <div class="row"><div class="row-text"><div class="skeleton" style="width: 40%"></div><div class="skeleton" style="width: 80%"></div></div></div>
+              <div class="row"><div class="row-text"><div class="skeleton" style="width: 35%"></div><div class="skeleton" style="width: 70%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-wrap">
+        <div class="caption"><b>Save failed</b> the switch goes back</div>
+        <div class="app">
+          <div class="app-main">
+            <div class="group">
+              <div class="group-head">Warnings</div>
+              <div class="row">
+                <div class="row-text">
+                  <div class="row-name">Heavy AP load <span class="pill warn">Warning</span></div>
+                  <div class="row-desc">More than 3 AP courses in one year.</div>
+                  <div class="row-meta">Flags 2 students now</div>
+                </div>
+                <div class="switch-cell"><span class="switch-label">On</span><button class="switch" role="switch" aria-checked="true" aria-label="Heavy AP load" disabled></button></div>
+                <div class="row-error" role="alert">Couldn't save. Heavy AP load is still on. Try again.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-wrap">
+        <div class="caption"><b>Phone width</b> 390, dark</div>
+        <div class="app dark narrow" data-frame data-narrow></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>What changes, and what doesn't</h2>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>When a warning is off</h3>
+        <ul>
+          <li>It disappears from student pages, the course dialog, the student list's check pills, its counts and the "Has warnings" filter.</li>
+          <li>Reasons counselors typed stay on the requests. Switch the check back on and those warnings show as kept again.</li>
+          <li>Done works as before: only errors block it, and errors can't be switched off.</li>
+          <li>The setting is for the whole tool, not per counselor. There are no roles in the prototype (M10).</li>
+          <li>Reset demo data switches every check back on.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Not in this screen</h3>
+        <ul>
+          <li>Editing the rules themselves (which subjects per grade, the AP limit). That is the graduation rules add-on (Q15, #18).</li>
+          <li>Per-grade or per-student switches.</li>
+          <li>A history of who changed a switch. The row stores when it last changed.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Build shape (issue 1.12)</h3>
+        <ul>
+          <li>A <code>check_setting</code> table; no row means on.</li>
+          <li><code>GET /api/checks</code> and <code>PUT /api/checks/{rule}</code>; switching an error off is refused.</li>
+          <li>The service hands only switched-on rules to the checks, so the rules stay pure functions.</li>
+          <li>Header gets a third link, Checks.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>New copy</h2></div>
+    <div class="copy-table-wrap">
+      <table class="copy-table">
+        <thead><tr><th>Where</th><th>Text</th></tr></thead>
+        <tbody>
+          <tr><td>Header link</td><td>Checks</td></tr>
+          <tr><td>Page intro</td><td>Checks run on every student's course requests. Switching a warning off hides it on every screen, for everyone. Errors always stay on because they stop bad data reaching the schedule.</td></tr>
+          <tr><td>Errors group</td><td>Errors · Always on, and they block Done</td></tr>
+          <tr><td>Warnings group</td><td>Warnings · Counselors can keep them with a reason</td></tr>
+          <tr><td>Row count</td><td>Flags 2 students now · Flags no students now</td></tr>
+          <tr><td>Row when off</td><td>Off. Hidden on every screen.</td></tr>
+          <tr><td>Save error</td><td>Couldn't save. Heavy AP load is still on. Try again.</td></tr>
+          <tr><td>Footnote</td><td>Reasons counselors entered are kept. Switch a check back on and those warnings show as kept again.</td></tr>
+          <tr><td>Core subject note</td><td>Our assumption until the school's graduation rules are added.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="choice">
+    <span class="eyebrow">One choice for you</span>
+    <h2>Can the two errors be switched off too?</h2>
+    <p>Recommended: no. Unknown and duplicate courses are bad SIS data, and Q5 has them block Done so they never reach the schedule. Letting them be switched off would let a student be marked Done with SS303 on the list. If you want all five switchable, the errors would get switches like the warnings and the Done gate would follow whatever is on.</p>
+  </section>
+</div>
+
+<script>
+const CHECKS = [
+  { id: "unknown_course", name: "Unknown course", severity: "error", desc: "A requested course code isn't in the course catalog.", count: 1 },
+  { id: "duplicate_course", name: "Course requested twice", severity: "error", desc: "The same course is on a student's list more than once.", count: 1 },
+  { id: "out_of_grade", name: "Course outside its grade", severity: "warning", desc: "A course listed for other grades, like a grade 9 retake for a grade 10 student.", count: 3, on: true },
+  { id: "core_subject", name: "No priority course in a core subject", severity: "warning", desc: "Grades 9 to 11 need a priority course in Math, English, Social Studies and Science; grade 12 in English.", note: "Our assumption until the school's graduation rules are added.", count: 0, on: false },
+  { id: "ap_load", name: "Heavy AP load", severity: "warning", desc: "More than 3 AP courses in one year.", count: 2, on: true },
+];
+
+const flags = (n) => n === 0 ? "Flags no students now" : `Flags ${n} student${n === 1 ? "" : "s"} now`;
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const LOGO = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2"></path><path d="M8 7h8M8 11h6"></path></svg>';
+const LOCK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>';
+
+function row(c, frameId) {
+  const pill = c.severity === "error" ? '<span class="pill err">Error</span>' : '<span class="pill warn">Warning</span>';
+  const meta = c.severity === "warning" && !c.on ? "Off. Hidden on every screen." : flags(c.count);
+  const control = c.severity === "error"
+    ? `<span class="lock">${LOCK}Always on</span>`
+    : `<div class="switch-cell"><span class="switch-label">${c.on ? "On" : "Off"}</span><button id="${frameId}-${c.id}" class="switch" role="switch" aria-checked="${c.on}" aria-label="${esc(c.name)}" data-id="${c.id}"></button></div>`;
+  return `<div class="row${c.severity === "warning" && !c.on ? " off" : ""}">
+    <div class="row-text">
+      <div class="row-name">${esc(c.name)} ${pill}</div>
+      <div class="row-desc">${esc(c.desc)}${c.note ? ` <em>${esc(c.note)}</em>` : ""}</div>
+      <div class="row-meta">${meta}</div>
+    </div>${control}</div>`;
+}
+
+function render(el, state, frameId) {
+  const narrow = el.hasAttribute("data-narrow");
+  const errors = state.filter((c) => c.severity === "error");
+  const warnings = state.filter((c) => c.severity === "warning");
+  el.innerHTML = `
+    <div class="app-header">
+      <div class="logo">${LOGO}<span>CourseManager</span></div>
+      <div class="nav"><span>Students</span><span>Courses</span><span aria-current="page">Checks</span></div>
+      ${narrow ? "" : '<div class="spacer"></div><span class="hdr-muted">2027–28 course requests · SIS data as of Oct 27, 6:00 AM</span>'}
+    </div>
+    <div class="app-main">
+      <div class="app-title"><h3>Checks</h3><p>Checks run on every student's course requests. Switching a warning off hides it on every screen, for everyone. Errors always stay on because they stop bad data reaching the schedule.</p></div>
+      <div class="group"><div class="group-head">Errors <small>Always on, and they block Done</small></div>${errors.map((c) => row(c, frameId)).join("")}</div>
+      <div class="group"><div class="group-head">Warnings <small>Counselors can keep them with a reason</small></div>${warnings.map((c) => row(c, frameId)).join("")}</div>
+      <p class="footnote">Reasons counselors entered are kept. Switch a check back on and those warnings show as kept again.</p>
+    </div>`;
+}
+
+document.querySelectorAll("[data-frame]").forEach((el, i) => {
+  const state = CHECKS.map((c) => ({ ...c }));
+  const frameId = `f${i}`;
+  render(el, state, frameId);
+  el.addEventListener("click", (e) => {
+    const btn = e.target.closest(".switch[data-id]");
+    if (!btn) return;
+    const c = state.find((x) => x.id === btn.dataset.id);
+    c.on = !c.on;
+    render(el, state, frameId);
+    document.getElementById(`${frameId}-${c.id}`)?.focus();
+  });
+});
+</script>
