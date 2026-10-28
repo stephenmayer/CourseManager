@@ -2,8 +2,9 @@ import { Route, Routes } from "react-router";
 
 import CourseDialog from "./courses/CourseDialog";
 import CoursesPage from "./pages/Courses";
-import { NotFoundPage, StudentListPage } from "./pages/Placeholders";
+import NotFoundPage from "./pages/NotFound";
 import StudentDetailPage from "./pages/StudentDetail";
+import StudentListPage from "./pages/StudentList";
 import Header from "./shell/Header";
 import { useTheme } from "./theme";
 
