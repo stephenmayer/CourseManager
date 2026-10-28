@@ -30,7 +30,7 @@ SIS data arrives in three layers (built in 1.2, seams S1):
 Designed, not built (Q15): SisSource gains a transcript feed; a GraduationRules config (per district) joins it.
 ```
 
-The two ports split the data by **who owns it**, which is the exercise's own split: the SIS owns students and the catalog; the app owns what counselors do. That one seam answers "how is the data layer abstracted so the source is easy to swap?" Swapping the seed for a real SIS means writing a new Source that returns the same raw export shape (`app/sis/export.py`); the Loader, `SisSource`, rules and UI do not change. Only the Loader knows the export's quirks (`9/10` grades, `P`/`E`, AP from the name). and is the same seam the SIS sync design hangs off ([Q2](../decisions/q002-request-ownership.md)).
+The two ports split the data by **who owns it**, which is the exercise's own split: the SIS owns students and the catalog; the app owns what counselors do. That one seam answers "how is the data layer abstracted so the source is easy to swap?" Swapping the seed for a real SIS means writing a new Source that returns the same raw export shape (`app/sis/export.py`); the Loader, `SisSource`, rules and UI do not change. Only the Loader knows the export's quirks (`9/10` grades, `P`/`E`, AP from the name). It is also the seam the SIS sync design hangs off ([Q2](../decisions/q002-request-ownership.md)).
 
 ## 2. Data model
 
@@ -73,6 +73,7 @@ Built in 1.3 as `backend/app/rules.py`. Each issue carries a severity, rule id, 
 - The duplicate is reported on each later copy and links the first; the unknown-code and core checks ignore unknown codes, so SS303 raises one error only (S8).
 - The core check has no request to sit on, so it cannot be kept; it clears when a priority course in the subject is added.
 - The heavy AP warning sits on the **last** AP request in the list, so a reason there keeps it. Removing APs below four clears it.
+- The rules always see a student's requests in the order they were added, on every screen, so "the first copy" and "the last AP" name the same request on the student page and in the course dialog. Screens sort for display afterwards.
 
 Adding a rule = one function + its tests. That is the "generalize" story: graduation rules or prerequisites plug in the same way once the data exists.
 

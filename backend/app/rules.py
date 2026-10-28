@@ -47,7 +47,7 @@ def unknown_course(student: Student, requests: list[Request], catalog: Catalog) 
             message=f"{r.course_code} isn't in the course catalog.",
             detail=(
                 "It can't be scheduled. Remove it and add the course "
-                f"{_first_name(student)} meant from the catalog."
+                f"{first_name(student)} meant from the catalog."
             ),
             request_id=r.id,
         )
@@ -71,7 +71,7 @@ def duplicate_course(student: Student, requests: list[Request], catalog: Catalog
                 severity="error",
                 rule="duplicate_course",
                 message=(
-                    f"{name} is already on {_first_name(student)}'s list as a {original.type}."
+                    f"{name} is already on {first_name(student)}'s list as a {original.type}."
                 ),
                 detail="A course can only be requested once. Remove this copy.",
                 request_id=r.id,
@@ -98,7 +98,7 @@ def out_of_grade(student: Student, requests: list[Request], catalog: Catalog) ->
                 rule="out_of_grade",
                 message=(
                     f"{course.name} is a grade {grades} course, and "
-                    f"{_first_name(student)} is going into grade {student.grade}."
+                    f"{first_name(student)} is going into grade {student.grade}."
                 ),
                 detail=KEEP_IT,
                 request_id=r.id,
@@ -163,5 +163,5 @@ def check_student(student: Student, requests: list[Request], catalog: Catalog) -
     return sorted(issues, key=lambda issue: issue.severity != "error")
 
 
-def _first_name(student: Student) -> str:
+def first_name(student: Student) -> str:
     return student.name.split()[0]

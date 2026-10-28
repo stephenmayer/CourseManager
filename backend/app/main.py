@@ -9,16 +9,16 @@ from fastapi import APIRouter, Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.db import connect
+from app.db import connect, transaction
 from app.models import RequestSource, RequestType, ReviewStatus
 from app.rules import Severity
 from app.seed import ensure_seeded, reset
 from app.service import (
-    CourseRow,
     CourseService,
     RequestView,
     ServiceError,
     StudentDetail,
+    UnknownCourseRow,
 )
 from app.sis.export import SeedFileSource
 from app.sis.reader import SqliteSisSource
@@ -175,7 +175,7 @@ def detail_out(detail: StudentDetail) -> StudentDetailOut:
     )
 
 
-def count_out(row: CourseRow) -> CourseCountOut:
+def count_out(row: UnknownCourseRow) -> CourseCountOut:
     c = row.counts
     return CourseCountOut(code=row.code, priority=c.priority, elective=c.elective, total=c.total)
 
@@ -262,7 +262,7 @@ async def courses(service: Service) -> CoursesOut:
     return CoursesOut(
         courses=[
             CatalogCourseCountOut(
-                code=row.code,
+                code=row.course.code,
                 name=row.course.name,
                 department=row.course.department,
                 grades=row.course.grades,
@@ -272,7 +272,6 @@ async def courses(service: Service) -> CoursesOut:
                 total=row.counts.total,
             )
             for row in in_catalog
-            if row.course is not None
         ],
         not_in_catalog=[count_out(row) for row in not_in_catalog],
     )
@@ -304,6 +303,7 @@ def build_service(conn: sqlite3.Connection) -> CourseService:
         sis=SqliteSisSource(conn),
         store=SqliteRequestStore(conn),
         reseed=lambda: reset(conn, SeedFileSource()),
+        atomic=lambda: transaction(conn),
     )
 
 

@@ -397,7 +397,7 @@ def test_a_failed_reopen_rolls_back_the_edit(conn: Connection) -> None:
     def broken(*_args: object, **_kwargs: object) -> None:
         raise RuntimeError("disk full")
 
-    service.store.set_review = broken  # type: ignore[method-assign]
+    service.store.set_review = broken  # type: ignore[method-assign,assignment]
     with pytest.raises(RuntimeError):
         service.remove_request(rid)
 
