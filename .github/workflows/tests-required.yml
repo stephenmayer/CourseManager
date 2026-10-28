@@ -1,0 +1,21 @@
+name: tests-required
+
+# Separate from verify so editing the PR body re-runs only this check.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  tests-required:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: List changed files
+        run: git diff --name-only "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" > "$RUNNER_TEMP/changed.txt"
+      - name: Check app code changes come with tests
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: python3 scripts/ci/tests_required.py "$RUNNER_TEMP/changed.txt"

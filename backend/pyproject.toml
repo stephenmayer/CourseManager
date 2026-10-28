@@ -1,0 +1,42 @@
+[project]
+name = "coursemanager-backend"
+version = "0.1.0"
+description = "CourseManager API: course request management prototype"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.27",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "../scripts/ci"]
+pythonpath = [".", "../scripts/ci"]
+addopts = "-q"
+# Starlette prefers a successor to httpx for TestClient; httpx still works.
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["app", "tests", "../scripts/ci"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "tests_required"]
