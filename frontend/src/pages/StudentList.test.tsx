@@ -175,13 +175,13 @@ test("a long profile shows 40 characters, 'more' expands to 255 and 'less' colla
   expect(row.getByText(LONG_PROFILE.slice(0, 40), { exact: false })).toBeInTheDocument();
   expect(row.queryByText(/B/)).not.toBeInTheDocument();
 
-  fireEvent.click(row.getByRole("button", { name: "more" }));
+  fireEvent.click(row.getByRole("button", { name: "more: Jordan Williams profile" }));
   const expanded = row.getByText(LONG_PROFILE.slice(0, 255), { exact: false });
   expect(expanded.textContent).not.toContain("C");
 
-  fireEvent.click(row.getByRole("button", { name: "less" }));
+  fireEvent.click(row.getByRole("button", { name: "less: Jordan Williams profile" }));
   expect(row.queryByText(/B/)).not.toBeInTheDocument();
-  expect(row.getByRole("button", { name: "more" })).toBeInTheDocument();
+  expect(row.getByRole("button", { name: "more: Jordan Williams profile" })).toBeInTheDocument();
 });
 
 test("a short profile shows in full with no 'more'", async () => {
@@ -189,7 +189,7 @@ test("a short profile shows in full with no 'more'", async () => {
   const row = within(rowFor("Priya Patel"));
 
   expect(row.getByText(SHORT_PROFILE)).toBeInTheDocument();
-  expect(row.queryByRole("button", { name: "more" })).not.toBeInTheDocument();
+  expect(row.queryByRole("button", { name: /^more/ })).not.toBeInTheDocument();
 });
 
 test("a failed load shows the error message", async () => {
@@ -198,4 +198,33 @@ test("a failed load shows the error message", async () => {
   await renderList();
 
   expect(screen.getByRole("alert")).toHaveTextContent("Can't reach the CourseManager server.");
+});
+
+test("an empty import says there are no students, not that none match", async () => {
+  students.mockResolvedValue({ sis_as_of: "2026-10-27T13:00:00Z", students: [] });
+
+  await renderList();
+
+  expect(screen.getByText("No students in the current SIS import")).toBeInTheDocument();
+  expect(screen.queryByText("No students match")).not.toBeInTheDocument();
+});
+
+test("the filters wait for the students to load", async () => {
+  students.mockRejectedValue(new ApiError("Can't reach the CourseManager server."));
+
+  await renderList();
+
+  expect(screen.queryByRole("group", { name: "Filter by status" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("group", { name: "Filter by checks" })).not.toBeInTheDocument();
+});
+
+test("the student link encodes the SIS ID", async () => {
+  students.mockResolvedValue({
+    sis_as_of: "2026-10-27T13:00:00Z",
+    students: [student("A/12#3", "Odd Id", 9, "not_started", [1, 0, 0, 0])],
+  });
+
+  await renderList();
+
+  expect(screen.getByRole("link", { name: "Odd Id" })).toHaveAttribute("href", "/students/A%2F12%233");
 });
