@@ -3,7 +3,7 @@
 import sqlite3
 from uuid import uuid4
 
-from app.db import SCHEMA, TABLES, now, transaction
+from app.db import CHECK_SETTING, SCHEMA, TABLES, now, transaction
 from app.sis.export import ExportSource
 from app.sis.loader import write_import
 
@@ -24,7 +24,7 @@ def reset(conn: sqlite3.Connection, sis: ExportSource) -> None:
 
 
 def ensure_seeded(conn: sqlite3.Connection, sis: ExportSource) -> None:
-    """Seed a new database; leave one that already has a current import alone."""
+    """Seed a new database; leave the data in one that already has a current import alone."""
     has_imports = conn.execute(
         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'sis_import'"
     ).fetchone()
@@ -33,6 +33,8 @@ def ensure_seeded(conn: sqlite3.Connection, sis: ExportSource) -> None:
         or not conn.execute("SELECT 1 FROM sis_import WHERE is_current = 1").fetchone()
     ):
         reset(conn, sis)
+    else:
+        conn.execute(CHECK_SETTING)  # tables added since the file was made
 
 
 def _start_app_data(conn: sqlite3.Connection, import_id: int) -> None:

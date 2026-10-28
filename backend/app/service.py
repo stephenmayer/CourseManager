@@ -227,8 +227,8 @@ class CourseService:
         for student in self.sis.students():
             issues = check_student(student, by_student.get(student.id, []), catalog, RULES)
             flagged.update({issue.rule for issue in issues})
-        disabled = self.store.disabled_checks()
-        return [CheckRow(check, check.id not in disabled, flagged[check.id]) for check in CHECKS]
+        on = self._checks_on()
+        return [CheckRow(check, check in on, flagged[check.id]) for check in CHECKS]
 
     # Writes
 
@@ -329,8 +329,12 @@ class CourseService:
 
     def _rules(self) -> list[Rule]:
         """The switched-on rules, in rule order (Q20)."""
+        return [check.rule for check in self._checks_on()]
+
+    def _checks_on(self) -> list[Check]:
+        """Errors are on whatever is stored (Q5); a warning is on unless switched off."""
         disabled = self.store.disabled_checks()
-        return [check.rule for check in CHECKS if check.id not in disabled]
+        return [check for check in CHECKS if check.locked or check.id not in disabled]
 
     def _catalog(self) -> dict[str, Course]:
         return {course.code: course for course in self.sis.catalog()}

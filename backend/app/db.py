@@ -6,6 +6,13 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
+# Q20. IF NOT EXISTS so startup can add it to a database made before it existed.
+CHECK_SETTING = """CREATE TABLE IF NOT EXISTS check_setting (
+  rule       TEXT PRIMARY KEY,
+  enabled    INTEGER NOT NULL,
+  updated_at TEXT NOT NULL
+)"""
+
 SCHEMA = [
     """CREATE TABLE sis_import (
   id          INTEGER PRIMARY KEY,
@@ -68,11 +75,7 @@ SCHEMA = [
   updated_at  TEXT NOT NULL,
   CHECK (status <> 'on_hold' OR hold_reason IS NOT NULL)
 )""",
-    """CREATE TABLE check_setting (
-  rule       TEXT PRIMARY KEY,
-  enabled    INTEGER NOT NULL,
-  updated_at TEXT NOT NULL
-)""",
+    CHECK_SETTING,
 ]
 
 # Children before parents, so foreign keys never block the drop.

@@ -97,13 +97,13 @@ function Group({ title, hint, children }: { title: string; hint: string; childre
 export default function SettingsPage() {
   const [load] = useLoad(api.checks);
   const [saved, setSaved] = useState<Check[] | null>(null); // the list a successful save returned
-  const [saving, setSaving] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false); // one save at a time, so responses land in order
   const [error, setError] = useState<{ rule: string; message: string } | null>(null); // the last failed save
 
   const checks = saved ?? (load.state === "ready" ? load.data : null);
 
   const toggle = (check: Check) => {
-    setSaving(check.rule);
+    setSaving(true);
     setError(null);
     api
       .setCheck(check.rule, !check.enabled)
@@ -111,7 +111,7 @@ export default function SettingsPage() {
         const state = check.enabled ? "on" : "off";
         setError({ rule: check.rule, message: `Couldn't save. ${check.name} is still ${state}. Try again.` });
       })
-      .finally(() => setSaving(null));
+      .finally(() => setSaving(false));
   };
 
   const rows = (severity: Check["severity"]) =>
@@ -121,7 +121,7 @@ export default function SettingsPage() {
         <CheckRow
           key={c.rule}
           check={c}
-          saving={saving === c.rule}
+          saving={saving}
           error={error?.rule === c.rule ? error.message : null}
           onToggle={toggle}
         />
