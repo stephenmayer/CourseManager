@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router";
 
+import CourseDialog from "./courses/CourseDialog";
 import CoursesPage from "./pages/Courses";
 import { NotFoundPage, StudentListPage } from "./pages/Placeholders";
 import StudentDetailPage from "./pages/StudentDetail";
@@ -15,7 +16,7 @@ export default function App() {
       <main className="app-main">
         <Routes>
           <Route path="/" element={<StudentListPage />} />
-          <Route path="/students/:id" element={<StudentDetailPage />} />
+          <Route path="/students/:id" element={<StudentDetailPage courseDialog={CourseDialog} />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
