@@ -38,7 +38,7 @@ verify: clean-tree
 BASE ?= origin/main
 export PR_BODY
 tests-required:
-	@git diff --name-only $(BASE)...HEAD | python3 scripts/ci/tests_required.py /dev/stdin
+	@changed=$$(git diff --name-only $(BASE)...HEAD) && printf '%s\n' "$$changed" | python3 scripts/ci/tests_required.py /dev/stdin
 
 # Backend on :8000 and frontend on :5173 (proxying /api). Override with API_PORT / WEB_PORT.
 dev: install

@@ -32,7 +32,7 @@ Production behaviour without a new or changed test is rejected, unless the issue
 
 Run the issue's Verification commands verbatim. UI changes: run component tests and UI scenarios, **look at every screenshot** against the artboard. Then the project's single merge-gate command (`make verify`), which must refuse uncommitted changes and print a receipt naming the exact commit. Run checks in the foreground; never background them and idle.
 
-It is the gate, not CI: any failure blocks the PR, even one you think is unrelated (show that test fails on a clean `main` and say so).
+It is the gate, not CI: any failure blocks the PR, even one you think is unrelated (if it also fails on a clean `main`, say so and fix `main` first).
 
 **The proof is what actually executes the changed lines.** Re-run what you ran to prove the work in the first place (stack scripts, integration path, UI scenarios), not just the directory's unit tests.
 

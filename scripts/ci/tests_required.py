@@ -1,4 +1,4 @@
-"""CI gate: a PR that changes app code must add or change a test (CLAUDE.md, TDD).
+"""Local gate (Q21): a PR that changes app code must add or change a test (CLAUDE.md, TDD).
 
 Usage: tests_required.py <file listing changed paths>   (PR body in $PR_BODY)
 """

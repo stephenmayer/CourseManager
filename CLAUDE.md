@@ -32,7 +32,7 @@ Stephen restarted this project from scratch on 2026-10-24 and set the order:
 - UI work: designs Stephen approved in `docs/design/` are spec.
 - Test-driven development is mandatory (`implement-change`): for each issue, write its TDD plan's tests first and commit them failing (`test(<part>): ...`), then the minimum code to pass, then refactor with the suite green.
 - A change adding behaviour with no new or changed test is rejected, unless the issue says "no new tests". `make tests-required` checks it.
-- **The local run is the merge gate; CI is not relied on** (Stephen, 2026-10-28). `make verify` and `make tests-required` must pass before opening a PR and again on the head brought up to date with `main` right before merging. Anything fails: stop, fix and re-run, or report it. Never open or merge on red. Procedure: [developer guide](docs/process/developer-guide.md#the-gate-is-local).
+- **The local run is the merge gate; CI is not relied on** (Stephen, 2026-10-28). `make verify` and `make tests-required` must pass before opening a PR and again on the head brought up to date with `main` right before merging. Anything fails: stop, fix and re-run, or report it. Never open or merge on red. Why: [Q21](docs/decisions/q021-local-merge-gate.md). Procedure: [developer guide](docs/process/developer-guide.md#the-gate-is-local).
 - Never skip, disable or quarantine a test, or weaken an assertion, to get green.
 - Before opening any PR, invoke the `/simplify` skill and then the `/code-review` skill on the PR's diff (Skill tool), as `implement-change` §7 orders them. Your own re-read is not a substitute, and the PR body lists each finding and what was done about it. Stephen asked for this on 2026-10-28 after the first four build PRs skipped it.
 

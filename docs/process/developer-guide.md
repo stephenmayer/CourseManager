@@ -60,11 +60,11 @@ Every issue follows `implement-change`: commit the failing tests (`test(<part>):
 
 ## The gate is local
 
-CI/CD is not relied on (Stephen, 2026-10-28). The gate is two local commands, and both must pass:
+CI/CD is not relied on ([Q21](../decisions/q021-local-merge-gate.md)). The gate is two local commands; run `git fetch origin main` first so the base is current, and both must pass:
 
 - `make verify` (above).
-- `make tests-required PR_BODY="<the PR body>"`: fails when the branch changes non-test files under `backend/app/` or `frontend/src/` against `origin/main` and adds or changes no test file (`backend/tests/**/test_*.py`, `frontend/src/**/*.test.ts(x)`; fixtures such as `conftest.py` alone don't count), unless the body says `no new tests` with the reason.
+- `make tests-required PR_BODY="<the PR body>"`: fails when the branch changes non-test files under `backend/app/` or `frontend/src/` against `origin/main` and adds or changes no test file (`backend/tests/**/test_*.py`, `frontend/src/**/*.test.ts(x)`; fixtures such as `conftest.py` alone don't count), unless the body says `no new tests` with the reason. Pass the PR's actual body text.
 
-Run them before opening a PR, and again right before merging on the head brought up to date with `main` (a receipt already posted for that same SHA counts). Any failure blocks the PR or the merge until it is fixed and re-run. Merge steps: `pr-flow`.
+Run them before opening a PR, and again right before merging on the head brought up to date with `main` (a receipt already posted for that same SHA counts). Any failure blocks the PR or the merge until it is fixed and re-run, including one that also fails on a clean `main`: then fix `main` first. Merge steps: `pr-flow`.
 
 The workflows in `.github/workflows/` may still run on pull requests; they are informational, never the gate.

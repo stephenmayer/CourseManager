@@ -3,7 +3,7 @@ name: pr-flow
 description: >
   How pull requests move from open to merged without owner babysitting: hand
   off instead of watching, respond to review events, merge on a local
-  `make verify` receipt in dependency order, run a merge train when PRs
+  gate receipt in dependency order, run a merge train when PRs
   conflict, and know which steps
   (release, deploy, production changes, paid CI) always need the owner. Use after
   opening a PR, when PRs pile up, or when main is red.
@@ -20,7 +20,7 @@ The gate is local, not CI ([developer guide](../../../docs/process/developer-gui
 1. Open ready (see `implement-change` section 8). Drafts are never merged; use them only for unresolved review findings.
 2. **Hand off, don't watch.** Subscribe to PR activity and end the turn. No polling, sleeping or self-scheduled wake-ups.
 3. On a wake (review comment, conflict, check failure): fix, commit, re-run the merge-gate command, post the new receipt as a PR comment *before* pushing, push once, end turn. A receipt names one commit, so every push needs its own.
-4. A failure that is not this PR's: reproduce just that test or tool on a clean `main`, and say so on the PR.
+4. A failure that is not this PR's: reproduce just that test or tool on a clean `main`, say so on the PR, and fix `main` first (see merge train). Never merge on red.
 5. Echoes of your own comments and duplicates: skip.
 6. **Before merging:** merge `main` in if it moved, run the gate on that head (a posted receipt for the same SHA counts), squash-merge only if it passed and review is addressed, then unsubscribe. Never enable auto-merge; nothing checks the gate for it.
 7. If `main` moved between that run and the merge, run `make verify` on the new `main`. Red: revert the merge; re-land by reverting the revert plus the fix, with a fresh receipt.
