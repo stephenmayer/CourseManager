@@ -290,7 +290,7 @@ A squad of 2-3 engineers over one quarter (about 13 weeks), working with one or 
 | 1-2 | **Answer the requirements.** RQ1-RQ12 with the pilot districts and their SIS vendors; pick the first connector | Each RQ has an answer or a recorded assumption; the first SIS and its export format are chosen |
 | 3-6 | **One-way sync, PowerSchool.** District connection config with dry run, the PowerSchool `ExportSource` adapter (OneRoster + PowerQuery, Q22) proven against the mock, import snapshots, three-way merge, runs as jobs on RabbitMQ, failed runs write nothing | A pilot PowerSchool district syncs nightly and on demand; counselor edits survive it; a broken export leaves yesterday's data in place |
 | 7-9 | **Recover and see.** Conflict review in the request editor (Add-on F), restore to any kept import (3.7), jobs view, Datadog logs and alerts, S3 error reports | A bad sync is rolled back in one action from the jobs view; counselors resolve flagged requests |
-| 10-12 | **Second district, limits.** Import retention and pruning (D4), per-district concurrency and throttling, "sync now", the CSV file adapter for a district that only offers exports | Two districts sync nightly side by side without interfering |
+| 10-12 | **Second district, limits.** Year-end archive of imports to S3 (section 5), per-district concurrency and throttling, "sync now", the CSV file adapter for a district that only offers exports | Two districts sync nightly side by side without interfering |
 | 13 | Buffer and pilot review | The pilot districts tell us what to fix next |
 
 **Cut from the MVP**, in the order we'd add them back: write-back (`SisWriter`, D2), provisional students (D8), transcript feed and graduation progress (Q15), suggested fixes for bad codes (Q5 option D), alternates ([Q16](decisions/q016-alternate-requests.md)), school-year rollover (RQ8), near-real-time sync (webhooks or push).
@@ -301,5 +301,5 @@ A squad of 2-3 engineers over one quarter (about 13 weeks), working with one or 
 
 1. Should a run whose change count is far above normal **pause** for a person instead of applying? That is an approval gate, which Q13 chose against; the alert in 3.9 is the lighter option. Recommendation: alert only, and revisit after the pilot.
 2. Does an unresolved SIS conflict block Done? The plan's default is yes ([phases.md](plan/phases.md)).
-3. How many imports do we keep (N)? Recommendation: 30 days, never pruning one a request still uses as its base.
+3. ~~How many imports do we keep?~~ **Decided by Stephen (2026-10-28):** every import for the whole school year, archived to S3 at year-end rollover; an import a request still uses as its base is never pruned.
 4. Who may roll back a run (RQ11)?

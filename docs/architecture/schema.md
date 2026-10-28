@@ -221,7 +221,7 @@ CREATE TABLE sync_change (
 );
 ```
 
-Retention: keep the last N imports (N to set with Stephen; trivial at 10 students), and never prune an import that an active request still names as its `base_import_id`.
+Retention: keep every import for the school year, archiving to S3 at year-end rollover (Stephen, 2026-10-28; [SIS design §5](../sis-sync-design.md#5-open-questions-for-this-review)), and never prune an import that an active request still names as its `base_import_id`.
 
 ## 7. Not in this schema: add-ons (designed, not built)
 
