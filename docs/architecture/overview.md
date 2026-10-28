@@ -3,7 +3,7 @@ id: arch-overview
 title: Prototype architecture
 status: current
 owns: "the shape of the prototype: components, data model, rules, the swap seam, testing strategy, and the open architecture choices"
-updated: 2026-10-24
+updated: 2026-10-28
 ---
 
 # Prototype architecture (draft for the step 3 brainstorm)
@@ -20,13 +20,17 @@ API (thin routes)
    ▼
 Service ── rules (pure functions → issues)
    │
-   ├── SisSource      read-only: students, catalog, SIS requests   ← seed today, SIS connector tomorrow
+   ├── SisSource      read-only: students, catalog, current import ← reads the current SIS import
    └── RequestStore   read/write: requests, reasons, review status ← SQLite file today (Q8), Mongo tomorrow
+
+SIS data arrives in three layers (built in 1.2, seams S1):
+   Source (raw export)  →  Loader (normalize, write one import)  →  current import  →  SisSource
+   SeedFileSource reads backend/seed/sis_export.json today; an SIS API connector replaces it tomorrow.
 
 Designed, not built (Q15): SisSource gains a transcript feed; a GraduationRules config (per district) joins it.
 ```
 
-The two ports split the data by **who owns it**, which is the exercise's own split: the SIS owns students and the catalog; the app owns what counselors do. That one seam answers "how is the data layer abstracted so the source is easy to swap?" and is the same seam the SIS sync design hangs off ([Q2](../decisions/q002-request-ownership.md)).
+The two ports split the data by **who owns it**, which is the exercise's own split: the SIS owns students and the catalog; the app owns what counselors do. That one seam answers "how is the data layer abstracted so the source is easy to swap?" Swapping the seed for a real SIS means writing a new Source that returns the same raw export shape (`app/sis/export.py`); the Loader, `SisSource`, rules and UI do not change. Only the Loader knows the export's quirks (`9/10` grades, `P`/`E`, AP from the name). and is the same seam the SIS sync design hangs off ([Q2](../decisions/q002-request-ownership.md)).
 
 ## 2. Data model
 
@@ -63,6 +67,12 @@ Each rule is a pure function `(student, requests, catalog) → issues`, run on e
 Status rules ([Q3](../decisions/q003-student-review-status.md)): Done is refused while any error remains; editing a Done student moves it to In progress; On hold requires a reason.
 
 Designed but not built ([Q15](../decisions/q015-history-and-grad-rules.md)): a graduation progress rule (rules minus earned minus requested credits) that replaces the Q4 core check once transcripts and rules exist, and enables prerequisite checks and a "fills a gap" catalog filter.
+
+Built in 1.3 as `backend/app/rules.py`. Each issue carries a severity, rule id, message and detail (copy from the approved boards for the first three rules), the request it sits on, and `kept` when that request has a reason. Choices made in the build, reversible:
+
+- The duplicate is reported on each later copy and links the first; the unknown-code and core checks ignore unknown codes, so SS303 raises one error only (S8).
+- The core check has no request to sit on, so it cannot be kept; it clears when a priority course in the subject is added.
+- The heavy AP warning sits on the **last** AP request in the list, so a reason there keeps it. Removing APs below four clears it.
 
 Adding a rule = one function + its tests. That is the "generalize" story: graduation rules or prerequisites plug in the same way once the data exists.
 
