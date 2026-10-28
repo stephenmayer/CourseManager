@@ -8,11 +8,11 @@ from app.db import now
 from app.models import CourseCounts, Request, RequestType, Review, ReviewStatus
 
 
-class _Unset:
+class Unset:
     pass
 
 
-UNSET: Final = _Unset()
+UNSET: Final = Unset()
 
 
 class RequestStore(Protocol):
@@ -26,7 +26,7 @@ class RequestStore(Protocol):
         request_id: str,
         *,
         type: RequestType | None = None,
-        reason: str | None | _Unset = UNSET,
+        reason: str | None | Unset = UNSET,
     ) -> Request: ...
     def remove(self, request_id: str) -> Request: ...
     def counts_by_course(self) -> dict[str, CourseCounts]: ...
@@ -76,13 +76,13 @@ class SqliteRequestStore:
         request_id: str,
         *,
         type: RequestType | None = None,
-        reason: str | None | _Unset = UNSET,
+        reason: str | None | Unset = UNSET,
     ) -> Request:
         """Switch type and/or set the reason. Any change marks the request edited (Q2, S5)."""
         changes: dict[str, object] = {}
         if type is not None:
             changes["type"] = type
-        if not isinstance(reason, _Unset):
+        if not isinstance(reason, Unset):
             changes["reason"] = reason
         if not changes:
             return self._must_get(request_id)
