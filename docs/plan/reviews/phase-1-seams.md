@@ -12,7 +12,7 @@ The repo has no application code yet (greenfield). Every requirement traces to `
 
 ## Summary
 
-- 16 seams: 0 blockers, 9 must-resolve (each owned by a part), 7 minor. 12 edge cases. 1 owner question.
+- 16 seams: 0 blockers, 8 must-resolve (each owned by a part), 7 minor, 1 resolved by Stephen. 12 edge cases. 0 open owner questions.
 - Top 3 risks:
   1. **Duplicates and removal by the wrong key.** Aisha has SS402 twice. If the API removes "SS402 for S008" instead of a request ID, removing the duplicate elective also removes her priority. Fix: every edit addresses a request by `id` (S3).
   2. **Removing a SIS request must not come back.** If remove deletes the row, the Phase 2 sync re-adds it. Fix: soft delete from day one (S4).
@@ -32,7 +32,7 @@ The repo has no application code yet (greenfield). Every requirement traces to `
 | S8 | Rule overlap | An unknown course has no grades, so out-of-grade must not also fire on SS303. A duplicate fires once per pair, not twice. | Out-of-grade skips unknown codes; duplicate reports on the second occurrence with a link to the first. Tests with S008. | must-resolve, 1.3 |
 | S9 | Core-subject check (Q4) | Switching a core priority to elective (e.g. Jordan's ENG201) must raise the warning; the seed raises none. | Test the switch case. AP load counts priority and elective (S009's five APs include an elective). | minor, 1.3 |
 | S10 | Catalog grade checkboxes | Courses list grades as `9/10`. A course shows if **any** checked grade is in its list. | Parse to a list in the loader; filter in the UI. Test with AT101 (9/10) under Grade 10 only. | minor, 1.2, 1.7 |
-| S11 | Student list "From profile" column | The approved design shows short notes ("Retaking Algebra I") that the SIS does not provide; the profile is a paragraph. | Owner question 1. Default: first sentence of the profile, truncated at about 40 characters, full text on the detail page. | must-resolve, 1.6 |
+| S11 | Student list "From profile" column | The approved design shows short notes ("Retaking Algebra I") that the SIS does not provide; the profile is a paragraph. | Stephen (2026-10-28): store the full SIS text untouched; the list shows the first 40 characters with a "more" link that expands in place, up to 255 characters; the student page shows the full text. | resolved, 1.6 |
 | S12 | Header "SIS data as of" | Comes from the current import's `received_at`. On a fresh seed that is the load time, not "Oct 27, 6:00 AM". | Use load time; designs used a sample time. | minor, 1.5 |
 | S13 | Reset re-seeds (Q8) | Deleting the SQLite file while the app holds a connection fails on some platforms. | Reset closes the connection, drops and recreates tables, reloads import #1, in one call. Test: edits gone after reset. | minor, 1.2 |
 | S14 | Theme toggle | Defaults to the system setting; remembered per browser. Storage can throw in private windows. | Wrap storage in try/catch; fall back to system setting. | minor, 1.5 |
@@ -58,7 +58,7 @@ The repo has no application code yet (greenfield). Every requirement traces to `
 
 ## Open questions for the owner (each with a default)
 
-1. **Student list "From profile" text.** The SIS gives a paragraph; the design shows a short note. Default: first sentence of the profile, cut at about 40 characters ("Failed MTH101 (Algebra I) last year."), full text on the student page. Alternative: hand-written short notes in the seed (that would be invented data).
+None open. Question 1 (student list profile text) answered by Stephen on 2026-10-28; see S11.
 
 ## Build plan (dependency order)
 
@@ -69,8 +69,8 @@ See [phases.md](../phases.md), Phase 1. Each part's issue lists the seams (S#) a
 - `architecture/overview.md` §1: SisSource reads the current import (S1).
 - `architecture/schema.md`: any column change in 1.2.
 - `CLAUDE.md` Commands section: filled in by 1.1.
-- `design/README.md`: note S11's outcome.
+- `design/README.md`: note S11's outcome (40 characters, "more" expands to 255).
 
 ## Seams review applied
 
-2026-10-28: resolutions folded into the Phase 1 parts and issues. Owner question 1 open with a stated default; it does not block parts 1.1-1.5.
+2026-10-28: resolutions folded into the Phase 1 parts and issues. Owner question 1 answered by Stephen the same day (S11).
