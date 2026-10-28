@@ -72,7 +72,7 @@ These are places where two parts of the document can't both be right. They matte
 | G21 | Which SIS, and how we get data (API, file export, push, pull) | Shapes the whole sync design | "Which SIS products first? API or nightly file?" |
 | G22 | How often the SIS changes during request season | Decides batch vs near-real-time | "How often do students and the catalog change while counselors work?" |
 | G23 | Who owns requests once both sides can edit | "May also come from the SIS, and are created and edited in the app" doesn't say who wins a conflict | "After import, is the app the source of truth for requests, or can the SIS still change them?" Assumed for now: edited requests are kept ([Q2](../decisions/q002-request-ownership.md)) |
-| G24 | Write-back | Not stated whether requests go back to the SIS | "Do edited requests need to be written back to the SIS?" |
+| G24 | Write-back | Not stated whether requests go back to the SIS | "Do edited requests need to be written back to the SIS?" Baseline one-way, app always merges; write-back optional per district ([Q19](../decisions/q019-one-way-sync-baseline.md)) |
 | G25 | Stable identifiers | Course codes or student IDs that change break every link | "Are student IDs and course codes stable year to year?" |
 | G26 | What happens to requests when SIS data changes underneath them | A course retired, a student withdraws or changes grade | "If a requested course disappears from the catalog, what should the counselor see?" |
 | G27 | Data quality expectations | S008 suggests SIS data arrives dirty | "How bad is the incoming data, and who fixes it today?" Assumed for now: load as-is, flag, block Done ([Q5](../decisions/q005-bad-sis-request-data.md)) |
