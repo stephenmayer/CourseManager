@@ -68,6 +68,12 @@ Status rules ([Q3](../decisions/q003-student-review-status.md)): Done is refused
 
 Designed but not built ([Q15](../decisions/q015-history-and-grad-rules.md)): a graduation progress rule (rules minus earned minus requested credits) that replaces the Q4 core check once transcripts and rules exist, and enables prerequisite checks and a "fills a gap" catalog filter.
 
+Built in 1.3 as `backend/app/rules.py`. Each issue carries a severity, rule id, message and detail (copy from the approved boards for the first three rules), the request it sits on, and `kept` when that request has a reason. Choices made in the build, reversible:
+
+- The duplicate is reported on each later copy and links the first; the unknown-code and core checks ignore unknown codes, so SS303 raises one error only (S8).
+- The core check has no request to sit on, so it cannot be kept; it clears when a priority course in the subject is added.
+- The heavy AP warning sits on the **last** AP request in the list, so a reason there keeps it. Removing APs below four clears it.
+
 Adding a rule = one function + its tests. That is the "generalize" story: graduation rules or prerequisites plug in the same way once the data exists.
 
 ## 4. Screens (detail comes in the design step)
