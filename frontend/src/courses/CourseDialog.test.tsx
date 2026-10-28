@@ -207,3 +207,22 @@ test("focus moves into the dialog, is trapped there, and returns to the trigger 
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(trigger).toHaveFocus();
 });
+
+test("after an edit removes the focused card, Escape still closes and Tab goes back into the dialog", async () => {
+  const onClose = vi.fn();
+  const dialog = await openDialog("SS402", { onClose });
+  mocked.courseRequests.mockResolvedValue(requestsFor("SS402").filter((r) => r.request.id !== "r-aisha-e"));
+  const remove = within(cards(dialog)[1]).getByRole("button", { name: "Remove" });
+  remove.focus();
+
+  fireEvent.click(remove);
+  await act(async () => {});
+  expect(dialog).not.toContainElement(document.activeElement as HTMLElement);
+
+  fireEvent.keyDown(document.activeElement ?? document.body, { key: "Tab" });
+  expect(within(dialog).getByRole("button", { name: "Close" })).toHaveFocus();
+
+  (document.activeElement as HTMLElement).blur();
+  fireEvent.keyDown(document.body, { key: "Escape" });
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
