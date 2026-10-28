@@ -1,12 +1,12 @@
 ---
-id: q020-powerschool-first
+id: q022-powerschool-first
 title: First SIS target is PowerSchool via OneRoster plus a PowerQuery, with a CSV file connection as the second, both tested against a mock
 status: current
 decided: 2026-10-28, by Stephen
 ---
 
-<a id="q020"></a>
-# Q20: Which SIS do we build for first, through which interface, and how do we test it?
+<a id="q022"></a>
+# Q22: Which SIS do we build for first, through which interface, and how do we test it?
 
 ## Context
 

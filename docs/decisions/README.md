@@ -31,4 +31,4 @@ One file per decision (`q0NN-<slug>.md`, template in `.claude/process-kit/templa
 | [Q17](q017-provisional-students.md) | Students missing from the SIS get a provisional record matched on sync with counselor confirmation; designed as an add-on, not built | current | 2026-10-27, Stephen |
 | [Q18](q018-sis-import-versioning.md) | SIS imports are versioned snapshots; requests keep their SIS base and reconcile three ways; schema now, compare logic if time | current | 2026-10-28, Stephen |
 | [Q19](q019-one-way-sync-baseline.md) | Assume one-way SIS sync; the app always merges (Q18); write-back is an optional per-district job that reduces conflicts | current | 2026-10-28, Stephen |
-| [Q20](q020-powerschool-first.md) | First SIS target is PowerSchool: OneRoster for students and courses, a PowerQuery for requests; plus a CSV file connection; both tested against a PowerSchool mock (#34, #35) | current | 2026-10-28, Stephen |
+| [Q22](q022-powerschool-first.md) | First SIS target is PowerSchool: OneRoster for students and courses, a PowerQuery for requests; plus a CSV file connection; both tested against a PowerSchool mock (#34, #35) | current | 2026-10-28, Stephen |
