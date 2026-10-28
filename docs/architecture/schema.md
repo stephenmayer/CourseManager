@@ -51,7 +51,7 @@ erDiagram
     }
     SIS_REQUEST {
         int import_id PK
-        text sis_key PK "SIS id, or student+course+type"
+        text sis_key PK "SIS id, or student+course+n"
         text student_id
         text course_code "not checked"
         text type
@@ -132,7 +132,7 @@ CREATE TABLE sis_course (
 
 CREATE TABLE sis_request (
   import_id   INTEGER NOT NULL REFERENCES sis_import (id),
-  sis_key     TEXT NOT NULL,        -- the SIS's request ID; in the seed, 'S008|SS402|elective'
+  sis_key     TEXT NOT NULL,        -- the SIS's request ID; in the seed, student|course|n, e.g. 'S008|SS402|2'
   student_id  TEXT NOT NULL,
   course_code TEXT NOT NULL,        -- loaded as-is with errors (Q5)
   type        TEXT NOT NULL CHECK (type IN ('priority', 'elective')),
@@ -142,7 +142,8 @@ CREATE TABLE sis_request (
 
 - **An import is a Q13 sync run.** The table replaces the earlier `sync_run`. Its states are Timely's job states (Q13, Q14).
 - **An errored import is never marked current**, so a failed run changes nothing anyone sees.
-- **The sis_key includes the type** because the seed has no request IDs and Aisha's SS402 appears twice (P and E). The trade-off: a SIS change from priority to elective looks like one removal plus one addition (Q18).
+- **The sis_key is student + course + an occurrence counter** when the SIS sends no request ID. Type is not part of the key, so a SIS change from priority to elective is a type change on the same request. The counter (`1`, `2`) only separates duplicates like Aisha's two SS402 rows, which are already errors (Q5); if the SIS reorders duplicates, they may swap keys, which is acceptable for rows that block Done anyway.
+- **`sis_import.id` is the internal version ID.** Every request records the import it last agreed with (`base_import_id`).
 
 ## 3. App-owned tables
 
