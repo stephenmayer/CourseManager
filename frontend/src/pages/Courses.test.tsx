@@ -22,11 +22,13 @@ vi.mock("../api/client", async (importOriginal) => {
 
 const mocked = vi.mocked(api);
 
-let location = "";
 function LocationProbe() {
   const here = useLocation();
-  location = here.pathname + here.search;
-  return null;
+  return <output data-testid="location">{here.pathname + here.search}</output>;
+}
+
+function location() {
+  return screen.getByTestId("location").textContent;
 }
 
 beforeEach(() => {
@@ -160,7 +162,7 @@ test("clicking a code opens the course dialog and highlights the row", async () 
   await act(async () => {});
 
   expect(screen.getByRole("dialog", { name: "SS402 AP Government" })).toBeInTheDocument();
-  expect(location).toBe("/courses?course=SS402");
+  expect(location()).toBe("/courses?course=SS402");
   expect(row("SS402")).toHaveClass("selected");
 });
 
@@ -181,7 +183,7 @@ test("Escape closes the dialog, clears the URL and returns focus to the code", a
   await act(async () => {});
 
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  expect(location).toBe("/courses");
+  expect(location()).toBe("/courses");
   expect(screen.getByRole("button", { name: "SS402" })).toHaveFocus();
 });
 
