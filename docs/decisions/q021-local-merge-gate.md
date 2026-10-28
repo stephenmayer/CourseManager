@@ -27,4 +27,4 @@ Stephen (2026-10-28): "Update instructions on this repo to always run automated 
 
 - `CLAUDE.md`, `docs/process/developer-guide.md`, `Makefile` (`tests-required` target).
 - Skills: `implement-change`, `pr-flow`, `pr-sweep`, `build-process`.
-- Open: whether to remove `.github/workflows/` or keep them non-gating (asked 2026-10-28).
+- `.github/workflows/` stay in place as non-gating checks (Stephen, 2026-10-28): a free second signal, easy to remove later.
