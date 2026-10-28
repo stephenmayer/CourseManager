@@ -19,6 +19,23 @@ export interface SisImport {
 export type RequestType = "priority" | "elective";
 export type ReviewStatus = "not_started" | "in_progress" | "on_hold" | "done";
 
+export interface StudentSummary {
+  id: string;
+  name: string;
+  grade: number;
+  profile: string;
+  status: ReviewStatus;
+  priority_count: number;
+  elective_count: number;
+  error_count: number;
+  warning_count: number;
+}
+
+export interface StudentList {
+  sis_as_of: string;
+  students: StudentSummary[];
+}
+
 export interface CatalogCourse {
   code: string;
   name: string;
@@ -135,6 +152,7 @@ async function request<T>(path: string, init: RequestInit): Promise<T> {
 
 export const api = {
   currentImport: () => getJson<SisImport>("/sis/current-import"),
+  students: () => getJson<StudentList>("/students"),
   catalog: () => getJson<CatalogCourse[]>("/catalog"),
   courses: () => getJson<CoursesResponse>("/courses"),
   courseRequests: (code: string) =>
