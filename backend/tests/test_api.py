@@ -336,3 +336,69 @@ def test_an_empty_patch_changes_nothing(client: TestClient) -> None:
 
     assert body["status"] == "done"
     assert next(r for r in body["requests"] if r["id"] == rid)["edited_in_app"] is False
+
+
+# Follow-ups from the /code-review pass on PRs #21-#25
+
+
+def test_detail_and_course_dialog_put_a_warning_on_the_same_request(client: TestClient) -> None:
+    """The rules see one request order on every screen, so 'last AP' means the same row."""
+    client.patch(
+        f"/api/requests/{request_id(client, 'S009', 'AT301', 'elective')}",
+        json={"type": "priority"},
+    )
+    client.patch(
+        f"/api/requests/{request_id(client, 'S009', 'MTH401', 'priority')}",
+        json={"type": "elective"},
+    )
+
+    [warning] = [i for i in student(client, "S009")["issues"] if i["rule"] == "ap_load"]
+    on_request = next(
+        r for r in student(client, "S009")["requests"] if r["id"] == warning["request_id"]
+    )
+    dialog = client.get(f"/api/courses/{on_request['course_code']}/requests").json()
+    liam = next(row for row in dialog if row["student_id"] == "S009")
+    assert [i["rule"] for i in liam["issues"]] == ["ap_load"]
+
+
+def test_setting_the_same_type_is_not_an_edit(client: TestClient) -> None:
+    set_status(client, "S001", "done")
+    rid = request_id(client, "S001", "MTH101", "priority")
+
+    body = client.patch(f"/api/requests/{rid}", json={"type": "priority"}).json()
+
+    assert body["status"] == "done"
+    assert next(r for r in body["requests"] if r["id"] == rid)["edited_in_app"] is False
+
+
+def test_a_student_new_in_a_later_import_starts_not_started(conn: Connection) -> None:
+    from app.sis.loader import load_import
+
+    from .test_sis_import import TWO_STUDENTS, FakeSource
+
+    load_import(conn, FakeSource(TWO_STUDENTS), source="file")
+    with TestClient(create_app(conn)) as client:
+        rows = client.get("/api/students").json()["students"]
+        assert [(r["id"], r["status"]) for r in rows] == [
+            ("X1", "not_started"),
+            ("X2", "not_started"),
+        ]
+        assert set_status(client, "X2", "in_progress").json()["status"] == "in_progress"
+
+
+def test_a_failed_reopen_rolls_back_the_edit(conn: Connection) -> None:
+    """S6: the edit and the reopen are one write."""
+    from app.main import build_service
+
+    service = build_service(conn)
+    service.set_review("S001", "done")
+    rid = next(r.id for r in service.store.list_active("S001") if r.course_code == "AT101")
+
+    def broken(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("disk full")
+
+    service.store.set_review = broken  # type: ignore[method-assign]
+    with pytest.raises(RuntimeError):
+        service.remove_request(rid)
+
+    assert rid in [r.id for r in service.store.list_active("S001")]
