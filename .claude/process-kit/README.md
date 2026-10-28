@@ -12,6 +12,7 @@ A project-agnostic extraction of the process used to build Forward Budget (a sol
 | Decisions | A product or process question only the owner can answer | `skills/decide/SKILL.md` |
 | Implement a change (TDD) | Writing code for an issue | `skills/implement-change/SKILL.md` |
 | PR flow and merge train | A branch is ready, or PRs are piling up | `skills/pr-flow/SKILL.md` |
+| PR sweep (whole queue) | A schedule fires, PRs are conflicting or parked as drafts | `skills/pr-sweep/SKILL.md` |
 | Bug bash | Many open defects | `skills/bug-bash/SKILL.md` |
 | Project `CLAUDE.md` starter | Day one of a project | `templates/CLAUDE.md.template` |
 | Docs-tree conventions | Day one, and every docs change | `templates/docs-CONVENTIONS.md.template` |

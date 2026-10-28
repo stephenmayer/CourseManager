@@ -60,16 +60,18 @@ The roster is clean for six students; four are flagged by Timely as intentionall
 
 So the data itself argues for three behaviours: catch real data errors (unknown course, duplicate), flag but allow judgment calls (out-of-grade, heavy AP load) with a reason, and mark a student's list as not ready (S010).
 
-## 6. MVP candidates beyond R1-R4 (to brainstorm)
+## 6. MVP candidates beyond R1-R4
+
+Scope decided in [Q6](../decisions/q006-timebox-and-mvp-scope.md).
 
 | # | Candidate | User value | Cost | My lean |
 | --- | --- | --- | --- | --- |
-| M1 | Data-error checks: unknown course code, duplicate course | Stops bad SIS data reaching scheduling (S008) | Low | In |
-| M2 | Judgment warnings: out-of-grade, missing core subject, heavy AP load, override with a reason | Counselor stays in control; reason is visible to the AP | Low-medium | In, as warnings not blocks |
-| M3 | Per-student review status (not started / in progress / done / on hold) and a caseload filter | Turns the list into a work queue; covers S010 "on hold" | Low | In |
-| M4 | Request source: from SIS vs added in app | Needed for any safe SIS sync; links the prototype to the design doc | Low | In (data only, small UI cue) |
+| M1 | Data-error checks: unknown course code, duplicate course | Stops bad SIS data reaching scheduling (S008) | Low | In; errors block Done ([Q5](../decisions/q005-bad-sis-request-data.md)) |
+| M2 | Judgment warnings: out-of-grade, missing core subject, heavy AP load, override with a reason | Counselor stays in control; reason is visible to the AP | Low-medium | In, as warnings not blocks (decided for grade levels: [Q1](../decisions/q001-out-of-grade-courses.md)) |
+| M3 | Per-student review status (not started / in progress / done / on hold) and a caseload filter | Turns the list into a work queue; covers S010 "on hold" | Low | In ([Q3](../decisions/q003-student-review-status.md)) |
+| M4 | Request source: from SIS vs added in app | Needed for any safe SIS sync; links the prototype to the design doc | Low | In (data only, small UI cue); sync rule in [Q2](../decisions/q002-request-ownership.md) |
 | M5 | Notes on a student or request | Captures why (retake, early AP) | Low | Maybe: fold into M2's reason |
-| M6 | Course demand tally across students | Shows how requests feed scheduling | Low | Maybe: good debrief story, not core to the counselor's job |
+| M6 | Course view: request counts per course, fix requests from the course side | Shows how requests feed scheduling; finds bad codes in one place | Low-medium | In, core build ([Q12](../decisions/q012-course-view.md)) |
 | M7 | Change history / audit | Several staff edit the same list | Medium | Out; mention as next |
 | M8 | Prerequisite checks | S006 asks for it | High: needs transcript data we don't have | Out; explain why |
 | M9 | Schedule conflict detection | S009 asks for it | High: needs sections and periods | Out; this is the scheduler's job, explain why |
@@ -79,14 +81,14 @@ So the data itself argues for three behaviours: catch real data errors (unknown 
 
 - A1. One school, one upcoming year, about 10 students in the seed but the UI should still work at a few hundred per counselor.
 - A2. Seeded suggested requests are what came from the SIS, loaded as-is with their errors.
-- A3. Graduation rules are not given; any "missing core subject" check uses a stated simple rule that a school would configure.
-- A4. No need to persist across restarts for the prototype (to confirm in step 3).
+- A3. Graduation rules are not given; any "missing core subject" check uses a stated simple rule that a school would configure ([Q4](../decisions/q004-priority-core-check.md)).
+- A4. Counselor edits persist across restarts in a SQLite file ([Q8](../decisions/q008-prototype-storage.md)).
 
-## 8. Questions to walk through together (in order)
+## 8. Questions walked through (all answered 2026-10-24)
 
-1. **Timebox.** Do we hold to about 3 hours and say so, or spend more and say what we added? My lean: hold to it and list what more time would buy.
-2. **Validation philosophy.** Warn and let the counselor override with a reason, or block? My lean: block only true data errors (M1), warn on judgment calls (M2).
-3. **MVP scope.** Which of M1-M10 are in? My lean: M1-M4 in, M5 folded into M2, M6 only if time, rest out with a sentence each.
-4. **AP role.** Separate role or same screen plus a cohort view? My lean: same screen; the status filter covers oversight.
-5. **Complex students.** Handle all four, or skip as the exercise allows? My lean: handle them; they are the best demo of judgment.
-6. **SIS design format.** Markdown in the repo with a diagram, then exported to PDF? My lean: yes, plus the video outline.
+1. **Timebox:** 2 hours prototype, 1 hour SIS design, AI-accelerated ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
+2. **Validation:** judgment calls warn and are kept with a reason ([Q1](../decisions/q001-out-of-grade-courses.md)); data errors block only Done ([Q5](../decisions/q005-bad-sis-request-data.md)).
+3. **MVP scope:** M1-M4 in, M5 folded into M2, M6 in as the course view ([Q12](../decisions/q012-course-view.md)), M7-M10 out ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
+4. **AP role:** same screen; status filter covers oversight; sign-off deferred ([Q3](../decisions/q003-student-review-status.md)).
+5. **Complex students:** all handled through warnings and errors ([Q6](../decisions/q006-timebox-and-mvp-scope.md)).
+6. **SIS design format:** Markdown in the repo to start ([Q10](../decisions/q010-sis-design-format.md)).

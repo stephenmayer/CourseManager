@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Provisional students (add-on)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}table{border-collapse:collapse}</style>
+</helmet>
+<div style="min-height: 1400px; background: #F6F7F9; color: #1A1D23; font-family: Inter, system-ui, sans-serif; font-size: 14px">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; padding: 0 32px; min-height: 60px; background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+    <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2457C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2"></path><path d="M8 7h8M8 11h6"></path></svg>
+      <span>CourseManager</span>
+    </div>
+    <nav aria-label="Main" style="display: flex; gap: 4px">
+      <a href="Main.dc.html" aria-current="page" style="padding: 8px 14px; border-radius: 8px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">Students</a>
+      <a href="Courses.dc.html" style="padding: 8px 14px; border-radius: 8px; font-weight: 500; color: #5B6270">Courses</a>
+    </nav>
+    <div style="flex-grow: 1"></div>
+    <span style="color: #5B6270">2027–28 course requests · SIS data as of Oct 27, 6:00 AM</span>
+    <span style="font-weight: 500">Ms. Lee · Counselor</span>
+  </header>
+  <div role="note" style="display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 12px 32px; background: #F4F3FF; border-bottom: 1px solid #7A5AF8; color: #3E1C96">
+    <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #7A5AF8; color: #FFFFFF">Add-on · designed, not built</span>
+    <span>Plan for late transfers before the SIS has them, then match on sync with counselor confirmation (Q17).</span>
+  </div>
+  <main style="max-width: 1240px; margin: 0 auto; padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700">Students not in the SIS yet</h1>
+      <p style="margin: 0; color: #5B6270">Plan for a late transfer now. When the SIS sends their record, confirm the match and their requests move over. (Q17)</p>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <section aria-labelledby="add-h" style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+        <h2 id="add-h" style="margin: 0; font-size: 18px; font-weight: 700">1. Add a provisional student</h2>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label style="font-size: 12px; font-weight: 600; color: #5B6270">Name</label><input type="text" value="Daniel Kim" style="height: 44px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label style="font-size: 12px; font-weight: 600; color: #5B6270">Incoming grade</label><select style="height: 44px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit"><option>Grade 9</option><option>Grade 10</option><option selected>Grade 11</option><option>Grade 12</option></select></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label style="font-size: 12px; font-weight: 600; color: #5B6270">Previous school</label><input type="text" value="Lakeview High School" style="height: 44px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label style="font-size: 12px; font-weight: 600; color: #5B6270">Note</label><input type="text" value="Transferring in August; transcript requested" style="height: 44px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit"></div>
+        <div style="display: flex; gap: 8px"><button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: none; background: #2457C5; color: #FFFFFF; font: inherit; font-weight: 600">Add student</button><button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Cancel</button></div>
+        <p style="margin: 0; font-size: 12px; color: #5B6270">This is the only student record the app creates, and only until the SIS sends the real one.</p>
+      </section>
+      <section aria-labelledby="list-h" style="flex: 1 1 520px; display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+        <h2 id="list-h" style="margin: 0; font-size: 18px; font-weight: 700">2. On the student list</h2>
+        <table style="width: 100%">
+          <thead><tr><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Student</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Grade</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Requests</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Status</th></tr></thead>
+          <tbody>
+            <tr style="background: #F4F3FF"><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Daniel Kim</b> <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #FFF8EB; color: #93370D">Not in SIS yet</span><div style="font-size: 12px; color: #5B6270">Provisional · added Oct 27 by Ms. Lee</div></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">11</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">4 P · 1 E</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">In progress</span></td></tr>
+            <tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Nina Torres</b><div style="font-size: 12px; color: #5B6270">S010</div></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">12</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">1 P · 2 E</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F4EBFF; color: #6927DA">On hold</span></td></tr>
+          </tbody>
+        </table>
+        <p style="margin: 0; font-size: 12px; color: #5B6270">Requests are built the same way. Done is allowed, but the list can't go to scheduling until the student is matched.</p>
+      </section>
+    </div>
+    <section aria-labelledby="match-h" style="display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA; border-color: #2457C5">
+      <h2 id="match-h" style="margin: 0; font-size: 18px; font-weight: 700">3. After a sync: confirm the match</h2>
+      <p style="margin: 0">Sync run #1051 brought in a new SIS student who may be Daniel. Nothing merges until you confirm.</p>
+      <div style="overflow-x: auto">
+      <table style="width: 100%; min-width: 640px">
+        <thead><tr><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left"></th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Provisional (in app)</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">New SIS record</th></tr></thead>
+        <tbody>
+          <tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Name</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Daniel Kim</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Daniel J. Kim</td></tr>
+          <tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Grade</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">11</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">11</td></tr>
+          <tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>ID</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">—</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">S011</td></tr>
+          <tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Previous school</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Lakeview High School</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><span style="color: #5B6270">Not sent by SIS</span></td></tr>
+          <tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Requests</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">5 (4 P · 1 E)</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">None</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px"><button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: none; background: #2457C5; color: #FFFFFF; font: inherit; font-weight: 600">Same student: move 5 requests to S011</button><button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Not the same student</button></div>
+      <p style="margin: 0; font-size: 12px; color: #5B6270">Moved requests keep "Added in app", so future syncs never overwrite them (Q2). A provisional student still unmatched after 30 days is flagged on Sync jobs (the 30 days is a placeholder to set with the school).</p>
+    </section>
+    <p style="margin: 0; font-size: 12px; color: #5B6270">Sample student for illustration; Daniel Kim is not in the exercise data.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

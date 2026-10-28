@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Aisha Johnson: course requests</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
+</style>
+</helmet>
+<div style="min-height: 1000px; background: {{t.bg}}; color: {{t.text}}; font-family: Inter, system-ui, sans-serif; font-size: 14px">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; padding: 0 32px; min-height: 60px; background: {{t.surface}}; border-bottom: 1px solid {{t.border}}">
+    <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{t.accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2"></path><path d="M8 7h8M8 11h6"></path></svg>
+      <span>CourseManager</span>
+    </div>
+    <nav aria-label="Main" style="display: flex; gap: 4px">
+      <a href="Main.dc.html" aria-current="page" style="padding: 8px 14px; border-radius: 8px; font-weight: 600; background: {{t.accentSoft}}; color: {{t.accentText}}">Students</a>
+      <a href="Courses.dc.html" style="padding: 8px 14px; border-radius: 8px; font-weight: 500; color: {{t.muted}}">Courses</a>
+    </nav>
+    <div style="flex-grow: 1"></div>
+    <span style="color: {{t.muted}}">2027–28 course requests · SIS data as of Oct 27, 6:00 AM</span>
+    <span style="font-weight: 500">Ms. Lee · Counselor</span>
+    <a href="{{mode.href}}" role="button" aria-label="{{mode.label}}" title="{{mode.label}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.border}}; color: {{t.text}}; font-weight: 500; text-decoration: none">
+      <sc-if value="{{mode.toDark}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></sc-if>
+      <sc-if value="{{mode.toLight}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+      <span>{{mode.text}}</span>
+    </a>
+  </header>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 20px">
+    <a href="Main.dc.html" style="color: {{t.accentText}}; font-weight: 500">← All students</a>
+
+    <section aria-label="Student" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding: 24px; border-radius: 12px; background: {{t.surface}}; border: 1px solid {{t.border}}">
+      <div style="display: flex; flex-direction: column; gap: 8px; flex: 999 1 520px; min-width: 0">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+          <h1 style="margin: 0; font-size: 28px; font-weight: 700">Aisha Johnson</h1>
+          <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: {{t.sisBg}}; color: {{t.sisText}}">Not started</span>
+        </div>
+        <div style="color: {{t.muted}}">S008 · Going into grade 12</div>
+        <p style="margin: 4px 0 0; max-width: 720px; line-height: 1.5"><span style="font-size: 12px; font-weight: 600; color: {{t.muted}}">FROM SIS PROFILE </span>On track for graduation. Focused on completing requirements. Interested in Psychology and Economics as final electives.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; flex: 1 1 240px">
+        <button type="button" disabled aria-describedby="done-why" style="height: 44px; padding: 0 18px; border-radius: 8px; border: none; background: {{t.disabledBg}}; color: {{t.disabledText}}; font: inherit; font-weight: 600; cursor: not-allowed">Mark Done</button>
+        <button type="button" style="height: 44px; padding: 0 18px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-weight: 500">Put on hold…</button>
+        <span id="done-why" style="font-size: 12px; font-weight: 600; color: {{t.errText}}">Fix 2 errors to mark Done.</span>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <section aria-labelledby="req-h" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: 12px; background: {{t.surface}}; border: 1px solid {{t.border}}">
+        <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px">
+          <h2 id="req-h" style="margin: 0; font-size: 20px; font-weight: 700">Requests for 2027–28</h2>
+          <span style="color: {{t.muted}}">3 priority · 3 elective · <b style="color: {{t.errText}}">2 errors</b></span>
+        </div>
+        <p style="margin: 0; padding: 12px 14px; border-radius: 8px; background: {{t.sisBg}}; line-height: 1.5">Two requests came from the SIS with problems. They're shown as they arrived; nothing was changed. Remove or replace them, then mark Done.</p>
+
+        <p style="margin: 0; font-size: 13px; color: {{t.muted}}">Select a course code to see everyone who requested it.</p>
+
+        <h3 style="margin: 8px 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: {{t.muted}}">PRIORITY: MUST TAKE</h3>
+        <sc-for list="{{priority}}" as="r" hint-placeholder-count="3">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 10px; border: 1px solid {{t.border}}">
+            <a href="{{r.href}}" title="See who requested this course" style="font-weight: 700; min-width: 72px; color: {{t.accentText}}; text-decoration: underline; text-underline-offset: 3px">{{r.code}}</a>
+            <span style="flex-grow: 1">{{r.name}} <span style="color: {{t.muted}}">· {{r.dept}} · grade {{r.grades}}</span></span>
+            <span style="{{tag.sis}}">From SIS</span>
+            <button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Make elective</button>
+            <button type="button" aria-label="{{r.removeLabel}}" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">✕</button>
+          </div>
+        </sc-for>
+
+        <h3 style="margin: 8px 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: {{t.muted}}">ELECTIVE</h3>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 10px; border: 1px solid {{t.border}}">
+          <a href="#" title="See who requested this course" style="font-weight: 700; min-width: 72px; color: {{t.accentText}}; text-decoration: underline; text-underline-offset: 3px">SCI403</a>
+          <span style="flex-grow: 1">Anatomy &amp; Physiology <span style="color: {{t.muted}}">· Science · grade 12</span></span>
+          <span style="{{tag.sis}}">From SIS</span>
+            <button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Make priority</button>
+            <button type="button" aria-label="Remove SCI403 Anatomy and Physiology" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">✕</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 10px; background: {{t.errBg}}; border: 1px solid {{t.errBorder}}">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+            <span style="font-weight: 700; min-width: 72px">SS303</span>
+            <span style="flex-grow: 1"><span style="color: {{t.muted}}">Unknown course</span></span>
+            <span style="{{tag.sis}}">From SIS</span>
+            <button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Make priority</button>
+            <button type="button" aria-label="Remove SS303" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">✕</button>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: flex-start; color: {{t.errText}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5h.01"></path></svg>
+            <span><b>SS303 isn't in the course catalog.</b> It can't be scheduled. Remove it and add the course Aisha meant from the catalog.</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 10px; background: {{t.errBg}}; border: 1px solid {{t.errBorder}}">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+            <a href="#" title="See who requested this course" style="font-weight: 700; min-width: 72px; color: {{t.accentText}}; text-decoration: underline; text-underline-offset: 3px">SS402</a>
+            <span style="flex-grow: 1">AP Government <span style="color: {{t.muted}}">· Social Studies · grade 12</span></span>
+            <span style="{{tag.sis}}">From SIS</span>
+            <button type="button" style="height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">Make priority</button>
+            <button type="button" aria-label="Remove the elective copy of SS402 AP Government" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">✕</button>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: flex-start; color: {{t.errText}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5h.01"></path></svg>
+            <span><b>AP Government is already on Aisha's list as a priority.</b> A course can only be requested once. Remove this copy.</span>
+          </div>
+        </div>
+      </section>
+
+      <aside aria-labelledby="cat-h" style="flex: 1 1 400px; display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 12px; background: {{t.surface}}; border: 1px solid {{t.border}}">
+        <h2 id="cat-h" style="margin: 0; font-size: 20px; font-weight: 700">Add from catalog</h2>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="cat-search" style="font-size: 12px; font-weight: 600; color: {{t.muted}}">Search courses</label>
+          <input id="cat-search" type="search" placeholder="Name or code" style="height: 44px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: inherit">
+        </div>
+        <fieldset style="margin: 0; padding: 0; border: none; display: flex; flex-direction: column; gap: 8px">
+          <legend style="padding: 0; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: {{t.muted}}">Show courses for grades</legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <label style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}">
+              <input type="checkbox" style="width: 18px; height: 18px; margin: 0">
+              <span>Grade 9</span>
+            </label>
+            <label style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}">
+              <input type="checkbox" style="width: 18px; height: 18px; margin: 0">
+              <span>Grade 10</span>
+            </label>
+            <label style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}">
+              <input type="checkbox" style="width: 18px; height: 18px; margin: 0">
+              <span>Grade 11</span>
+            </label>
+            <label style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.accent}}; background: {{t.accentSoft}}; color: {{t.accentText}}; font-weight: 600">
+              <input type="checkbox" checked style="width: 18px; height: 18px; margin: 0">
+              <span>Grade 12</span>
+            </label>
+          </div>
+          <span style="font-size: 12px; color: {{t.muted}}">Starts with the student's grade (12). Check more to see other courses.</span>
+        </fieldset>
+        <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse">
+          <thead>
+            <tr style="text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: {{t.muted}}">
+              <th scope="col" style="padding: 8px 8px 8px 0; border-bottom: 1px solid {{t.border}}; font-weight: 600; width: 72px">Code</th>
+              <th scope="col" style="padding: 8px; border-bottom: 1px solid {{t.border}}; font-weight: 600">Course</th>
+              <th scope="col" style="padding: 8px; border-bottom: 1px solid {{t.border}}; font-weight: 600; width: 56px">Grades</th>
+              <th scope="col" style="padding: 8px 0 8px 8px; border-bottom: 1px solid {{t.border}}; font-weight: 600; width: 76px; text-align: right"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Action</span></th>
+            </tr>
+          </thead>
+          <sc-for list="{{catalog}}" as="d" hint-placeholder-count="4">
+            <tbody>
+              <tr><th scope="rowgroup" colspan="4" style="padding: 14px 0 6px; text-align: left; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: {{t.muted}}">{{d.dept}}</th></tr>
+              <sc-for list="{{d.courses}}" as="c" hint-placeholder-count="2">
+                <tr>
+                  <td style="padding: 4px 8px 4px 0; border-bottom: 1px solid {{t.border}}; font-weight: 700">{{c.code}}</td>
+                  <td style="padding: 4px 8px; border-bottom: 1px solid {{t.border}}">{{c.name}}</td>
+                  <td style="padding: 4px 8px; border-bottom: 1px solid {{t.border}}; color: {{t.muted}}">{{c.grades}}</td>
+                  <td style="padding: 4px 0 4px 8px; border-bottom: 1px solid {{t.border}}; text-align: right">
+                    <sc-if value="{{c.added}}" hint-placeholder-val="{{false}}">
+                      <span style="font-size: 12px; font-weight: 600; color: {{t.okText}}">On list</span>
+                    </sc-if>
+                    <sc-if value="{{c.addable}}" hint-placeholder-val="{{true}}">
+                      <button type="button" aria-label="{{c.addLabel}}" style="height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.accent}}; background: {{t.surface}}; color: {{t.accentText}}; font: inherit; font-weight: 600">+ Add</button>
+                    </sc-if>
+                  </td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </sc-for>
+        </table>
+        </div>
+        <p style="margin: 0; font-size: 12px; color: {{t.muted}}">New courses are added as electives. Switch to priority on the list.</p>
+      </aside>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dark = !!this.props.dark;
+    const t = dark ? {
+      bg: '#0F1115', surface: '#171A21', text: '#E8EAED', muted: '#A3AAB6', border: '#2A2F3A', borderStrong: '#4A5262',
+      accent: '#7AA2F7', accentSoft: '#1C2A47', accentText: '#A9C2FA', okText: '#75E0A7',
+      errBg: '#2A1715', errBorder: '#7A2E28', errText: '#FDA29B', disabledBg: '#242934', disabledText: '#7D8594',
+      sisBg: '#242934', sisText: '#C9CED6'
+    } : {
+      bg: '#F6F7F9', surface: '#FFFFFF', text: '#1A1D23', muted: '#5B6270', border: '#E2E5EA', borderStrong: '#B8BEC8',
+      accent: '#2457C5', accentSoft: '#EAF0FC', accentText: '#1D4AAA', okText: '#067647',
+      errBg: '#FEF3F2', errBorder: '#F4A39B', errText: '#B42318', disabledBg: '#E2E5EA', disabledText: '#6B7280',
+      sisBg: '#F0F2F5', sisText: '#3F4652'
+    };
+    const pill = (bg, fg) => `display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: ${bg}; color: ${fg}`;
+    const tag = { sis: pill(t.sisBg, t.sisText) };
+    const priority = [
+      { code: 'MTH302', name: 'Statistics', dept: 'Math', grades: '11/12' },
+      { code: 'ENG401', name: 'AP English Language', dept: 'English', grades: '12' },
+      { code: 'SS402', name: 'AP Government', dept: 'Social Studies', grades: '12' }
+    ].map((r) => ({ ...r, removeLabel: `Remove ${r.code} ${r.name}`, href: '#' }));
+    const onList = ['MTH302', 'ENG401', 'SS402', 'SCI403'];
+    const raw = [
+      { dept: 'SOCIAL STUDIES', courses: [['SS302', 'Economics', '11/12'], ['SS401', 'AP U.S. History', '11/12'], ['SS402', 'AP Government', '12'], ['SS403', 'Psychology', '11/12']] },
+      { dept: 'MATH', courses: [['MTH301', 'Calculus', '11/12'], ['MTH302', 'Statistics', '11/12'], ['MTH401', 'AP Calculus AB', '12'], ['MTH402', 'AP Statistics', '12']] },
+      { dept: 'ENGLISH', courses: [['ENG302', 'Creative Writing', '11/12'], ['ENG401', 'AP English Language', '12'], ['ENG402', 'AP English Literature', '12'], ['ENG403', 'Senior Seminar', '12']] },
+      { dept: 'SCIENCE', courses: [['SCI302', 'Environmental Science', '11/12'], ['SCI401', 'AP Biology', '11/12'], ['SCI402', 'AP Chemistry', '12'], ['SCI403', 'Anatomy & Physiology', '12']] }
+    ];
+    const catalog = raw.map((d) => ({
+      dept: d.dept,
+      courses: d.courses.map(([code, name, grades]) => {
+        const added = onList.includes(code);
+        return { code, name, grades, added, addable: !added, addLabel: `Add ${code} ${name}` };
+      })
+    }));
+    const mode = { href: dark ? '#' : '#', label: dark ? 'Switch to light mode' : 'Switch to dark mode', text: dark ? 'Light' : 'Dark', toDark: !dark, toLight: dark };
+    return { t, mode, tag, priority, catalog };
+  }
+}
+</script>
+</body>
+</html>

@@ -11,8 +11,8 @@ updated: 2026-10-24
 | Step | What | Status |
 | --- | --- | --- |
 | 1 | Install the build kit | Done 2026-10-24 |
-| 2 | Requirements walkthrough and solution brainstorm with Stephen | In progress |
-| 3 | Architecture and solution brainstorm with Stephen | Not started |
-| 4 | Build with the kit (plan, seams review, design approval, test-first) | Waiting for Stephen's go-ahead |
+| 2 | Requirements walkthrough and solution brainstorm with Stephen | Done 2026-10-24 (Q1-Q6) |
+| 3 | Architecture and solution brainstorm with Stephen | Done 2026-10-25 (Q7-Q10) |
+| 4 | Build with the kit (plan, seams review, design approval, test-first) | Designs approved 2026-10-27; plan and Phase 1 seams review written 2026-10-28 ([phases.md](phases.md)); build waiting for Stephen's go-ahead |
 
 Seams reviews go in [`reviews/`](reviews/).

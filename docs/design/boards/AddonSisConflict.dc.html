@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SIS changes to review (add-on)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}table{border-collapse:collapse}</style>
+</helmet>
+<div style="min-height: 1900px; background: #F6F7F9; color: #1A1D23; font-family: Inter, system-ui, sans-serif; font-size: 14px">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; padding: 0 32px; min-height: 60px; background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+    <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2457C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2"></path><path d="M8 7h8M8 11h6"></path></svg>
+      <span>CourseManager</span>
+    </div>
+    <nav aria-label="Main" style="display: flex; gap: 4px">
+      <a href="Main.dc.html" aria-current="page" style="padding: 8px 14px; border-radius: 8px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">Students</a>
+      <a href="Courses.dc.html" style="padding: 8px 14px; border-radius: 8px; font-weight: 500; color: #5B6270">Courses</a>
+    </nav>
+    <div style="flex-grow: 1"></div>
+    <span style="color: #5B6270">2027–28 course requests · SIS data as of Oct 27, 6:00 AM</span>
+    <span style="font-weight: 500">Ms. Lee · Counselor</span>
+  </header>
+  <div role="note" style="display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 12px 32px; background: #F4F3FF; border-bottom: 1px solid #7A5AF8; color: #3E1C96">
+    <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #7A5AF8; color: #FFFFFF">Add-on · designed, not built</span>
+    <span>A later SIS import disagrees with the counselor's edits: shown on the request, never overwritten (Q2, Q18, Q19).</span>
+  </div>
+  <main style="max-width: 1240px; margin: 0 auto; padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 20px">
+    <a href="StudentDetail.dc.html" style="color: #1D4AAA; font-weight: 500">← All students</a>
+    <div role="status" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 10px; background: #EAF0FC; border: 1px solid #2457C5; color: #1D4AAA">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>
+      <span style="flex-grow: 1"><b>The SIS changed 2 of Jordan's requests after you edited them.</b> This morning's SIS update (Oct 28, 6:00 AM) disagrees with your changes. Your version is kept until you choose.</span>
+    </div>
+
+    <section aria-label="Student" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+      <div style="display: flex; flex-direction: column; gap: 8px; flex: 999 1 520px; min-width: 0">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+          <h1 style="margin: 0; font-size: 28px; font-weight: 700">Jordan Williams</h1>
+          <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">In progress</span>
+          <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">2 SIS changes to review</span>
+        </div>
+        <div style="color: #5B6270">S003 · Going into grade 10</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; flex: 1 1 240px">
+        <button type="button" disabled style="height: 44px; padding: 0 18px; border-radius: 8px; border: none; background: #E2E5EA; color: #6B7280; font: inherit; font-weight: 600; cursor: not-allowed">Mark Done</button>
+        <span style="font-size: 12px; font-weight: 600; color: #1D4AAA">Review 2 SIS changes to mark Done.</span>
+      </div>
+    </section>
+
+    <section aria-labelledby="req-h" style="display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+      <h2 id="req-h" style="margin: 0; font-size: 20px; font-weight: 700">Requests for 2027–28</h2>
+      <h3 style="margin: 4px 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #5B6270">PRIORITY: MUST TAKE</h3>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 10px; background: #F5F8FF; border: 2px solid #2457C5">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+          <span style="font-weight: 700; min-width: 72px">MTH101</span>
+          <span style="flex-grow: 1">Algebra I <span style="color: #5B6270">· Math · grade 9</span></span>
+          <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">SIS changed this</span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: flex-start; color: #1D4AAA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg><span><b>The SIS now has Geometry instead of Algebra I.</b> You kept Algebra I as a retake on Oct 27. If Jordan passed Algebra I in summer school, Geometry is right.</span></div>
+        <div style="overflow-x: auto"><table style="width: 100%; min-width: 560px; background: #FFFFFF; border-radius: 8px">
+            <thead><tr><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left"></th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">SIS before · Oct 26</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Yours · in the app</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">SIS now · Oct 28</th></tr></thead>
+            <tbody><tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Course</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">MTH101 Algebra I</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">MTH101 Algebra I · reason: "Retake: failed Algebra I last year"</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>MTH102 Geometry</b></td></tr><tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Type</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Priority</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Priority</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Priority</td></tr></tbody></table></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Keep mine: Algebra I</button>
+          <button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: none; background: #2457C5; color: #FFFFFF; font: inherit; font-weight: 600">Use SIS: Geometry</button>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 10px; border: 1px solid #E2E5EA">
+        <span style="font-weight: 700; min-width: 72px">ENG201</span><span style="flex-grow: 1">English 10 <span style="color: #5B6270">· English · grade 10</span></span><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F0F2F5; color: #3F4652">From SIS</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 10px; border: 1px solid #E2E5EA">
+        <span style="font-weight: 700; min-width: 72px">SS201</span><span style="flex-grow: 1">U.S. History <span style="color: #5B6270">· Social Studies · grade 10</span></span><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F0F2F5; color: #3F4652">From SIS</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 10px; border: 1px solid #E2E5EA">
+        <span style="font-weight: 700; min-width: 72px">SCI201</span><span style="flex-grow: 1">Chemistry <span style="color: #5B6270">· Science · grade 10</span></span><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F0F2F5; color: #3F4652">From SIS</span>
+      </div>
+
+      <h3 style="margin: 8px 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #5B6270">ELECTIVE</h3>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 10px; border: 1px solid #E2E5EA">
+        <span style="font-weight: 700; min-width: 72px">AT202</span><span style="flex-grow: 1">Music Theory <span style="color: #5B6270">· Arts &amp; Tech · grade 10/11</span></span><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #ECFDF3; color: #067647">Added in app</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 10px; background: #F5F8FF; border: 2px solid #2457C5">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+          <span style="font-weight: 700; min-width: 72px; text-decoration: line-through; color: #5B6270">AT201</span>
+          <span style="flex-grow: 1; color: #5B6270"><s>Web Design</s> · removed by you</span>
+          <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">SIS changed this</span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: flex-start; color: #1D4AAA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg><span><b>You removed Web Design, but the SIS now has it as a priority.</b> Someone may have updated Jordan's picks in the SIS after your meeting.</span></div>
+        <div style="overflow-x: auto"><table style="width: 100%; min-width: 560px; background: #FFFFFF; border-radius: 8px">
+            <thead><tr><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left"></th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">SIS before · Oct 26</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Yours · in the app</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">SIS now · Oct 28</th></tr></thead>
+            <tbody><tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>On the list</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Yes</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Removed</b> on Oct 27 (swapped for Music Theory)</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Yes</td></tr><tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Type</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Elective</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">—</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>Priority</b></td></tr></tbody></table></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: none; background: #2457C5; color: #FFFFFF; font: inherit; font-weight: 600">Keep it removed</button>
+          <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Add it back as priority</button>
+        </div>
+      </div>
+
+      <details style="padding: 12px 16px; border-radius: 10px; background: #F6F7F9; border: 1px solid #E2E5EA">
+        <summary style="cursor: pointer; font-weight: 600; min-height: 24px">1 SIS change applied automatically</summary>
+        <p style="margin: 10px 0 0">SCI201 Chemistry: the SIS changed it from elective to priority. You hadn't edited it, so it was applied. Nothing for you to do.</p>
+      </details>
+    </section>
+
+    <section aria-labelledby="how-h" style="display: flex; flex-direction: column; gap: 10px; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+      <h2 id="how-h" style="margin: 0; font-size: 16px; font-weight: 700">Elsewhere</h2>
+      <ul style="margin: 0; padding-left: 18px; line-height: 1.8">
+        <li><b>Student list:</b> Jordan's Checks column shows "2 SIS changes", and a <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">SIS changes · 3</span> filter chip finds every student with one.</li>
+        <li><b>After an import:</b> a one-line banner on the student list: "This morning's SIS update changed 3 requests you'd edited, for 2 students. Review them."</li>
+        <li><b>Choices are recorded</b> on the request (who, when, which side), so a later import doesn't ask again.</li>
+      </ul>
+    </section>
+    <p style="margin: 0; font-size: 12px; color: #5B6270">Sample conflicts for illustration. Requires the sync demo (Q9) and the three-way merge (Q18); assumes one-way sync (Q19). "Blocks Done until reviewed" is a proposal for Stephen.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

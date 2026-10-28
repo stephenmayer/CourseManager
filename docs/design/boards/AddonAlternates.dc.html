@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Alternates (add-on)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}table{border-collapse:collapse}</style>
+</helmet>
+<div style="min-height: 1060px; background: #F6F7F9; color: #1A1D23; font-family: Inter, system-ui, sans-serif; font-size: 14px">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; padding: 0 32px; min-height: 60px; background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+    <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2457C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2"></path><path d="M8 7h8M8 11h6"></path></svg>
+      <span>CourseManager</span>
+    </div>
+    <nav aria-label="Main" style="display: flex; gap: 4px">
+      <a href="Main.dc.html" aria-current="page" style="padding: 8px 14px; border-radius: 8px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">Students</a>
+      <a href="Courses.dc.html" style="padding: 8px 14px; border-radius: 8px; font-weight: 500; color: #5B6270">Courses</a>
+    </nav>
+    <div style="flex-grow: 1"></div>
+    <span style="color: #5B6270">2027–28 course requests · SIS data as of Oct 27, 6:00 AM</span>
+    <span style="font-weight: 500">Ms. Lee · Counselor</span>
+  </header>
+  <div role="note" style="display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 12px 32px; background: #F4F3FF; border-bottom: 1px solid #7A5AF8; color: #3E1C96">
+    <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #7A5AF8; color: #FFFFFF">Add-on · designed, not built</span>
+    <span>Ranked backups for electives, ready to add live in the follow-up (Q16). Example: Jordan backs up Music Theory with Web Design.</span>
+  </div>
+  <main style="max-width: 1240px; margin: 0 auto; padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 20px">
+    <a href="StudentDetail.dc.html" style="color: #1D4AAA; font-weight: 500">← Jordan Williams</a>
+    <section aria-labelledby="el-h" style="display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+      <h1 id="el-h" style="margin: 0; font-size: 22px; font-weight: 700">Jordan Williams · Electives with alternates</h1>
+      <p style="margin: 0; color: #5B6270">If the schedule can't fit a first choice, the scheduler tries the backups in order.</p>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 10px; border: 1px solid #E2E5EA">
+        <span style="font-weight: 700; min-width: 72px">AT202</span>
+        <span style="flex-grow: 1">Music Theory <span style="color: #5B6270">· Arts &amp; Tech · first choice</span></span>
+        <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #ECFDF3; color: #067647">Added in app</span>
+        <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">+ Add alternate</button>
+        <button type="button" aria-label="Remove AT202 Music Theory" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; font: inherit">✕</button>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-left: 40px; padding: 10px 16px; border-radius: 10px; border: 1px dashed #B8BEC8; background: #F6F7F9">
+        <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F0F2F5; color: #3F4652">Backup 1</span>
+        <span style="font-weight: 700; min-width: 72px">AT201</span>
+        <span style="flex-grow: 1">Web Design <span style="color: #5B6270">· Arts &amp; Tech</span></span>
+        <button type="button" aria-label="Move up" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; font: inherit">↑</button>
+        <button type="button" aria-label="Move down" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; font: inherit">↓</button>
+        <button type="button" aria-label="Remove backup AT201" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; font: inherit">✕</button>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-left: 40px; padding: 10px 16px; border-radius: 10px; border: 1px dashed #B8BEC8; background: #F6F7F9">
+        <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F0F2F5; color: #3F4652">Backup 2</span>
+        <span style="font-weight: 700; min-width: 72px">AT102</span>
+        <span style="flex-grow: 1">Visual Arts I <span style="color: #5B6270">· Arts &amp; Tech</span></span>
+        <button type="button" aria-label="Move up" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; font: inherit">↑</button>
+        <button type="button" aria-label="Move down" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; font: inherit">↓</button>
+        <button type="button" aria-label="Remove backup AT102" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; font: inherit">✕</button>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: flex-start; margin-left: 40px; padding: 12px 14px; border-radius: 10px; background: #FEF3F2; border: 1px solid #F4A39B; color: #B42318">
+        <span><b>Example error:</b> a backup can't be the same course as its first choice, or point at a request that was removed.</span>
+      </div>
+    </section>
+    <section aria-labelledby="ca-h" style="display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+      <h2 id="ca-h" style="margin: 0; font-size: 18px; font-weight: 700">On the Courses screen, backups are counted on their own</h2>
+      <table style="width: 100%; max-width: 760px">
+        <thead><tr><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Code</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Course</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left; text-align: right">Priority</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left; text-align: right">Elective</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left; text-align: right">Backup</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left; text-align: right">First-choice total</th></tr></thead>
+        <tbody>
+          <tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>AT201</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Web Design</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right; font-weight: 600">1</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td></tr>
+          <tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>AT202</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Music Theory</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">1</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">1</td></tr>
+          <tr><td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>AT102</b></td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Visual Arts I</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right; font-weight: 600">1</td><td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td></tr>
+        </tbody>
+      </table>
+      <p style="margin: 0; font-size: 12px; color: #5B6270">Backups don't count toward demand, the core-subject check or the AP load warning.</p>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1060}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sync jobs (add-on)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}table{border-collapse:collapse}</style>
+</helmet>
+<div style="min-height: 1100px; background: #F6F7F9; color: #1A1D23; font-family: Inter, system-ui, sans-serif; font-size: 14px">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; padding: 0 32px; min-height: 60px; background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+    <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2457C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2"></path><path d="M8 7h8M8 11h6"></path></svg>
+      <span>CourseManager</span>
+    </div>
+    <nav aria-label="Main" style="display: flex; gap: 4px">
+      <a href="Main.dc.html" style="padding: 8px 14px; border-radius: 8px; font-weight: 500; color: #5B6270">Students</a>
+      <a href="Courses.dc.html" style="padding: 8px 14px; border-radius: 8px; font-weight: 500; color: #5B6270">Courses</a>
+      <a href="AddonJobs.dc.html" aria-current="page" style="padding: 8px 14px; border-radius: 8px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">Sync jobs</a>
+    </nav>
+    <div style="flex-grow: 1"></div>
+    <span style="color: #5B6270">2027–28 course requests · SIS data as of Oct 27, 6:00 AM</span>
+    <span style="font-weight: 500">Ms. Lee · Counselor</span>
+  </header>
+  <div role="note" style="display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 12px 32px; background: #F4F3FF; border-bottom: 1px solid #7A5AF8; color: #3E1C96">
+    <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #7A5AF8; color: #FFFFFF">Add-on · designed, not built</span>
+    <span>Background SIS sync runs on Timely's job queue, with cancel and roll back (Q13, Q14). Likely for an admin role.</span>
+  </div>
+  <main style="max-width: 1240px; margin: 0 auto; padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700">Sync jobs</h1>
+      <p style="margin: 0; color: #5B6270">Every SIS sync runs as a background job. Watch what's running, cancel a job, or roll back a completed run. (Q13, Q14)</p>
+    </div>
+    <div role="group" aria-label="Filter by state" style="display: flex; flex-wrap: wrap; gap: 8px">
+      <button type="button" aria-pressed="true" style="height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #2457C5; background: #EAF0FC; color: #1D4AAA; font: inherit; font-weight: 600">All · 5</button>
+      <button type="button" aria-pressed="false" style="height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #E2E5EA; background: #FFFFFF; font: inherit">Running · 1</button>
+      <button type="button" aria-pressed="false" style="height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #E2E5EA; background: #FFFFFF; font: inherit">Queued · 1</button>
+      <button type="button" aria-pressed="false" style="height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #E2E5EA; background: #FFFFFF; font: inherit">Errored · 1</button>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <div style="flex: 999 1 640px; min-width: 0; overflow-x: auto; border: 1px solid #E2E5EA; border-radius: 12px; background: #FFFFFF">
+        <table style="width: 100%; min-width: 760px">
+          <thead><tr><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Run</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">State</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Started</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left">Elapsed</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left; text-align: right">Changes</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left; text-align: right">Errors in</th><th scope="col" style="padding: 10px 12px; border-bottom: 1px solid #E2E5EA; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #5B6270; font-weight: 600; text-align: left"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th></tr></thead>
+          <tbody>
+          <tr style="">
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>#1043</b><div style="font-size: 12px; color: #5B6270">Nightly SIS sync</div></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F0F2F5; color: #3F4652">Submitted</span><div style="font-size: 12px; color: #5B6270; margin-top: 4px">Queued: one sync per district at a time</div></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Oct 27, 6:05 AM</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">waiting</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">—</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">—</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right"><button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Cancel</button></td>
+          </tr>
+          <tr style="">
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>#1042</b><div style="font-size: 12px; color: #5B6270">Nightly SIS sync</div></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #EAF0FC; color: #1D4AAA">Started</span><div style="font-size: 12px; color: #5B6270; margin-top: 4px">Students done, loading requests</div></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Oct 27, 6:00 AM</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">3m 12s</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">—</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">—</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right"><button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Cancel</button></td>
+          </tr>
+          <tr style="background: #EAF0FC">
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>#1041</b><div style="font-size: 12px; color: #5B6270">Nightly SIS sync</div></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #ECFDF3; color: #067647">Completed</span></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Oct 26, 6:00 AM</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">4m 05s</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">38</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right"><span style="color: #B42318; font-weight: 600">2</span></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right"><button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Roll back…</button></td>
+          </tr>
+          <tr style="">
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>#1040</b><div style="font-size: 12px; color: #5B6270">Manual sync</div></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #FEF3F2; color: #B42318">Errored</span><div style="font-size: 12px; color: #5B6270; margin-top: 4px">SIS API timed out; nothing was written</div></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Oct 25, 2:14 PM</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">0m 41s</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">—</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right"><a href="#" style="color: #1D4AAA; font-weight: 600; text-decoration: underline">Error report</a></td>
+          </tr>
+          <tr style="">
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><b>#1039</b><div style="font-size: 12px; color: #5B6270">Nightly SIS sync</div></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA"><span style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F4EBFF; color: #6927DA">Rolled back</span><div style="font-size: 12px; color: #5B6270; margin-top: 4px">Rolled back by Mr. Diaz, Oct 25 9:10 AM</div></td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">Oct 25, 6:00 AM</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA">3m 58s</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">41</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right">0</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E2E5EA; text-align: right"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <aside aria-labelledby="run-h" style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+        <h2 id="run-h" style="margin: 0; font-size: 20px; font-weight: 700">Run #1041</h2>
+        <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px">
+          <li>✓ Submitted <span style="color: #5B6270">· 6:00:00 AM</span></li>
+          <li>✓ Started <span style="color: #5B6270">· 6:00:02 AM</span></li>
+          <li>✓ Completed <span style="color: #5B6270">· 6:04:07 AM</span></li>
+        </ol>
+        <h3 style="margin: 6px 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #5B6270">CHANGES APPLIED · 38</h3>
+        <ul style="margin: 0; padding-left: 18px; line-height: 1.7">
+          <li>12 student records updated</li>
+          <li>3 catalog courses changed</li>
+          <li>23 SIS requests added or updated</li>
+          <li>4 requests skipped because a counselor edited them (Q2)</li>
+        </ul>
+        <h3 style="margin: 6px 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #5B6270">ERRORS BROUGHT IN · 2</h3>
+        <ul style="margin: 0; padding-left: 18px; line-height: 1.7">
+          <li><a href="StudentErrors.dc.html" style="color: #1D4AAA; text-decoration: underline">Aisha Johnson</a>: SS303 isn't in the catalog</li>
+          <li><a href="StudentErrors.dc.html" style="color: #1D4AAA; text-decoration: underline">Aisha Johnson</a>: SS402 requested twice</li>
+        </ul>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 10px; background: #FFF8EB; border: 1px solid #F5C26B">
+          <b>Roll back this run?</b>
+          <span>Puts back the 38 values this run changed. Requests a counselor edited are never touched.</span>
+          <div><button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #B8BEC8; background: #FFFFFF; color: #1A1D23; font: inherit">Roll back run #1041</button></div>
+        </div>
+      </aside>
+    </div>
+    <p style="margin: 0; font-size: 12px; color: #5B6270">Sample runs for illustration. States match Timely's job pattern: submitted, started, completed, errored. An errored run writes nothing.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
