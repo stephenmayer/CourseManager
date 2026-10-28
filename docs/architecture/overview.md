@@ -85,14 +85,20 @@ Adding a rule = one function + its tests. That is the "generalize" story: gradua
 2. **Student detail:** profile, requests grouped Priority then Elective, each with source and any issue; add from catalog (grade checkboxes 9-12, the student's grade checked by default); remove; switch P/E; give a reason; set status; select a course code to open the same course dialog as the Courses screen.
 3. **Courses** ([Q12](../decisions/q012-course-view.md)): every course with request counts by department, plus a "Not in catalog" row; select a course to open a dialog showing who requested it, to remove, switch P/E or open the student. Catalog stays read-only.
 
+4. **Settings** ([Q20](../decisions/q020-checks-on-off.md)): switch each warning check on or off for everyone; errors stay on.
+
 ## 5. Testing strategy
 
-- Unit tests on every rule, using the seed's own cases (S003, S006, S008) as fixtures: the bulk of the value.
-- API tests through the service with a fresh in-memory SQLite database per test: add, remove, switch type, Done blocked by an error, edit reopens Done.
-- Frontend: typecheck plus one smoke test of the main flow if time allows.
-- One command runs it all (the kit's merge gate).
+As built in Phase 1 (`backend/tests/`, and `*.test.ts(x)` next to each component):
 
-Pilot vs scale, in one line each for the README: the ports let a pilot run on a nightly SIS file and an in-memory or SQLite store, and move to a real database and SIS API without touching rules or UI; what doesn't scale yet is auth, tenancy (every query scoped by school), and audit history.
+- **Rules:** every check is a pure function, unit-tested on the seed's own students (Jordan's retake, Sofia's grade-12 courses, Aisha's unknown and duplicate codes, the heavy AP loads). A test holds every check's issues to the id and severity the Settings screen switches and locks by. The bulk of the value.
+- **API:** through FastAPI and the service, with a fresh in-memory SQLite database per test: add, remove, switch type, reasons, Done blocked by an error, edits reopening Done, course counts agreeing with the student list, check switches, reset, a failed write rolling back.
+- **Data layer:** seed loading, import versioning, soft delete, an older database gaining new tables on startup.
+- **Screens:** component tests with the API client mocked: filters, search, edits, error states, switches.
+- **Test first:** each issue's failing tests are committed before its code. One command runs it all (`make verify`, the merge gate); a change to app code with no new or changed test is refused ([developer guide](../process/developer-guide.md)).
+- **Not automated, on purpose:** browser end-to-end tests (each screen is checked by running the app and comparing screenshots with its approved board) and load testing (one SQLite file serves one school).
+
+Pilot vs scale: summarised for reviewers in the [README](../../README.md#5-pilot-vs-scale).
 
 ## 6. Choices made with Stephen (all decided)
 
