@@ -1,7 +1,7 @@
 // The course dialog (Q12): who requested a course, with the same edits as the student page.
 // Opened from the Courses screen and from any course code on a student page, so it
 // fetches its own data and takes only the code.
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { api, type CatalogCourse, type CourseRequest } from "../api/client";
@@ -78,6 +78,10 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
   const [error, setError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   // Bumped after each edit to fetch the requests again.
   const [version, setVersion] = useState(0);
@@ -106,24 +110,36 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
     };
   }, []);
 
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Escape") {
-      event.stopPropagation();
-      onClose();
-      return;
+  // Keys are handled on the document: after an edit the focused button can be disabled
+  // or gone, leaving focus on the body, and Escape and Tab must still work.
+  useEffect(() => {
+    function onKeyDown(event: globalThis.KeyboardEvent) {
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (!dialog.contains(active)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
-    if (event.key !== "Tab" || !dialogRef.current) return;
-    const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE));
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   async function edit(action: () => Promise<unknown>) {
     setBusy(true);
@@ -155,7 +171,6 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
         aria-modal="true"
         aria-labelledby="course-dialog-title"
         className="dialog"
-        onKeyDown={onKeyDown}
       >
         <button ref={closeRef} type="button" className="dialog-close" aria-label="Close" onClick={onClose}>
           ✕
