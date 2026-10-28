@@ -100,6 +100,14 @@ function jordan(overrides: Partial<StudentDetail> = {}): StudentDetail {
   };
 }
 
+// Jordan with MTH101 changed (e.g. a saved reason), its warning marked kept.
+function jordanWithMth101(changes: Partial<RequestOut>): StudentDetail {
+  return jordan({
+    requests: jordan().requests.map((r) => (r.id === "r-mth101" ? { ...r, ...changes } : r)),
+    issues: [{ ...MTH101_WARNING, kept: true }],
+  });
+}
+
 const SS303_ERROR = issue(
   "error",
   "unknown_course",
@@ -173,6 +181,14 @@ async function renderStudent(id: string, props: { courseDialog?: React.Component
 async function click(element: HTMLElement) {
   fireEvent.click(element);
   await act(async () => {});
+}
+
+async function putOnHold(reason: string) {
+  await click(screen.getByRole("button", { name: "Put on hold…" }));
+  fireEvent.change(screen.getByLabelText("Why is this student on hold?"), {
+    target: { value: reason },
+  });
+  await click(screen.getByRole("button", { name: "Put on hold" }));
 }
 
 function requestRow(code: string, nth = 0) {
@@ -262,11 +278,9 @@ test("Jordan's MTH101 shows the warning in plain language with a reason field", 
 });
 
 test("Keep with reason saves the reason on that request and re-renders from the response", async () => {
-  const kept = jordan({
-    requests: jordan().requests.map((r) =>
-      r.id === "r-mth101" ? { ...r, reason: "Retake: failed Algebra I last year", edited_in_app: true } : r,
-    ),
-    issues: [{ ...MTH101_WARNING, kept: true }],
+  const kept = jordanWithMth101({
+    reason: "Retake: failed Algebra I last year",
+    edited_in_app: true,
   });
   mocked.updateRequest.mockResolvedValue(kept);
   await renderStudent("S003");
@@ -299,12 +313,7 @@ test("Keep with reason with an empty reason asks for one and doesn't save", asyn
 
 test("a kept warning shows its saved reason", async () => {
   mocked.student.mockResolvedValue(
-    jordan({
-      requests: jordan().requests.map((r) =>
-        r.id === "r-mth101" ? { ...r, reason: "Retake: failed Algebra I last year" } : r,
-      ),
-      issues: [{ ...MTH101_WARNING, kept: true }],
-    }),
+    jordanWithMth101({ reason: "Retake: failed Algebra I last year" }),
   );
 
   await renderStudent("S003");
@@ -315,12 +324,7 @@ test("a kept warning shows its saved reason", async () => {
 });
 
 test("Make elective switches that request by its ID and keeps its reason (S7)", async () => {
-  const switched = jordan({
-    requests: jordan().requests.map((r) =>
-      r.id === "r-mth101" ? { ...r, type: "elective", reason: "Retake", edited_in_app: true } : r,
-    ),
-    issues: [{ ...MTH101_WARNING, kept: true }],
-  });
+  const switched = jordanWithMth101({ type: "elective", reason: "Retake", edited_in_app: true });
   mocked.updateRequest.mockResolvedValue(switched);
   await renderStudent("S003");
 
@@ -477,11 +481,7 @@ test("Put on hold with a reason saves it", async () => {
   );
   await renderStudent("S003");
 
-  await click(screen.getByRole("button", { name: "Put on hold…" }));
-  fireEvent.change(screen.getByLabelText("Why is this student on hold?"), {
-    target: { value: "Waiting on summer school grade" },
-  });
-  await click(screen.getByRole("button", { name: "Put on hold" }));
+  await putOnHold("Waiting on summer school grade");
 
   expect(mocked.setReview).toHaveBeenCalledWith("S003", "on_hold", "Waiting on summer school grade");
   expect(screen.queryByLabelText("Why is this student on hold?")).not.toBeInTheDocument();
@@ -656,11 +656,7 @@ test("a hold the server refuses keeps the form open with the server's message", 
   mocked.setReview.mockRejectedValue(new ApiError("Say why the student is on hold.", 422));
   await renderStudent("S003");
 
-  await click(screen.getByRole("button", { name: "Put on hold…" }));
-  fireEvent.change(screen.getByLabelText("Why is this student on hold?"), {
-    target: { value: "Waiting" },
-  });
-  await click(screen.getByRole("button", { name: "Put on hold" }));
+  await putOnHold("Waiting");
 
   expect(screen.getByLabelText("Why is this student on hold?")).toHaveValue("Waiting");
   expect(screen.getByRole("alert")).toHaveTextContent("Say why the student is on hold.");

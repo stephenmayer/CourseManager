@@ -5,7 +5,6 @@ import { type ComponentType, type FormEvent, useCallback, useEffect, useRef, use
 import { Link, useParams } from "react-router";
 
 import {
-  ApiError,
   api,
   type CatalogCourse,
   type IssueOut,
@@ -13,13 +12,11 @@ import {
   type ReviewStatus,
   type StudentDetail,
 } from "../api/client";
+import type { CourseDialogProps } from "../courses/CourseDialog";
+import { errorText, gradeList, plural } from "../courses/format";
 
-// The course dialog belongs to the Courses screen (#8); App passes it in.
-export interface CourseDialogProps {
-  code: string;
-  onClose: () => void;
-  onChange: () => void;
-}
+// The course dialog belongs to the Courses screen (#8); App passes it in, tests pass a stand-in.
+export type { CourseDialogProps };
 
 const GRADES = [9, 10, 11, 12];
 
@@ -31,18 +28,6 @@ const STATUS_LABEL: Record<ReviewStatus, string> = {
 };
 
 const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
-
-function plural(count: number, word: string): string {
-  return `${count} ${word}${count === 1 ? "" : "s"}`;
-}
-
-function message(error: unknown): string {
-  return error instanceof ApiError ? error.message : "Something went wrong. Try again.";
-}
-
-function gradesText(grades: number[]): string {
-  return grades.join("/");
-}
 
 export default function StudentDetailPage({
   courseDialog: CourseDialog,
@@ -64,7 +49,7 @@ export default function StudentDetailPage({
         if (current) setStudent(loaded);
       },
       (error: unknown) => {
-        if (current) setLoadError(message(error));
+        if (current) setLoadError(errorText(error));
       },
     );
     return () => {
@@ -79,7 +64,7 @@ export default function StudentDetailPage({
         if (current) setCatalog(loaded);
       },
       (error: unknown) => {
-        if (current) setActionError(message(error));
+        if (current) setActionError(errorText(error));
       },
     );
     return () => {
@@ -88,7 +73,7 @@ export default function StudentDetailPage({
   }, []);
 
   const reload = useCallback(() => {
-    api.student(id).then(setStudent, (error: unknown) => setActionError(message(error)));
+    api.student(id).then(setStudent, (error: unknown) => setActionError(errorText(error)));
   }, [id]);
 
   // One write at a time, so a double click can't send the same edit twice.
@@ -101,7 +86,7 @@ export default function StudentDetailPage({
       setActionError(null);
       return true;
     } catch (error) {
-      setActionError(message(error));
+      setActionError(errorText(error));
       return false;
     } finally {
       writing.current = false;
@@ -203,7 +188,7 @@ function HeaderCard({
   }
 
   return (
-    <section aria-label="Student" className="sd-card sd-student-card">
+    <section aria-label="Student" className="card sd-card sd-student-card">
       <div className="sd-student-card-main">
         <div className="sd-student-title">
           <h1>{student.name}</h1>
@@ -273,7 +258,7 @@ function HeaderCard({
 }
 
 interface RowActions {
-  onOpenCourse: ((code: string) => void) | undefined;
+  onOpenCourse?: (code: string) => void;
   onSwitch: (request: RequestOut) => void;
   onRemove: (request: RequestOut) => void;
   onKeep: (request: RequestOut, reason: string) => void;
@@ -290,7 +275,7 @@ function Requests({ student, ...actions }: { student: StudentDetail } & RowActio
   ).length;
 
   return (
-    <section aria-labelledby="req-h" className="sd-card sd-requests">
+    <section aria-labelledby="req-h" className="card sd-card sd-requests">
       <div className="sd-requests-head">
         <h2 id="req-h">Requests for 2027–28</h2>
         <span className="muted">
@@ -332,14 +317,14 @@ function Requests({ student, ...actions }: { student: StudentDetail } & RowActio
             id="group-priority"
             title="Priority: must take"
             requests={priority}
-            student={student}
+            issues={student.issues}
             {...actions}
           />
           <RequestGroup
             id="group-elective"
             title="Elective"
             requests={elective}
-            student={student}
+            issues={student.issues}
             {...actions}
           />
         </>
@@ -352,9 +337,9 @@ function RequestGroup({
   id,
   title,
   requests,
-  student,
+  issues,
   ...actions
-}: { id: string; title: string; requests: RequestOut[]; student: StudentDetail } & RowActions) {
+}: { id: string; title: string; requests: RequestOut[]; issues: IssueOut[] } & RowActions) {
   return (
     <>
       <h3 id={id} className="sd-group-heading">
@@ -369,7 +354,7 @@ function RequestGroup({
               // Re-mount when the saved reason changes so the field shows the server's value.
               key={`${r.id}:${r.reason ?? ""}`}
               request={r}
-              issues={student.issues.filter((i) => i.request_id === r.id)}
+              issues={issues.filter((i) => i.request_id === r.id)}
               {...actions}
             />
           ))}
@@ -436,7 +421,7 @@ function RequestRow({
               {request.course_name}
               <span className="muted">
                 {" "}
-                · {request.department} · grade {gradesText(request.grades ?? [])}
+                · {request.department} · grade {gradeList(request.grades ?? [])}
               </span>
             </>
           ) : (
@@ -466,7 +451,7 @@ function RequestRow({
       {errors.length === 0 && warnings.length > 0 && (
         <div className="sd-keep-reason">
           <div className="sd-keep-field">
-            <label htmlFor={reasonId} className="sd-field-label sd-warn-text">
+            <label htmlFor={reasonId} className="sd-field-label">
               Reason for keeping it
             </label>
             <input
@@ -554,7 +539,7 @@ function AddFromCatalog({
   }
 
   return (
-    <aside aria-labelledby="cat-h" className="sd-card sd-catalog">
+    <aside aria-labelledby="cat-h" className="card sd-card sd-catalog">
       <h2 id="cat-h">Add from catalog</h2>
       <div className="sd-field">
         <label htmlFor="cat-search" className="sd-field-label">
@@ -619,7 +604,7 @@ function AddFromCatalog({
                     <tr key={c.code}>
                       <td className="sd-col-code">{c.code}</td>
                       <td>{c.name}</td>
-                      <td className="muted">{gradesText(c.grades)}</td>
+                      <td className="muted">{gradeList(c.grades)}</td>
                       <td className="sd-col-action">
                         {onList.has(c.code) ? (
                           <span className="sd-on-list">On list</span>

@@ -507,11 +507,9 @@ a:hover {
 
 /* Controls (touch targets 44px, per the boards) */
 
+/* On top of the shared .card */
 .sd-card {
   padding: 24px;
-  border-radius: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
 }
 
 .sd-pill {
@@ -820,7 +818,8 @@ a:hover {
   flex-direction: column;
   gap: 10px;
   border-radius: 10px;
-  border: 1px solid var(--warn-border);
+  border-width: 1px;
+  border-style: solid;
 }
 
 .sd-request-line {
