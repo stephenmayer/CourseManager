@@ -2,7 +2,7 @@
 id: developer-guide
 title: Developer guide
 status: current
-owns: "how to set up, run, test and verify the code, and what CI enforces"
+owns: "how to set up, run, test and verify the code, and the local merge gate"
 updated: 2026-10-28
 ---
 
@@ -20,7 +20,7 @@ Needs Python 3.12 and [uv](https://docs.astral.sh/uv/), Node 22 with npm, and GN
 | `backend/tests/` | pytest suite. |
 | `frontend/src/` | React + TypeScript (Vite). Tests sit next to the code as `*.test.ts(x)` (Vitest, Testing Library). |
 | `scripts/dev.sh` | Runs the API and the app together (`make dev`). |
-| `scripts/ci/` | CI helpers and their tests (`tests_required.py`). |
+| `scripts/ci/` | Gate helpers and their tests (`tests_required.py`). |
 
 ## Run
 
@@ -58,11 +58,13 @@ Every issue follows `implement-change`: commit the failing tests (`test(<part>):
 | Typecheck | `mypy` (strict) | `tsc --noEmit` |
 | Test | `pytest` (also runs `scripts/ci` tests) | `vitest run` |
 
-## CI
+## The gate is local
 
-Two workflows run on pull requests to `main`:
+CI/CD is not relied on (Stephen, 2026-10-28). Before opening a PR, and again right before merging it to `main`, run the full suite locally and stop if anything fails:
 
-- **verify**: `make verify` on a clean checkout (also on pushes to `main`).
-- **tests-required**: fails when the PR changes non-test files under `backend/app/` or `frontend/src/` and adds or changes no test file (`backend/tests/**/test_*.py`, `frontend/src/**/*.test.ts(x)`; fixtures such as `conftest.py` alone don't count). A PR body containing `no new tests` (with the reason) passes it. Editing the PR body re-runs only this check.
+1. `make verify` on the PR's head commit (before merging: on the head brought up to date with `main`). It must print `verify: PASSED at commit <sha>`; paste that line in the PR.
+2. **tests-required**: the PR must add or change a test file (`backend/tests/**/test_*.py`, `frontend/src/**/*.test.ts(x)`; fixtures such as `conftest.py` alone don't count) when it changes non-test files under `backend/app/` or `frontend/src/`, unless its body says `no new tests` with the reason. Check it with `git diff --name-only origin/main...HEAD > /tmp/changed.txt && PR_BODY="<body>" python3 scripts/ci/tests_required.py /tmp/changed.txt`.
 
-Both should be marked required in `main`'s branch protection (Settings > Branches), which only the repo owner can do.
+Any failure blocks the PR or the merge until it is fixed and re-run. After a merge, run `make verify` on the new `main`; if it is red, revert the merge.
+
+The workflows in `.github/workflows/` (`verify`, `tests-required`) may still run on pull requests, but they are informational only: a green badge does not replace the local receipt and is not a reason to merge.

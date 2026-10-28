@@ -31,7 +31,8 @@ Stephen restarted this project from scratch on 2026-10-24 and set the order:
 - Staff-only tool; no student or parent UI.
 - UI work: designs Stephen approved in `docs/design/` are spec.
 - Test-driven development is mandatory (`implement-change`): for each issue, write its TDD plan's tests first and commit them failing (`test(<part>): ...`), then the minimum code to pass, then refactor with the suite green.
-- A change adding behaviour with no new or changed test is rejected, unless the issue says "no new tests". CI enforces this on every PR (#1), next to `make verify`.
+- A change adding behaviour with no new or changed test is rejected, unless the issue says "no new tests". Check it locally before every PR with `scripts/ci/tests_required.py` (see Commands).
+- **The local test run is the merge gate; CI is not relied on.** Run `make verify` and get `verify: PASSED` on the PR's head commit before opening the PR, and again on the head brought up to date with `main` immediately before merging. If anything fails (lint, typecheck or any test), stop: fix it and re-run, or report the failure. Never open a PR or merge to `main` on a red or skipped run. Stephen set this on 2026-10-28.
 - Never skip, disable or quarantine a test, or weaken an assertion, to get green.
 - Before opening any PR, invoke the `/simplify` skill and then the `/code-review` skill on the PR's diff (Skill tool), as `implement-change` §7 orders them. Your own re-read is not a substitute, and the PR body lists each finding and what was done about it. Stephen asked for this on 2026-10-28 after the first four build PRs skipped it.
 
@@ -49,4 +50,5 @@ Prerequisites: Python 3.12 with [uv](https://docs.astral.sh/uv/), Node 22 with n
 - `make test` · `make lint` · `make typecheck`: the parts of verify, without the clean-tree check.
 - `make dev`: API on http://127.0.0.1:8000 and the app on http://localhost:5173 (proxies `/api`). Override with `API_PORT` / `WEB_PORT`.
 - Inner loop: `cd backend && uv run pytest tests/test_x.py`, `cd frontend && npx vitest run src/x.test.tsx`.
-- CI (`.github/workflows/`): `verify` runs `make verify`; `tests-required` fails a PR that changes `backend/app/**` or `frontend/src/**` without adding or changing a test, unless the PR body says `no new tests`.
+- Before a PR: `git diff --name-only origin/main...HEAD > /tmp/changed.txt && PR_BODY="<body>" python3 scripts/ci/tests_required.py /tmp/changed.txt` fails if `backend/app/**` or `frontend/src/**` changed without a test added or changed, unless the body says `no new tests`.
+- GitHub workflows (`.github/workflows/`) may also run `verify` and `tests-required`, but they are not the gate: a green badge never replaces the local receipt, and a missing or red badge is not a reason to wait.

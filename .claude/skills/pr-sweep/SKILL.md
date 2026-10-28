@@ -14,7 +14,7 @@ One self-contained pass: read live state, act, report, end. It does not schedule
 
 ## 1. Map
 
-List open PRs. For each, read mergeable state, draft flag, CI result and last activity. Find PRs that conflict with <<default branch>> or each other, including **migration-number clashes** (two PRs on the same number, or a PR on a number the default branch already took; the journal cannot skip numbers).
+List open PRs. For each, read mergeable state, draft flag, latest `verify: PASSED` receipt and last activity. Find PRs that conflict with <<default branch>> or each other, including **migration-number clashes** (two PRs on the same number, or a PR on a number the default branch already took; the journal cannot skip numbers).
 
 ## 2. Conflicts you can fix
 
@@ -31,11 +31,11 @@ If the same logic changed on both sides, or the merge is blocked, do not guess. 
 
 ## 4. Drafts
 
-Mark a draft ready only when CI is green and the work looks complete. Leave it a draft, and say who it waits on, when its body says it needs the owner (a design approval, a decision).
+Mark a draft ready only when the local `make verify` passes on its head and the work looks complete. Leave it a draft, and say who it waits on, when its body says it needs the owner (a design approval, a decision).
 
 ## 5. Merge
 
-Squash-merge only PRs that are ready, CI green, conflict-free, with a <<merge-gate receipt>> (or the repo's docs-only/test-only fast path), in dependency order (see `pr-flow`). A PR with no receipt, or one meant for a manual merge, is left for the owner.
+Squash-merge only PRs that are ready, conflict-free, and pass `make verify` locally on the head being merged (up to date with main), with that receipt posted (or the repo's docs-only/test-only fast path), in dependency order (see `pr-flow`). A PR with no receipt, or one meant for a manual merge, is left for the owner.
 
 ## 6. Reverts
 
