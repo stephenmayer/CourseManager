@@ -38,7 +38,7 @@ idea -> decide (options, tradeoffs) -> plan -> seams review -> design approval (
 2. **Check the docs before asking the owner.** Ask only what the docs do not settle. The owner has been annoyed by questions the repo already answered.
 3. **Ask the owner once, plainly, with an example.** When a question is genuinely theirs, explain it as if they have not read the code: background, a concrete worked example with real numbers, options with tradeoffs, your recommendation. See `reference/working-with-the-owner.md`.
 4. **Reversible and seen-later: just do it and say so.** Irreversible, outward-facing, costly or production-changing: wait for the owner. The owner asking for the step is the approval; ask at most once.
-5. **No parked drafts.** Run your own reviews, mark the PR ready, merge when the local `make verify` passes on the up-to-date head, in dependency order. CI is not the gate here; a failing local run stops the PR. Do not leave PRs waiting for a routine nod.
+5. **No parked drafts.** Run your own reviews, mark the PR ready, merge when the local `make verify` passes on the up-to-date head, in dependency order. Do not leave PRs waiting for a routine nod.
 6. **Follow-ups are filed by class, not instance.** Search open and closed issues for the same shape first; comment on a match; only an unfiled class gets a new issue naming every site and the guard that stops recurrence.
 7. **Never silently skip a step.** If a tool, environment or approval is missing, say so, label the issue, and stop rather than push unverified work.
 8. **Costly infrastructure needs a yes first** (e.g. macOS CI runners, paid build minutes, store uploads). Be conservative; ask before kicking off.

@@ -32,7 +32,7 @@ Production behaviour without a new or changed test is rejected, unless the issue
 
 Run the issue's Verification commands verbatim. UI changes: run component tests and UI scenarios, **look at every screenshot** against the artboard. Then the project's single merge-gate command (`make verify`), which must refuse uncommitted changes and print a receipt naming the exact commit. Run checks in the foreground; never background them and idle.
 
-**The local run is the gate, not CI.** The full suite must pass locally: every lint, typecheck and test, backend and frontend. If anything fails, stop and fix it, or report it and do not open the PR. A failure you believe is unrelated to your change still blocks: prove it on a clean `main` and say so; never skip, disable or weaken a test to get past it.
+It is the gate, not CI: any failure blocks the PR, even one you think is unrelated (show that test fails on a clean `main` and say so).
 
 **The proof is what actually executes the changed lines.** Re-run what you ran to prove the work in the first place (stack scripts, integration path, UI scenarios), not just the directory's unit tests.
 
@@ -46,7 +46,7 @@ The two passes are the **`simplify` and `code-review` skills, invoked with the S
 4. **Invoke `/code-review`** on the issue's diff; fix each finding (test first when it changes behaviour) or record why not.
 5. Re-run the proof if fixes changed anything. If the fixes were more than trivial, run `/code-review` once more on the fix commits.
 6. **Review lenses** for risky diffs: spawn a fresh reviewer per lens the diff touches (e.g. tenancy/security; money/ledger correctness). Give each only the issue and the base branch, never your PR text or opinion, so it judges the diff cold. Verdict is `PASS` or `CHANGES`; `CHANGES` blocks. Fix, re-run the proof, re-run that lens only; at most two rounds, then open as draft with unresolved findings verbatim.
-7. Final commit, then `make verify` on that exact commit; it must print `verify: PASSED at commit <sha>`. Check the tests-required rule locally (`scripts/ci/tests_required.py`, command in `CLAUDE.md`). Only then push and open the PR. Any failure: stop, fix, and restart this step.
+7. Final commit; `make verify` and `make tests-required` pass on it ([developer guide](../../../docs/process/developer-guide.md#the-gate-is-local)); push; open the PR.
 
 Scope both passes to the issue's own diff. Things noticed outside it go through follow-ups, never silently into the diff.
 
