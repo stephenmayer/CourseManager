@@ -13,7 +13,7 @@ Stephen restarted this project from scratch on 2026-10-24 and set the order:
 1. Install the build kit. (done)
 2. Go through the requirements in detail with Stephen and brainstorm solutions. (`docs/requirements/`)
 3. Initial architecture and solution brainstorming with Stephen. (done)
-4. Build with the kit's method, **only after Stephen explicitly says go.** Plan, Phase 1 seams review and designs are done and approved; issues #1-#18 hold the work (`docs/plan/phases.md`). Waiting on Stephen's go.
+4. Build with the kit's method, **only after Stephen explicitly says go.** Plan, Phase 1 seams review and designs are done and approved; issues #1-#18 hold the work (`docs/plan/phases.md`). Stephen gave the go for Phase 1 on 2026-10-28: issues #1-#11, test first, in parallel where the dependencies allow.
 
 ## Never
 
@@ -42,6 +42,10 @@ Stephen restarted this project from scratch on 2026-10-24 and set the order:
 
 ## Commands
 
-Decided in the plan and created by issue #1 (they do not exist until then):
+Prerequisites: Python 3.12 with [uv](https://docs.astral.sh/uv/), Node 22 with npm, GNU make. Details: [`docs/process/developer-guide.md`](docs/process/developer-guide.md).
 
-`make verify` (the merge gate: lint, typecheck and tests for backend and frontend; refuses uncommitted changes; prints the commit it checked) · `make test` · `make dev` (backend plus frontend on localhost). #1 updates this section with the exact commands and adds `docs/process/developer-guide.md`.
+- `make verify`: the merge gate. Lint (ruff, ESLint), typecheck (mypy strict, `tsc`) and tests (pytest, Vitest) for backend and frontend. Refuses uncommitted changes; ends with `verify: PASSED at commit <sha>`, the receipt for a PR.
+- `make test` · `make lint` · `make typecheck`: the parts of verify, without the clean-tree check.
+- `make dev`: API on http://127.0.0.1:8000 and the app on http://localhost:5173 (proxies `/api`). Override with `API_PORT` / `WEB_PORT`.
+- Inner loop: `cd backend && uv run pytest tests/test_x.py`, `cd frontend && npx vitest run src/x.test.tsx`.
+- CI (`.github/workflows/`): `verify` runs `make verify`; `tests-required` fails a PR that changes `backend/app/**` or `frontend/src/**` without adding or changing a test, unless the PR body says `no new tests`.
