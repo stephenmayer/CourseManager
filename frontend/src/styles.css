@@ -505,7 +505,7 @@ a:hover {
 
 /* Screen 2: Student detail. Classes are prefixed sd- so they never collide with other screens. */
 
-/* Controls (touch targets 44px, per the boards) */
+/* Controls (touch targets 44px, per the boards; the boards' "+ Add" table buttons are 40px) */
 
 /* On top of the shared .card */
 .sd-card {
@@ -553,6 +553,11 @@ a:hover {
   font: inherit;
   font-weight: 500;
   cursor: pointer;
+}
+
+.sd-btn:not(.sd-btn-primary):disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .sd-btn-primary {

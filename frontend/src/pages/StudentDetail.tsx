@@ -29,18 +29,25 @@ const STATUS_LABEL: Record<ReviewStatus, string> = {
 
 const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
 
-export default function StudentDetailPage({
-  courseDialog: CourseDialog,
-}: {
-  courseDialog?: ComponentType<CourseDialogProps>;
-}) {
+type DialogProp = { courseDialog?: ComponentType<CourseDialogProps> };
+
+// Keyed by the student ID: moving to another student (say, from a link in the course
+// dialog) starts a fresh page, so no filter, form, dialog or pending write carries over.
+export default function StudentDetailPage({ courseDialog }: DialogProp) {
   const { id = "" } = useParams();
+  return <StudentDetailScreen key={id} id={id} courseDialog={courseDialog} />;
+}
+
+function StudentDetailScreen({ id, courseDialog: CourseDialog }: { id: string } & DialogProp) {
   const [student, setStudent] = useState<StudentDetail | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [catalog, setCatalog] = useState<CatalogCourse[]>([]);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
   const [openCourse, setOpenCourse] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const writing = useRef(false);
+  const latest = useRef(0);
 
   useEffect(() => {
     let current = true;
@@ -64,7 +71,7 @@ export default function StudentDetailPage({
         if (current) setCatalog(loaded);
       },
       (error: unknown) => {
-        if (current) setActionError(errorText(error));
+        if (current) setCatalogError(errorText(error));
       },
     );
     return () => {
@@ -72,24 +79,36 @@ export default function StudentDetailPage({
     };
   }, []);
 
-  const reload = useCallback(() => {
-    api.student(id).then(setStudent, (error: unknown) => setActionError(errorText(error)));
-  }, [id]);
+  // Only the newest read or write may replace the student, so a slow reload can't undo
+  // a later edit. Resolves to whether the request succeeded.
+  const show = useCallback(async (request: Promise<StudentDetail>): Promise<boolean> => {
+    const seq = ++latest.current;
+    try {
+      const detail = await request;
+      if (seq === latest.current) {
+        setStudent(detail);
+        setActionError(null);
+      }
+      return true;
+    } catch (error) {
+      if (seq === latest.current) setActionError(errorText(error));
+      return false;
+    }
+  }, []);
 
-  // One write at a time, so a double click can't send the same edit twice.
-  // Resolves to whether the write was saved.
+  const reload = useCallback(() => void show(api.student(id)), [show, id]);
+
+  // One write at a time: the ref stops a double click in the same tick, `busy` disables
+  // the buttons until the response is back.
   async function write(change: () => Promise<StudentDetail>): Promise<boolean> {
     if (writing.current) return false;
     writing.current = true;
+    setBusy(true);
     try {
-      setStudent(await change());
-      setActionError(null);
-      return true;
-    } catch (error) {
-      setActionError(errorText(error));
-      return false;
+      return await show(change());
     } finally {
       writing.current = false;
+      setBusy(false);
     }
   }
 
@@ -120,6 +139,7 @@ export default function StudentDetailPage({
       <HeaderCard
         student={student}
         errorCount={errorCount}
+        busy={busy}
         onMarkDone={() => write(() => api.setReview(student.id, "done"))}
         onHold={(reason) => write(() => api.setReview(student.id, "on_hold", reason))}
       />
@@ -133,6 +153,7 @@ export default function StudentDetailPage({
       <div className="sd-detail-columns">
         <Requests
           student={student}
+          busy={busy}
           onOpenCourse={CourseDialog ? setOpenCourse : undefined}
           onSwitch={(r) =>
             write(() =>
@@ -145,6 +166,8 @@ export default function StudentDetailPage({
         <AddFromCatalog
           student={student}
           catalog={catalog}
+          catalogError={catalogError}
+          busy={busy}
           onAdd={(code) => write(() => api.addRequest(student.id, code))}
         />
       </div>
@@ -159,11 +182,13 @@ export default function StudentDetailPage({
 function HeaderCard({
   student,
   errorCount,
+  busy,
   onMarkDone,
   onHold,
 }: {
   student: StudentDetail;
   errorCount: number;
+  busy: boolean;
   onMarkDone: () => void;
   onHold: (reason: string) => Promise<boolean>;
 }) {
@@ -209,7 +234,7 @@ function HeaderCard({
         <button
           type="button"
           className="sd-btn sd-btn-primary"
-          disabled={errorCount > 0}
+          disabled={errorCount > 0 || busy}
           aria-describedby="done-why"
           onClick={onMarkDone}
         >
@@ -234,7 +259,7 @@ function HeaderCard({
               </span>
             )}
             <div className="sd-hold-buttons">
-              <button type="submit" className="sd-btn sd-btn-dark">
+              <button type="submit" className="sd-btn sd-btn-dark" disabled={busy}>
                 Put on hold
               </button>
               <button type="button" className="sd-btn" onClick={closeHold}>
@@ -258,6 +283,7 @@ function HeaderCard({
 }
 
 interface RowActions {
+  busy: boolean;
   onOpenCourse?: (code: string) => void;
   onSwitch: (request: RequestOut) => void;
   onRemove: (request: RequestOut) => void;
@@ -377,6 +403,7 @@ function removeLabel(request: RequestOut, issues: IssueOut[]): string {
 function RequestRow({
   request,
   issues,
+  busy,
   onOpenCourse,
   onSwitch,
   onRemove,
@@ -431,13 +458,19 @@ function RequestRow({
         <span className={`sd-pill ${request.source === "sis" ? "sd-tag-sis" : "sd-tag-app"}`}>
           {request.source === "sis" ? "From SIS" : "Added in app"}
         </span>
-        <button type="button" className="sd-btn sd-btn-small" onClick={() => onSwitch(request)}>
+        <button
+          type="button"
+          className="sd-btn sd-btn-small"
+          disabled={busy}
+          onClick={() => onSwitch(request)}
+        >
           {request.type === "priority" ? "Make elective" : "Make priority"}
         </button>
         <button
           type="button"
           className="sd-btn sd-btn-icon"
           aria-label={removeLabel(request, issues)}
+          disabled={busy}
           onClick={() => onRemove(request)}
         >
           ✕
@@ -445,7 +478,7 @@ function RequestRow({
       </div>
 
       {[...errors, ...warnings].map((issue) => (
-        <IssueLine key={issue.rule} issue={issue} />
+        <IssueLine key={`${issue.rule}:${issue.message}`} issue={issue} />
       ))}
 
       {errors.length === 0 && warnings.length > 0 && (
@@ -462,7 +495,7 @@ function RequestRow({
               onChange={(e) => setReason(e.target.value)}
             />
           </div>
-          <button type="button" className="sd-btn sd-btn-dark" onClick={keep}>
+          <button type="button" className="sd-btn sd-btn-dark" disabled={busy} onClick={keep}>
             Keep with reason
           </button>
           {reasonError && (
@@ -514,10 +547,14 @@ function IssueLine({ issue }: { issue: IssueOut }) {
 function AddFromCatalog({
   student,
   catalog,
+  catalogError,
+  busy,
   onAdd,
 }: {
   student: StudentDetail;
   catalog: CatalogCourse[];
+  catalogError: string | null;
+  busy: boolean;
   onAdd: (code: string) => void;
 }) {
   // Starts with the student's grade (S10); null until the user changes it.
@@ -572,7 +609,11 @@ function AddFromCatalog({
           Starts with the student's grade ({student.grade}). Check more to see other courses.
         </span>
       </fieldset>
-      {departments.length === 0 ? (
+      {catalogError ? (
+        <p role="alert" className="sd-page-error">
+          {catalogError}
+        </p>
+      ) : departments.length === 0 ? (
         <p className="muted">No courses match.</p>
       ) : (
         <div className="sd-table-scroll">
@@ -613,6 +654,7 @@ function AddFromCatalog({
                             type="button"
                             className="sd-btn sd-btn-add"
                             aria-label={`Add ${c.code} ${c.name}`}
+                            disabled={busy}
                             onClick={() => onAdd(c.code)}
                           >
                             + Add
