@@ -83,6 +83,13 @@ test("a path outside both sections marks neither nav link as current", async () 
   expect(screen.getByRole("link", { name: "Courses" })).not.toHaveAttribute("aria-current");
 });
 
+test("an unknown path shows a not-found page", async () => {
+  await renderAt("/not-a-page");
+
+  expect(screen.getByRole("heading", { level: 1, name: "Page not found" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Go to the student list" })).toHaveAttribute("href", "/");
+});
+
 test.each([
   ["/", "Students"],
   ["/students/S001", "Student S001"],

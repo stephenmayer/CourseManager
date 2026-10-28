@@ -60,3 +60,11 @@ test("a network failure surfaces a plain message, not the browser's", async () =
     "Can't reach the CourseManager server. Check that it is running, then try again.",
   );
 });
+
+test("a success response that isn't JSON surfaces a plain message", async () => {
+  stubFetch(async () => new Response("<!doctype html><html></html>", { status: 200 }));
+
+  await expect(getJson("/students")).rejects.toThrow(
+    "The server sent a response CourseManager couldn't read. Try again.",
+  );
+});
