@@ -23,6 +23,8 @@ package = false
 testpaths = ["tests", "../scripts/ci"]
 pythonpath = [".", "../scripts/ci"]
 addopts = "-q"
+# Starlette prefers a successor to httpx for TestClient; httpx still works.
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
 
 [tool.ruff]
 line-length = 100
@@ -35,3 +37,6 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 python_version = "3.12"
 strict = true
 files = ["app", "tests", "../scripts/ci"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "tests_required"]
