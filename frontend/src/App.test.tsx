@@ -7,7 +7,11 @@ import { ApiError, api } from "./api/client";
 
 vi.mock("./api/client", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./api/client")>();
-  return { ...actual, api: { currentImport: vi.fn() } };
+  return {
+    ...actual,
+    // Screens' own reads never settle here; their tests cover them.
+    api: { currentImport: vi.fn(), courses: vi.fn(() => new Promise(() => {})) },
+  };
 });
 
 const currentImport = vi.mocked(api.currentImport);
