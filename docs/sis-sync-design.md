@@ -31,6 +31,7 @@ These are questions, not answers. Each one changes the design, so each says what
 | RQ9 | Does the SIS send a full export every time, or only changes since a date? | A delta feed is cheaper to pull but can silently miss rows; a full export lets us detect removals. | Full export. If only deltas exist, we run a periodic full pull to catch drift. |
 | RQ10 | Does the SIS carry alternate requests ("if not this, then that") or group requests ("any one Arts & Tech elective")? | Alternates change the request shape the connector must normalize. (gaps.md G32) | No. Alternates are entered in the app ([Q16](decisions/q016-alternate-requests.md)). |
 | RQ11 | Who at the district can see sync results, and who is allowed to roll one back? | Rollback is powerful; it shouldn't be one click for every counselor. | District admins and Timely support. Roles are out of scope for the prototype (requirements M10). |
+| RQ12 | Who sets up a district's SIS connection, and what does the district provide (credentials, file drop, field meanings)? | Decides whether we need a setup screen for districts or only an internal one, and how long onboarding takes. | Timely's implementation team sets it up; the district provides credentials and answers mapping questions. |
 
 Non-functional requirements we hold ourselves to, whatever the answers:
 
@@ -54,9 +55,9 @@ Each row names the options and the recommendation; the linked file has the full 
 | D6 | Where runs execute and how staff see them ([Q14](decisions/q014-sis-sync-on-queue.md)) | **Jobs on Timely's RabbitMQ with a jobs view**; cron per district; a new workflow engine | Reuse the queue, worker and job states Timely runs for the optimizer today (F7). Per-district limits are enforced where jobs leave the queue. |
 | D7 | Bad data from the SIS ([Q5](decisions/q005-bad-sis-request-data.md)) | Clean before load; drop on import; **load, flag, block Done**; flag and suggest a fix | Load exactly what the SIS sent, show errors on the student, block only the Done status. Each run reports how many errors it brought in. Suggested fixes are a later add-on. |
 | D8 | Students not in the SIS yet ([Q17](decisions/q017-provisional-students.md)) | **Provisional student, matched on sync with counselor confirmation**; build it now; SIS only | A provisional record the app owns until the SIS sends the real student; a sync shows likely matches and the counselor confirms. Nothing auto-merges. After the MVP. |
-| D9 | The interface seams | One sync module that talks to the SIS directly; **three narrow ports** | Three ports (section 3.2), so adding a SIS platform is one adapter and nothing else changes. |
+| D9 | The interface seams | One sync module that talks to the SIS directly; **three narrow ports** | Three ports (section 3.2), so adding a SIS platform is one adapter and nothing else changes; a new district on a known platform is configuration only (section 3.3). |
 
-Decisions D1, D3 and D5 are one mechanism seen from three sides; section 3.3 shows it end to end.
+Decisions D1, D3 and D5 are one mechanism seen from three sides; section 3.5 shows it end to end.
 
 ## 3. Flow and architecture
 
@@ -93,7 +94,9 @@ flowchart LR
             SS[SisSource<br/>reads the current import]
             WB[SisWriter<br/>optional, per district]
         end
+        CFG[(District SIS config<br/>secrets in a vault)]
         DB[(Imports, requests,<br/>sync changes)]
+        RAW[(S3 raw exports<br/>by import)]
         UI[Counselor app<br/>and jobs view]
         DD[Datadog logs and metrics]
         S3[(S3 error reports)]
@@ -102,7 +105,9 @@ flowchart LR
     API --> Q
     Q --> W
     W --> EX
+    CFG --> EX
     EX -->|pull| SIS
+    EX -->|archive raw| RAW
     W -->|"normalize, validate,<br/>merge in one transaction"| DB
     W --> DD
     W -->|errored run| S3
@@ -123,7 +128,73 @@ The three ports, each with one job:
 
 `SisSource` is already in the prototype's plan. `SisExportSource` and `SisWriter` are the names this design proposes for the other two; neither is built.
 
-### 3.3 One sync run, end to end
+### 3.3 SIS configuration and adapters
+
+**Each district has one SIS connection**, a configuration record the app owns. The worker reads it at the start of every run and hands it to the adapter it names. Nothing about a district is in code.
+
+| Setting | What it holds | Example |
+| --- | --- | --- |
+| Adapter | Which `SisExportSource` implementation to use | `csv_file`, `oneroster_api`, a vendor-specific adapter |
+| Where | File location, or API base URL | SFTP path and file-name pattern; S3 prefix; `https://sis.district.example/api` |
+| Credential | A reference to a secret in the secrets vault, never the secret itself | `sis/district-42/api-key` |
+| Scope | Which schools and which school year to pull | Two high schools, 2027-28 requests |
+| Field mapping | SIS field names and codes mapped to ours | SIS column `CourseNum` to `course_code`; request type `R` to priority, `E` to elective |
+| Capabilities (RQ1, RQ2, RQ9) | What this SIS does: sends request IDs? full export or deltas? accepts writes, and to which fields? | `request_ids: false`, `export: full`, `writes: none` |
+| Schedule | When the nightly sync runs, in the district's time zone; whether "sync now" is allowed | 02:00 America/Chicago |
+| Limits (RQ3) | Calls per minute, pages in flight | 60 per minute, 1 in flight |
+| State | Draft, testing, live, paused | live |
+
+Every change to the configuration is saved as a new version, and each import records the configuration version it ran with, so "why did Tuesday's import look different?" can be answered by "the mapping changed on Monday" (section 3.4).
+
+**How an adapter works.** An adapter turns one district's SIS into the same normalized export, in three layers so most of the work is reused:
+
+1. **Transport:** get the bytes. SFTP, S3 or HTTP, with auth from the vault, paging, retries and throttling to the configured limits.
+2. **Format:** parse them. CSV, a standard roster format such as OneRoster, or a vendor's JSON.
+3. **Mapping:** apply the district's field mapping and build each request's `sis_key` (the SIS's own request ID when the capabilities say it sends one; otherwise student + course + occurrence counter, [Q18](decisions/q018-sis-import-versioning.md)).
+
+So a new district on a SIS we already support is configuration only; a new SIS platform is usually a new format layer; a new transport is rare. The adapter contract, in outline:
+
+```python
+class SisExportSource(Protocol):
+    def check_connection(self, config: SisConnection) -> ConnectionCheck: ...
+    def fetch(self, config: SisConnection) -> RawExport: ...             # bytes, archived to S3 by import ID
+    def normalize(self, raw: RawExport, config: SisConnection) -> NormalizedExport: ...
+    # NormalizedExport: students, courses, requests (each with sis_key), plus rows it could not read
+```
+
+Two kinds of failure, handled differently:
+
+- **The export is unusable** (authentication fails, file missing, required column missing, parse error): the run is **errored** and writes nothing ([Q13](decisions/q013-sis-sync-runs.md)). The S3 error report says which in plain words.
+- **Rows are bad** (unknown course code, duplicate request, a row missing a field): the run continues. Rows that parse load as-is and show as errors to counselors ([Q5](decisions/q005-bad-sis-request-data.md)); rows that can't be read at all are listed in the run's report. Both count toward the run's errors in.
+
+**Onboarding a district:** create the connection in draft; **check connection** (auth works, a sample can be read); **dry run** (fetch and normalize the full export, run the checks, show counts and errors, write nothing); fix the mapping until the dry run is clean enough; set it live, and the first real run becomes import #1. The dry run is for setup only; live nightly runs have no approval step (Q13).
+
+**Testing adapters:** every adapter passes one shared contract test suite, run against recorded sample exports for its SIS, so a new adapter proves it produces the same normalized shape. In the prototype, the seed file is the one adapter.
+
+Who sets up a connection is a requirement to confirm (RQ12). Assumption: Timely's implementation team, through an internal setup screen, with the district's IT providing credentials; district self-service comes later.
+
+### 3.4 Versioned SIS data: telling one import from the next
+
+Every import is a **version** of the district's SIS data with its own ID (`sis_import.id`), and it is never edited after it completes ([Q18](decisions/q018-sis-import-versioning.md)). Each import carries a manifest that says where it came from:
+
+| Field | Why |
+| --- | --- |
+| Import ID, and the import before it | The version number and its parent; IDs only go up per district |
+| Received and finished times | "SIS data as of" in the app header |
+| Connection configuration version, adapter and adapter version | Separates "the SIS changed" from "we changed how we read it" |
+| Source: file name and content hash, or API pull time window | Proves which export this was; an identical file to the last one is visible at a glance |
+| Row counts per entity, changes applied, errors in | The run's size at a glance, and the input to the "far above normal" alert (3.9) |
+| Link to the raw export in S3 | Lets us replay it: a mapping fix re-normalizes the same raw export as a **new** import, never by editing the old one |
+
+**Any two imports can be compared.** Because snapshots never change, the difference between import N and import M is computed by key (student ID, course code, `sis_key`): what was added, what was removed, and which fields changed, with before and after values. The jobs view shows each run's difference from the import before it, and support can compare any two (for example "Monday vs Thursday") when a counselor asks what moved.
+
+**Every row knows which versions it belongs to.** With full snapshots (the prototype), a row is keyed by its import ID. With changed-rows storage (D4, at scale), a row has `valid_from_import` and `valid_to_import`, and "the SIS as of import N" is every row where `valid_from_import <= N` and (`valid_to_import` is empty or `> N`). Both give the same answers to "what did import N say?" and "what changed between N and M?"; only the storage differs.
+
+**App data points at versions, not copies.** Each request records the import it last agreed with (`base_import_id`), and a conflict flag records the import that raised it, so a counselor sees "the SIS changed this on Oct 26" rather than just "the SIS differs". Rollback moves the current pointer to an earlier version (3.7).
+
+An identical export still records an import (with zero changes), so the header shows that the SIS was checked last night, not that the sync stopped.
+
+### 3.5 One sync run, end to end
 
 ```mermaid
 sequenceDiagram
@@ -134,8 +205,8 @@ sequenceDiagram
     participant D as Database
     S->>Q: publish sync job (district)  [submitted]
     Q->>W: deliver when the district has no running sync
-    W->>D: create import, state started
-    W->>X: fetch and normalize export
+    W->>D: read the district's connection config, create import, state started
+    W->>X: fetch (raw archived to S3) and normalize export
     X-->>W: students, courses, requests
     W->>W: validate (Q5 checks), count errors in
     W->>D: BEGIN
@@ -148,7 +219,7 @@ sequenceDiagram
 
 Job states are Timely's own: submitted, started, completed, errored ([Q13](decisions/q013-sis-sync-runs.md), F7). Cancel is allowed while a job is submitted or started; a cancelled run writes nothing, the same as an errored one.
 
-### 3.4 The three-way merge
+### 3.6 The three-way merge
 
 Every request that came from the SIS remembers its `sis_key` and the import it last agreed with (`base_import_id`). A new import compares three versions of each request: **base** (the SIS's value in that earlier import), **app** (the request now), and **new** (the SIS's value in this import). Data model: [schema.md](architecture/schema.md).
 
@@ -168,22 +239,22 @@ Worked example (Q2's): Monday's import has Jordan's elective AT201. Tuesday, Ms.
 
 Students and courses aren't merged: they are SIS-owned and read-only, so the new import simply becomes current. Their changes still reach counselors through the checks, which are computed on every read. A course dropped from the catalog turns its requests into "not in catalog" errors; a grade change re-runs the grade checks (gaps.md G26).
 
-### 3.5 Rollback
+### 3.7 Rollback
 
 Rolling back a completed run points "current" back at the previous import and restores each request's old value from that run's `sync_change` rows, skipping any request a counselor has edited since the run ([Q13](decisions/q013-sis-sync-runs.md)). Only the most recent completed run can be rolled back directly; rolling back an older one rolls back everything after it first, newest first, so the merge's bases stay consistent. Imports a request still uses as its base are never pruned ([schema.md](architecture/schema.md#6-if-time-reconcile-a-second-import-q9-q13-q18)).
 
-### 3.6 Write-back (optional, per district)
+### 3.8 Write-back (optional, per district)
 
 Where `SisWriter` exists for a district (RQ1), each counselor edit publishes a write-back job to the same queue. On success, the next import agrees with the app and the merge sees "changed to the same value", which raises no flag. On failure, the job errors and shows on the jobs view; the edit stays in the app, and the next import raises a flag if the SIS still differs. The merge code doesn't change ([Q19](decisions/q019-one-way-sync-baseline.md)).
 
-### 3.7 Limits, monitoring and errors
+### 3.9 Limits, monitoring and errors
 
 - **Per-district fairness (F8).** At most one running sync per district; the worker skips a district's job while another is running and takes the next district's. The connector throttles calls to that district's rate limit. More districts means more workers on the same queue, not new infrastructure.
 - **Jobs view ([Q14](decisions/q014-sis-sync-on-queue.md), [AddonJobs board](design/boards/AddonJobs.dc.html)).** Every job with district, state, start time, elapsed time, changes applied and errors brought in; cancel; roll back a completed sync. Provisional students the SIS still hasn't sent after a set time are listed here (Q17).
 - **Logs and metrics.** Structured logs per run to Datadog, tagged with district and import ID. Alerts on: an errored run, no completed run for a district in a day, and a run whose change count is far above that district's normal (a sign of a bad export, like Q13's "every grade 11 student became grade 12").
 - **Error reports.** An errored run writes a report to S3, in plain language for support (F6), and the jobs view links to it.
 
-### 3.8 Designed, not in the MVP: transcripts and alternates
+### 3.10 Designed, not in the MVP: transcripts and alternates
 
 - **Transcript feed.** `SisExportSource` gains a fourth entity, transcript entries (course, school year, grade earned, credits), stored per import like the others and read through `SisSource`. A graduation progress rule plugs in as one more check over it ([Q15](decisions/q015-history-and-grad-rules.md)).
 - **Alternates from the SIS.** If a SIS sends alternates (RQ10), the connector normalizes them to the app's alternate fields (`alternate_for`, `rank`, [Q16](decisions/q016-alternate-requests.md)), and the merge treats a changed rank or backup like any other field: apply if only the SIS changed it, flag if both did.
@@ -194,8 +265,8 @@ A squad of 2-3 engineers over one quarter (about 13 weeks), working with one or 
 
 | Weeks | Milestone | Done when |
 | --- | --- | --- |
-| 1-2 | **Answer the requirements.** RQ1-RQ11 with the pilot districts and their SIS vendors; pick the first connector | Each RQ has an answer or a recorded assumption; the first SIS and its export format are chosen |
-| 3-6 | **One-way sync, file connector.** `SisExportSource` file adapter, import snapshots, three-way merge, runs as jobs on RabbitMQ, failed runs write nothing | A pilot district's nightly file lands in the app; counselor edits survive it; a broken file leaves yesterday's data in place |
+| 1-2 | **Answer the requirements.** RQ1-RQ12 with the pilot districts and their SIS vendors; pick the first connector | Each RQ has an answer or a recorded assumption; the first SIS and its export format are chosen |
+| 3-6 | **One-way sync, file connector.** District connection config with dry run, `SisExportSource` file adapter, import snapshots, three-way merge, runs as jobs on RabbitMQ, failed runs write nothing | A pilot district's nightly file lands in the app; counselor edits survive it; a broken file leaves yesterday's data in place |
 | 7-9 | **Recover and see.** Conflict review in the request editor (Add-on F), rollback, jobs view, Datadog logs and alerts, S3 error reports | A bad sync is rolled back in one action from the jobs view; counselors resolve flagged requests |
 | 10-12 | **Second district, limits.** Changed-rows storage (D4), per-district concurrency and throttling, "sync now", first API connector if a pilot needs it | Two districts sync nightly side by side without interfering |
 | 13 | Buffer and pilot review | The pilot districts tell us what to fix next |
@@ -206,7 +277,7 @@ A squad of 2-3 engineers over one quarter (about 13 weeks), working with one or 
 
 ## 5. Open questions for this review
 
-1. Should a run whose change count is far above normal **pause** for a person instead of applying? That is an approval gate, which Q13 chose against; the alert in 3.7 is the lighter option. Recommendation: alert only, and revisit after the pilot.
+1. Should a run whose change count is far above normal **pause** for a person instead of applying? That is an approval gate, which Q13 chose against; the alert in 3.9 is the lighter option. Recommendation: alert only, and revisit after the pilot.
 2. Does an unresolved SIS conflict block Done? The plan's default is yes ([phases.md](plan/phases.md)).
 3. How many imports do we keep (N)? Recommendation: 30 days, never pruning one a request still uses as its base.
 4. Who may roll back a run (RQ11)?
