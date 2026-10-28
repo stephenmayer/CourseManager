@@ -12,6 +12,10 @@
   --row-hi: #f3f7fe;
   --err-bg: #fef3f2;
   --err-text: #b42318;
+  --err-border: #f4a39b;
+  --warn-border: #f5c26b;
+  --zero: #9aa1ad;
+  --scrim: rgba(16, 24, 40, 0.45);
   --warn-bg: #fff6e5;
   --warn-text: #93370d;
   --ok-bg: #ecfdf3;
@@ -36,6 +40,10 @@
   --row-hi: #1c2333;
   --err-bg: #3a1d1b;
   --err-text: #fda29b;
+  --err-border: #7a2e28;
+  --warn-border: #7a5a1e;
+  --zero: #5f6775;
+  --scrim: rgba(0, 0, 0, 0.6);
   --warn-bg: #3a2a12;
   --warn-text: #fec84b;
   --ok-bg: #12301f;
@@ -145,4 +153,344 @@ a:hover {
   margin: 0;
   font-size: 28px;
   font-weight: 700;
+}
+
+/* Shared pieces (Courses board: buttons, pills, cards). */
+
+.strong {
+  font-weight: 700;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+.button {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pill-priority {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.pill-elective {
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
+}
+
+.pill-error {
+  background: var(--err-bg);
+  color: var(--err-text);
+}
+
+.student-link {
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+.error-text {
+  margin: 0;
+  color: var(--err-text);
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+/* Screen 3: Courses */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.page-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+}
+
+.page-title p {
+  margin: 0;
+}
+
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.search input {
+  width: 280px;
+  max-width: 100%;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.not-in-catalog {
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--err-bg);
+  border: 1px solid var(--err-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.not-in-catalog h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--err-text);
+}
+
+.not-in-catalog-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.not-in-catalog-code {
+  min-width: 72px;
+}
+
+.dept {
+  overflow-x: auto;
+}
+
+.dept h2 {
+  margin: 0;
+  padding: 14px 16px 6px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.dept h2 .muted {
+  font-weight: 500;
+}
+
+.course-table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+}
+
+.course-table th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.course-table th,
+.course-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.course-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.course-table .col-code {
+  width: 96px;
+}
+
+.course-table .col-num-left {
+  width: 80px;
+}
+
+.course-table .col-num,
+.course-table .num {
+  width: 80px;
+  text-align: right;
+}
+
+.course-table .num.strong {
+  font-weight: 600;
+}
+
+.course-table .zero {
+  color: var(--zero);
+}
+
+.course-table tr.selected {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.code-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.code-link:hover {
+  text-decoration: underline;
+}
+
+/* Course dialog */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--scrim);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 140px 16px 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.dialog {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+}
+
+.dialog h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.dialog p {
+  margin: 0;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  padding: 0;
+  font-size: 16px;
+}
+
+.dialog-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-right: 56px;
+}
+
+.dialog-footnote {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.request-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.request-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.request-card-error {
+  background: var(--err-bg);
+  border-color: var(--err-border);
+}
+
+.request-card-error .request-note {
+  color: var(--err-text);
+}
+
+.request-card-warning {
+  background: var(--warn-bg);
+  border-color: var(--warn-border);
+}
+
+.request-card-warning .request-note {
+  color: var(--warn-text);
+}
+
+.request-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.request-card-name {
+  flex-grow: 1;
+}
+
+.request-card-actions {
+  display: flex;
+  gap: 8px;
 }
