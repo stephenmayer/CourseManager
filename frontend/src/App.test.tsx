@@ -9,12 +9,19 @@ vi.mock("./api/client", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./api/client")>();
   return {
     ...actual,
-    // Screens' own reads never settle here; their tests cover them.
-    api: { currentImport: vi.fn(), courses: vi.fn(() => new Promise(() => {})) },
+    // Screens' own reads never settle here unless a test says so; their tests cover them.
+    api: {
+      currentImport: vi.fn(),
+      courses: vi.fn(() => new Promise(() => {})),
+      student: vi.fn(),
+      catalog: vi.fn(),
+    },
   };
 });
 
 const currentImport = vi.mocked(api.currentImport);
+const student = vi.mocked(api.student);
+const catalog = vi.mocked(api.catalog);
 
 function systemPrefersDark(dark: boolean) {
   vi.stubGlobal(
@@ -48,6 +55,17 @@ beforeEach(() => {
     received_at: "2026-10-28T13:05:00Z",
     source: "seed",
   });
+  student.mockResolvedValue({
+    id: "S001",
+    name: "Alex Rivera",
+    grade: 9,
+    profile: "On track.",
+    status: "done",
+    hold_reason: null,
+    requests: [],
+    issues: [],
+  });
+  catalog.mockResolvedValue([]);
   systemPrefersDark(false);
 });
 
@@ -96,7 +114,7 @@ test("an unknown path shows a not-found page", async () => {
 
 test.each([
   ["/", "Students"],
-  ["/students/S001", "Student S001"],
+  ["/students/S001", "Alex Rivera"],
   ["/courses", "Courses"],
 ])("%s routes to the %s page", async (path, heading) => {
   await renderAt(path);

@@ -132,3 +132,45 @@ test("updateRequest patches only the fields given", async () => {
   expect(init?.method).toBe("PATCH");
   expect(JSON.parse(String(init?.body))).toEqual({ type: "priority" });
 });
+
+test("student reads one student's detail", async () => {
+  const fetchMock = stubFetch(async () => jsonResponse({ id: "S003" }));
+
+  await api.student("S003");
+
+  expect(fetchMock).toHaveBeenCalledWith("/api/students/S003", expect.anything());
+});
+
+test("addRequest posts the course code and leaves the type to the server (elective)", async () => {
+  const fetchMock = stubFetchCalls({});
+
+  await api.addRequest("S003", "AT202");
+
+  const [url, init] = fetchMock.mock.calls[0];
+  expect(url).toBe("/api/students/S003/requests");
+  expect(init?.method).toBe("POST");
+  expect(JSON.parse(String(init?.body))).toEqual({ course_code: "AT202" });
+});
+
+test("setReview puts the status", async () => {
+  const fetchMock = stubFetchCalls({});
+
+  await api.setReview("S003", "done");
+
+  const [url, init] = fetchMock.mock.calls[0];
+  expect(url).toBe("/api/students/S003/review");
+  expect(init?.method).toBe("PUT");
+  expect(JSON.parse(String(init?.body))).toEqual({ status: "done" });
+});
+
+test("setReview sends the hold reason with On hold", async () => {
+  const fetchMock = stubFetchCalls({});
+
+  await api.setReview("S003", "on_hold", "Waiting on transcript");
+
+  const [, init] = fetchMock.mock.calls[0];
+  expect(JSON.parse(String(init?.body))).toEqual({
+    status: "on_hold",
+    hold_reason: "Waiting on transcript",
+  });
+});
