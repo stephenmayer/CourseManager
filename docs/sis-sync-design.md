@@ -299,7 +299,7 @@ A squad of 2-3 engineers over one quarter (about 13 weeks), working with one or 
 
 ## 5. Open questions for this review
 
-1. Should a run whose change count is far above normal **pause** for a person instead of applying? That is an approval gate, which Q13 chose against; the alert in 3.9 is the lighter option. Recommendation: alert only, and revisit after the pilot.
+1. ~~Should a run whose change count is far above normal pause for a person?~~ **Decided by Stephen (2026-10-28): apply and alert.** The run applies as usual; support is alerted (3.9) and the jobs view highlights it; a person restores the previous import if it is wrong (3.7). No pause, so Q13's "no approval step" holds. Revisit after the pilot.
 2. Does an unresolved SIS conflict block Done? The plan's default is yes ([phases.md](plan/phases.md)).
 3. ~~How many imports do we keep?~~ **Decided by Stephen (2026-10-28):** every import for the whole school year, archived to S3 at year-end rollover; an import a request still uses as its base is never pruned.
 4. Who may roll back a run (RQ11)?
