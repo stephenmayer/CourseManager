@@ -1,4 +1,3 @@
-from collections.abc import Iterator
 from sqlite3 import Connection
 from typing import Any
 
@@ -6,12 +5,6 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import create_app
-
-
-@pytest.fixture
-def client(conn: Connection) -> Iterator[TestClient]:
-    with TestClient(create_app(conn)) as test_client:
-        yield test_client
 
 
 def student(client: TestClient, student_id: str) -> dict[str, Any]:

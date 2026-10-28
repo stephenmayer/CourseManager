@@ -3,21 +3,22 @@ id: site-map
 title: Site map
 status: current
 owns: "the screens, dialogs and navigation between them, including designed-but-not-built add-ons"
-updated: 2026-10-27
+updated: 2026-10-28
 ---
 
 # Site map
 
-Solid boxes are in the core build. Dashed boxes are add-ons that are designed but not built (Q5 option D, Q14, Q15, Q16, Q17). Every screen shares one header: Students, Courses, the SIS data date, the signed-in name and the light/dark toggle.
+Solid boxes are in the core build. Dashed boxes are add-ons that are designed but not built (Q5 option D, Q14, Q15, Q16, Q17). Every screen shares one header: Students, Courses, Settings, the SIS data date, the signed-in name and the light/dark toggle.
 
 ![Site map](img/site-map.png)
 
 ```mermaid
 flowchart TD
-    H["Header on every screen<br/>Students · Courses · SIS data date · Light/Dark"]
+    H["Header on every screen<br/>Students · Courses · Settings · SIS data date · Light/Dark"]
 
     H --> SL["Screen 1: Student list<br/>search · filter by status · filter by checks"]
     H --> CO["Screen 3: Courses<br/>counts by department · Not in catalog row"]
+    H --> ST["Screen 4: Settings<br/>Checks: switch each warning on or off"]
 
     SL -- "select a student" --> SD["Screen 2: Student detail<br/>profile · requests (priority, elective)<br/>checks with reasons · status: Done / On hold"]
     SD -- "All students" --> SL
@@ -56,6 +57,7 @@ flowchart TD
 | Student detail | Student list; course dialog; Not in catalog row | Q1-Q5, Q11 |
 | Courses | Header | Q12 |
 | Course dialog | Courses; any course code on a student page | Q12 |
+| Settings | Header | Q20 |
 | Sync jobs (add-on) | Header, for an admin | Q13, Q14 |
 | Graduation rules setup (add-on) | Header, for a district admin | Q15 |
 | Graduation progress, Alternates, Did you mean (add-ons) | Inside Student detail | Q15, Q16, Q5 D |

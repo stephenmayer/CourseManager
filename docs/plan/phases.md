@@ -26,7 +26,7 @@ Requested by Stephen on 2026-10-28: Phase 1 is everything the take-home asks for
 | 1.6 ([#6](https://github.com/stephenmayer/CourseManager/issues/6)) | Screen 1: Student list with search, status and checks filters | R1, M3 | 1.4, 1.5 |
 | 1.7 ([#7](https://github.com/stephenmayer/CourseManager/issues/7)) | Screen 2: Student detail (requests, checks with reasons, status, add from catalog) | R2-R4, M1-M4, Q11 | 1.4, 1.5 |
 | 1.8 ([#8](https://github.com/stephenmayer/CourseManager/issues/8)) | Screen 3: Courses and the course dialog (also from the student page) | M6, Q12 | 1.4, 1.5, 1.7 |
-| 1.12 ([#31](https://github.com/stephenmayer/CourseManager/issues/31)) | Screen 4: Checks, turn each warning on or off (added 2026-10-28) | Q20, A3, M2 | 1.4, 1.5; design board approved first |
+| 1.12 ([#31](https://github.com/stephenmayer/CourseManager/issues/31)) | Screen 4: Settings, turn each warning check on or off (added 2026-10-28) | Q20, A3, M2 | 1.4, 1.5 |
 | 1.9 ([#9](https://github.com/stephenmayer/CourseManager/issues/9)) | README: run, key decisions, testing strategy, pilot vs scale, how AI was used, known gaps | Deliverables, R8, F1-F3 | 1.1-1.8, 1.12 |
 | 1.10 ([#10](https://github.com/stephenmayer/CourseManager/issues/10)) | SIS sync design doc (Markdown) | R9, Q2, Q10, Q13, Q14, Q18, Q19 | none (can run in parallel) |
 | 1.11 ([#11](https://github.com/stephenmayer/CourseManager/issues/11)) | 5-minute video outline for the SIS design (Stephen records) | Deliverables | 1.10 |

@@ -2,7 +2,7 @@
 id: q020-checks-on-off
 title: Turning checks on and off
 status: current
-decided: 2026-10-28, by Stephen (scope); the errors-stay-on default is shown on the design board for his approval
+decided: 2026-10-28, by Stephen
 ---
 
 <a id="q020"></a>
@@ -25,9 +25,9 @@ Example: a school whose grade 11 has no Social Studies requirement sees the core
 
 ## Resolution
 
-Stephen chose to **add a checks screen to Phase 1 now** (2026-10-28), designed for his approval before the build, then built before the README (1.9).
+Stephen chose to **add a checks screen to Phase 1 now** (2026-10-28), built before the README (1.9).
 
-Proposed default, shown on the board for approval: **B**. Errors stay on because they protect scheduling (Q5); every warning can be switched off. D stays with Q15.
+**B**, approved on the design board the same day: errors stay on because they protect scheduling (Q5); every warning can be switched off. D stays with Q15. Stephen then renamed the page **Settings** (`/settings` in the header); the switches sit in its Checks section, which leaves room for later settings.
 
 How it behaves:
 
@@ -43,5 +43,5 @@ How it behaves:
 - [x] API: `process/developer-guide.md` endpoint table (with the build, issue 1.12)
 - [x] Roadmap/plan: `plan/phases.md` (1.12)
 - [x] Requirements: `requirements/requirements.md` (A3, M2)
-- [ ] Design notes: `design/README.md`, `design/site-map.md` (after Stephen approves the board)
+- [x] Design notes: `design/README.md`, `design/site-map.md`
 - [x] Decisions index row

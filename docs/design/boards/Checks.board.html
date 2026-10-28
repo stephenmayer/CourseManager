@@ -1,4 +1,4 @@
-<title>Checks Screen Board</title>
+<title>Settings Screen Board</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -86,6 +86,7 @@ h2 { font-size: 18px; margin: 0; text-wrap: balance; }
 .app-main { padding: 24px; display: flex; flex-direction: column; gap: 18px; }
 .app-title { display: flex; flex-direction: column; gap: 4px; }
 .app-title h3 { font-size: 22px; margin: 0; }
+.app-title h4 { font-size: 16px; margin: 0; }
 .app-title p { margin: 0; color: var(--muted); max-width: 68ch; }
 .group { display: flex; flex-direction: column; gap: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .group-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); flex-wrap: wrap; }
@@ -123,9 +124,9 @@ h2 { font-size: 18px; margin: 0; text-wrap: balance; }
 
 <div class="board">
   <header class="board-head">
-    <span class="eyebrow">Design board · Q20 · issue 1.12 · for Stephen's approval</span>
-    <h1>Screen 4: Checks</h1>
-    <p class="lede">A Checks page in the header turns each warning on or off for everyone using the tool. The two data errors stay on. Nothing is built until you approve this board. The switches on the frames work, so you can try them.</p>
+    <span class="eyebrow">Design board · Q20 · issue 1.12 · approved by Stephen 2026-10-28</span>
+    <h1>Screen 4: Settings</h1>
+    <p class="lede">A Settings page in the header has a Checks section that turns each warning on or off for everyone using the tool. The two data errors stay on. Stephen approved it on 2026-10-28 with the errors locked on, and renamed the page Settings. The switches on the frames work, so you can try them.</p>
   </header>
 
   <section class="section">
@@ -155,7 +156,7 @@ h2 { font-size: 18px; margin: 0; text-wrap: balance; }
         <div class="caption"><b>Loading</b> before the checks arrive</div>
         <div class="app">
           <div class="app-main">
-            <div class="app-title"><h3>Checks</h3><p>Loading checks…</p></div>
+            <div class="app-title"><h3>Settings</h3><p>Loading checks…</p></div>
             <div class="group">
               <div class="group-head">Errors</div>
               <div class="row"><div class="row-text"><div class="skeleton" style="width: 40%"></div><div class="skeleton" style="width: 80%"></div></div></div>
@@ -219,7 +220,7 @@ h2 { font-size: 18px; margin: 0; text-wrap: balance; }
           <li>A <code>check_setting</code> table; no row means on.</li>
           <li><code>GET /api/checks</code> and <code>PUT /api/checks/{rule}</code>; switching an error off is refused.</li>
           <li>The service hands only switched-on rules to the checks, so the rules stay pure functions.</li>
-          <li>Header gets a third link, Checks.</li>
+          <li>Header gets a third link, Settings (<code>/settings</code>).</li>
         </ul>
       </div>
     </div>
@@ -231,7 +232,8 @@ h2 { font-size: 18px; margin: 0; text-wrap: balance; }
       <table class="copy-table">
         <thead><tr><th>Where</th><th>Text</th></tr></thead>
         <tbody>
-          <tr><td>Header link</td><td>Checks</td></tr>
+          <tr><td>Header link and page title</td><td>Settings</td></tr>
+          <tr><td>Section heading</td><td>Checks</td></tr>
           <tr><td>Page intro</td><td>Checks run on every student's course requests. Switching a warning off hides it on every screen, for everyone. Errors always stay on because they stop bad data reaching the schedule.</td></tr>
           <tr><td>Errors group</td><td>Errors · Always on, and they block Done</td></tr>
           <tr><td>Warnings group</td><td>Warnings · Counselors can keep them with a reason</td></tr>
@@ -246,7 +248,7 @@ h2 { font-size: 18px; margin: 0; text-wrap: balance; }
   </section>
 
   <section class="choice">
-    <span class="eyebrow">One choice for you</span>
+    <span class="eyebrow">Decided: errors stay on</span>
     <h2>Can the two errors be switched off too?</h2>
     <p>Recommended: no. Unknown and duplicate courses are bad SIS data, and Q5 has them block Done so they never reach the schedule. Letting them be switched off would let a student be marked Done with SS303 on the list. If you want all five switchable, the errors would get switches like the warnings and the Done gate would follow whatever is on.</p>
   </section>
@@ -287,11 +289,12 @@ function render(el, state, frameId) {
   el.innerHTML = `
     <div class="app-header">
       <div class="logo">${LOGO}<span>CourseManager</span></div>
-      <div class="nav"><span>Students</span><span>Courses</span><span aria-current="page">Checks</span></div>
+      <div class="nav"><span>Students</span><span>Courses</span><span aria-current="page">Settings</span></div>
       ${narrow ? "" : '<div class="spacer"></div><span class="hdr-muted">2027–28 course requests · SIS data as of Oct 27, 6:00 AM</span>'}
     </div>
     <div class="app-main">
-      <div class="app-title"><h3>Checks</h3><p>Checks run on every student's course requests. Switching a warning off hides it on every screen, for everyone. Errors always stay on because they stop bad data reaching the schedule.</p></div>
+      <div class="app-title"><h3>Settings</h3></div>
+      <div class="app-title"><h4>Checks</h4><p>Checks run on every student's course requests. Switching a warning off hides it on every screen, for everyone. Errors always stay on because they stop bad data reaching the schedule.</p></div>
       <div class="group"><div class="group-head">Errors <small>Always on, and they block Done</small></div>${errors.map((c) => row(c, frameId)).join("")}</div>
       <div class="group"><div class="group-head">Warnings <small>Counselors can keep them with a reason</small></div>${warnings.map((c) => row(c, frameId)).join("")}</div>
       <p class="footnote">Reasons counselors entered are kept. Switch a check back on and those warnings show as kept again.</p>
