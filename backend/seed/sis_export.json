@@ -1,0 +1,541 @@
+{
+  "exported_at": "2026-10-27T06:00:00Z",
+  "students": [
+    {
+      "id": "S001",
+      "name": "Alex Rivera",
+      "grade": 9,
+      "profile": "Strong academic start. On track for standard 4-year pathway. No flags."
+    },
+    {
+      "id": "S002",
+      "name": "Mei Chen",
+      "grade": 9,
+      "profile": "English Language Learner, recently enrolled from China. Strong in math. Needs ELL English support course alongside core coursework."
+    },
+    {
+      "id": "S003",
+      "name": "Jordan Williams",
+      "grade": 10,
+      "profile": "Failed MTH101 (Algebra I) last year. Must retake before advancing in math. Otherwise on track. Counselor should flag math priority carefully."
+    },
+    {
+      "id": "S004",
+      "name": "Priya Patel",
+      "grade": 10,
+      "profile": "High achiever, targeting AP track. Has completed Algebra I and Geometry with honors. Wants to accelerate into Algebra II as a 10th grader."
+    },
+    {
+      "id": "S005",
+      "name": "Marcus Thompson",
+      "grade": 11,
+      "profile": "Average performer. Interested in arts and media. Meets all core requirements so far. Elective choices should reflect media interests."
+    },
+    {
+      "id": "S006",
+      "name": "Sofia Mendez",
+      "grade": 11,
+      "profile": "Strong across all subjects. Planning to take multiple APs. Counselor should confirm prerequisites are met and not overload schedule."
+    },
+    {
+      "id": "S007",
+      "name": "Ethan Park",
+      "grade": 11,
+      "profile": "Interested in science and medicine. Solid grades. Wants Anatomy & Physiology as a senior elective so should be tracked for SCI301 now."
+    },
+    {
+      "id": "S008",
+      "name": "Aisha Johnson",
+      "grade": 12,
+      "profile": "On track for graduation. Focused on completing requirements. Interested in Psychology and Economics as final electives."
+    },
+    {
+      "id": "S009",
+      "name": "Liam O'Brien",
+      "grade": 12,
+      "profile": "Full AP load. College-bound, strong academic record. Counselor should review for schedule conflicts across AP courses."
+    },
+    {
+      "id": "S010",
+      "name": "Nina Torres",
+      "grade": 12,
+      "profile": "Transferred mid-junior year from another district. Credit evaluation pending. Some core credits may be missing — counselor must verify prior coursework before assigning requests."
+    }
+  ],
+  "courses": [
+    {
+      "code": "MTH101",
+      "name": "Algebra I",
+      "department": "Math",
+      "grades": "9"
+    },
+    {
+      "code": "MTH102",
+      "name": "Geometry",
+      "department": "Math",
+      "grades": "9/10"
+    },
+    {
+      "code": "MTH201",
+      "name": "Algebra II",
+      "department": "Math",
+      "grades": "10"
+    },
+    {
+      "code": "MTH202",
+      "name": "Pre-Calculus",
+      "department": "Math",
+      "grades": "11"
+    },
+    {
+      "code": "MTH301",
+      "name": "Calculus",
+      "department": "Math",
+      "grades": "11/12"
+    },
+    {
+      "code": "MTH302",
+      "name": "Statistics",
+      "department": "Math",
+      "grades": "11/12"
+    },
+    {
+      "code": "MTH401",
+      "name": "AP Calculus AB",
+      "department": "Math",
+      "grades": "12"
+    },
+    {
+      "code": "MTH402",
+      "name": "AP Statistics",
+      "department": "Math",
+      "grades": "12"
+    },
+    {
+      "code": "ENG101",
+      "name": "English 9",
+      "department": "English",
+      "grades": "9"
+    },
+    {
+      "code": "ENG102",
+      "name": "English 9 ELL Support",
+      "department": "English",
+      "grades": "9"
+    },
+    {
+      "code": "ENG201",
+      "name": "English 10",
+      "department": "English",
+      "grades": "10"
+    },
+    {
+      "code": "ENG301",
+      "name": "American Literature",
+      "department": "English",
+      "grades": "11"
+    },
+    {
+      "code": "ENG302",
+      "name": "Creative Writing",
+      "department": "English",
+      "grades": "11/12"
+    },
+    {
+      "code": "ENG401",
+      "name": "AP English Language",
+      "department": "English",
+      "grades": "12"
+    },
+    {
+      "code": "ENG402",
+      "name": "AP English Literature",
+      "department": "English",
+      "grades": "12"
+    },
+    {
+      "code": "ENG403",
+      "name": "Senior Seminar",
+      "department": "English",
+      "grades": "12"
+    },
+    {
+      "code": "SS101",
+      "name": "World History",
+      "department": "Social Studies",
+      "grades": "9"
+    },
+    {
+      "code": "SS201",
+      "name": "U.S. History",
+      "department": "Social Studies",
+      "grades": "10"
+    },
+    {
+      "code": "SS301",
+      "name": "Civics & Government",
+      "department": "Social Studies",
+      "grades": "11"
+    },
+    {
+      "code": "SS302",
+      "name": "Economics",
+      "department": "Social Studies",
+      "grades": "11/12"
+    },
+    {
+      "code": "SS401",
+      "name": "AP U.S. History",
+      "department": "Social Studies",
+      "grades": "11/12"
+    },
+    {
+      "code": "SS402",
+      "name": "AP Government",
+      "department": "Social Studies",
+      "grades": "12"
+    },
+    {
+      "code": "SS403",
+      "name": "Psychology",
+      "department": "Social Studies",
+      "grades": "11/12"
+    },
+    {
+      "code": "SCI101",
+      "name": "Biology",
+      "department": "Science",
+      "grades": "9"
+    },
+    {
+      "code": "SCI201",
+      "name": "Chemistry",
+      "department": "Science",
+      "grades": "10"
+    },
+    {
+      "code": "SCI301",
+      "name": "Physics",
+      "department": "Science",
+      "grades": "11"
+    },
+    {
+      "code": "SCI302",
+      "name": "Environmental Science",
+      "department": "Science",
+      "grades": "11/12"
+    },
+    {
+      "code": "SCI401",
+      "name": "AP Biology",
+      "department": "Science",
+      "grades": "11/12"
+    },
+    {
+      "code": "SCI402",
+      "name": "AP Chemistry",
+      "department": "Science",
+      "grades": "12"
+    },
+    {
+      "code": "SCI403",
+      "name": "Anatomy & Physiology",
+      "department": "Science",
+      "grades": "12"
+    },
+    {
+      "code": "AT101",
+      "name": "Introduction to Computing",
+      "department": "Arts & Tech",
+      "grades": "9/10"
+    },
+    {
+      "code": "AT102",
+      "name": "Visual Arts I",
+      "department": "Arts & Tech",
+      "grades": "9/10"
+    },
+    {
+      "code": "AT201",
+      "name": "Web Design",
+      "department": "Arts & Tech",
+      "grades": "10/11"
+    },
+    {
+      "code": "AT202",
+      "name": "Music Theory",
+      "department": "Arts & Tech",
+      "grades": "10/11"
+    },
+    {
+      "code": "AT301",
+      "name": "AP Computer Science A",
+      "department": "Arts & Tech",
+      "grades": "11/12"
+    },
+    {
+      "code": "AT302",
+      "name": "Digital Media & Film",
+      "department": "Arts & Tech",
+      "grades": "11/12"
+    },
+    {
+      "code": "AT303",
+      "name": "Advanced Visual Arts",
+      "department": "Arts & Tech",
+      "grades": "11/12"
+    }
+  ],
+  "requests": [
+    {
+      "student_id": "S001",
+      "course_code": "MTH101",
+      "type": "P"
+    },
+    {
+      "student_id": "S001",
+      "course_code": "ENG101",
+      "type": "P"
+    },
+    {
+      "student_id": "S001",
+      "course_code": "SS101",
+      "type": "P"
+    },
+    {
+      "student_id": "S001",
+      "course_code": "SCI101",
+      "type": "P"
+    },
+    {
+      "student_id": "S001",
+      "course_code": "AT101",
+      "type": "E"
+    },
+    {
+      "student_id": "S002",
+      "course_code": "MTH101",
+      "type": "P"
+    },
+    {
+      "student_id": "S002",
+      "course_code": "ENG101",
+      "type": "P"
+    },
+    {
+      "student_id": "S002",
+      "course_code": "ENG102",
+      "type": "P"
+    },
+    {
+      "student_id": "S002",
+      "course_code": "SS101",
+      "type": "P"
+    },
+    {
+      "student_id": "S002",
+      "course_code": "SCI101",
+      "type": "P"
+    },
+    {
+      "student_id": "S003",
+      "course_code": "MTH101",
+      "type": "P"
+    },
+    {
+      "student_id": "S003",
+      "course_code": "ENG201",
+      "type": "P"
+    },
+    {
+      "student_id": "S003",
+      "course_code": "SS201",
+      "type": "P"
+    },
+    {
+      "student_id": "S003",
+      "course_code": "SCI201",
+      "type": "P"
+    },
+    {
+      "student_id": "S003",
+      "course_code": "AT201",
+      "type": "E"
+    },
+    {
+      "student_id": "S004",
+      "course_code": "MTH201",
+      "type": "P"
+    },
+    {
+      "student_id": "S004",
+      "course_code": "ENG201",
+      "type": "P"
+    },
+    {
+      "student_id": "S004",
+      "course_code": "SS201",
+      "type": "P"
+    },
+    {
+      "student_id": "S004",
+      "course_code": "SCI201",
+      "type": "P"
+    },
+    {
+      "student_id": "S004",
+      "course_code": "AT301",
+      "type": "E"
+    },
+    {
+      "student_id": "S005",
+      "course_code": "MTH202",
+      "type": "P"
+    },
+    {
+      "student_id": "S005",
+      "course_code": "ENG301",
+      "type": "P"
+    },
+    {
+      "student_id": "S005",
+      "course_code": "SS301",
+      "type": "P"
+    },
+    {
+      "student_id": "S005",
+      "course_code": "SCI301",
+      "type": "P"
+    },
+    {
+      "student_id": "S005",
+      "course_code": "AT302",
+      "type": "E"
+    },
+    {
+      "student_id": "S005",
+      "course_code": "AT303",
+      "type": "E"
+    },
+    {
+      "student_id": "S006",
+      "course_code": "MTH401",
+      "type": "P"
+    },
+    {
+      "student_id": "S006",
+      "course_code": "ENG401",
+      "type": "P"
+    },
+    {
+      "student_id": "S006",
+      "course_code": "SS401",
+      "type": "P"
+    },
+    {
+      "student_id": "S006",
+      "course_code": "SCI401",
+      "type": "P"
+    },
+    {
+      "student_id": "S006",
+      "course_code": "AT301",
+      "type": "E"
+    },
+    {
+      "student_id": "S007",
+      "course_code": "MTH202",
+      "type": "P"
+    },
+    {
+      "student_id": "S007",
+      "course_code": "ENG301",
+      "type": "P"
+    },
+    {
+      "student_id": "S007",
+      "course_code": "SS301",
+      "type": "P"
+    },
+    {
+      "student_id": "S007",
+      "course_code": "SCI301",
+      "type": "P"
+    },
+    {
+      "student_id": "S007",
+      "course_code": "SS302",
+      "type": "E"
+    },
+    {
+      "student_id": "S008",
+      "course_code": "MTH302",
+      "type": "P"
+    },
+    {
+      "student_id": "S008",
+      "course_code": "ENG401",
+      "type": "P"
+    },
+    {
+      "student_id": "S008",
+      "course_code": "SS402",
+      "type": "P"
+    },
+    {
+      "student_id": "S008",
+      "course_code": "SCI403",
+      "type": "E"
+    },
+    {
+      "student_id": "S008",
+      "course_code": "SS303",
+      "type": "E"
+    },
+    {
+      "student_id": "S008",
+      "course_code": "SS402",
+      "type": "E"
+    },
+    {
+      "student_id": "S009",
+      "course_code": "MTH401",
+      "type": "P"
+    },
+    {
+      "student_id": "S009",
+      "course_code": "ENG402",
+      "type": "P"
+    },
+    {
+      "student_id": "S009",
+      "course_code": "SS402",
+      "type": "P"
+    },
+    {
+      "student_id": "S009",
+      "course_code": "SCI402",
+      "type": "P"
+    },
+    {
+      "student_id": "S009",
+      "course_code": "AT301",
+      "type": "E"
+    },
+    {
+      "student_id": "S010",
+      "course_code": "ENG403",
+      "type": "P"
+    },
+    {
+      "student_id": "S010",
+      "course_code": "SCI403",
+      "type": "E"
+    },
+    {
+      "student_id": "S010",
+      "course_code": "SS302",
+      "type": "E"
+    }
+  ]
+}
