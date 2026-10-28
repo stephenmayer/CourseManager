@@ -1,7 +1,8 @@
 import { Route, Routes } from "react-router";
 
 import CoursesPage from "./pages/Courses";
-import { NotFoundPage, StudentDetailPage, StudentListPage } from "./pages/Placeholders";
+import { NotFoundPage, StudentListPage } from "./pages/Placeholders";
+import StudentDetailPage from "./pages/StudentDetail";
 import Header from "./shell/Header";
 import { useTheme } from "./theme";
 
