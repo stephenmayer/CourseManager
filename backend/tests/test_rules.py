@@ -2,7 +2,7 @@ from dataclasses import replace
 from sqlite3 import Connection
 
 from app.models import Request
-from app.rules import Issue, check_student
+from app.rules import CHECKS, RULES, Issue, check_student
 from app.sis.reader import SqliteSisSource
 from app.store import SqliteRequestStore
 
@@ -18,7 +18,7 @@ def issues_for(
     requests: list[Request] = SqliteRequestStore(conn).list_active(student_id)
     for code, changes in (edit or {}).items():
         requests = [replace(r, **changes) if r.course_code == code else r for r in requests]  # type: ignore[arg-type]
-    return check_student(student, requests, catalog)
+    return check_student(student, requests, catalog, RULES)
 
 
 def request_id(conn: Connection, student_id: str, code: str, n: int = 1) -> str:
@@ -176,3 +176,19 @@ def test_seed_warning_and_error_totals_match_the_approved_student_list(conn: Con
         "S009": (0, 1),
         "S010": (0, 0),
     }
+
+
+def test_every_check_names_its_issues_with_its_own_id_and_severity(conn: Connection) -> None:
+    """Q20: Settings switches a check off by id and locks it by severity, so each rule's
+    issues must carry exactly its Check's id and severity."""
+    sis = SqliteSisSource(conn)
+    catalog = {course.code: course for course in sis.catalog()}
+    store = SqliteRequestStore(conn)
+    cases = [(s, store.list_active(s.id)) for s in sis.students()]
+    marcus = next(s for s, _ in cases if s.id == "S005")
+    without_physics = [r for r in store.list_active("S005") if r.course_code != "SCI301"]
+    cases.append((marcus, without_physics))  # Q4's example: the only core-subject case
+    for check in CHECKS:
+        issues = [i for student, requests in cases for i in check.rule(student, requests, catalog)]
+        assert issues, f"{check.id} fired on no case; add one"
+        assert {(i.rule, i.severity) for i in issues} == {(check.id, check.severity)}

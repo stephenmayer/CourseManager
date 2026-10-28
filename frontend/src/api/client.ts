@@ -101,6 +101,18 @@ export interface CourseRequest {
   issues: IssueOut[];
 }
 
+// A check on the Settings screen (Q20). Errors are locked on.
+export interface Check {
+  rule: string;
+  name: string;
+  description: string;
+  note: string | null;
+  severity: "error" | "warning";
+  enabled: boolean;
+  locked: boolean;
+  student_count: number; // students it flags now, even while off
+}
+
 async function errorMessage(response: Response): Promise<string> {
   try {
     const body: unknown = await response.json();
@@ -172,4 +184,7 @@ export const api = {
       `/students/${encodeURIComponent(studentId)}/review`,
       holdReason === undefined ? { status } : { status, hold_reason: holdReason },
     ),
+  checks: () => getJson<Check[]>("/checks"),
+  setCheck: (rule: string, enabled: boolean) =>
+    sendJson<Check[]>("PUT", `/checks/${encodeURIComponent(rule)}`, { enabled }),
 };

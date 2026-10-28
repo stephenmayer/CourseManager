@@ -1,11 +1,12 @@
 """The checks: pure functions (student, active requests, catalog) -> issues (overview §3).
 
-Run on every read and never stored. Adding a rule = one function here, added to RULES,
-plus its tests. A rule only names the request an issue sits on; check_student marks a
-warning kept when that request has a reason, so every warning rule gets that for free.
+Run on every read and never stored. Adding a rule = one function here, named by a Check in
+CHECKS (its row on the Settings screen, Q20), plus its tests. A rule only names the request an
+issue sits on; check_student marks a warning kept when that request has a reason, so every
+warning rule gets that for free.
 """
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from typing import Literal
 
@@ -147,17 +148,77 @@ def ap_load(student: Student, requests: list[Request], catalog: Catalog) -> list
 
 
 Rule = Callable[[Student, list[Request], Catalog], list[Issue]]
-RULES: list[Rule] = [unknown_course, duplicate_course, out_of_grade, core_subject, ap_load]
 
 
-def check_student(student: Student, requests: list[Request], catalog: Catalog) -> list[Issue]:
-    """All issues for one student's active requests: errors first, then warnings."""
+@dataclass(frozen=True)
+class Check:
+    """A rule as the Settings screen shows it (Q20). Errors are locked on (Q5)."""
+
+    rule: Rule
+    severity: Severity
+    name: str
+    description: str
+    note: str | None = None
+
+    @property
+    def id(self) -> str:
+        """The `rule` on its issues: the function's name (a test holds them to it)."""
+        return self.rule.__name__
+
+    @property
+    def locked(self) -> bool:
+        return self.severity == "error"
+
+
+CHECKS: list[Check] = [
+    Check(
+        unknown_course,
+        "error",
+        "Unknown course",
+        "A requested course code isn't in the course catalog.",
+    ),
+    Check(
+        duplicate_course,
+        "error",
+        "Course requested twice",
+        "The same course is on a student's list more than once.",
+    ),
+    Check(
+        out_of_grade,
+        "warning",
+        "Course outside its grade",
+        "A course listed for other grades, like a grade 9 retake for a grade 10 student.",
+    ),
+    Check(
+        core_subject,
+        "warning",
+        "No priority course in a core subject",
+        "Grades 9 to 11 need a priority course in Math, English, Social Studies and Science;"
+        " grade 12 in English.",
+        "Our assumption until the school's graduation rules are added.",
+    ),
+    Check(
+        ap_load,
+        "warning",
+        "Heavy AP load",
+        f"More than {AP_LIMIT} AP courses in one year.",
+    ),
+]
+RULES: list[Rule] = [check.rule for check in CHECKS]  # all of them, switched on or not
+
+
+def check_student(
+    student: Student, requests: list[Request], catalog: Catalog, rules: Sequence[Rule]
+) -> list[Issue]:
+    """All issues from `rules` for one student's active requests: errors first, then warnings.
+
+    `rules` has no default, so every caller decides which checks are on (Q20)."""
     reasons = {r.id: r.reason for r in requests}
     issues = [
         replace(issue, kept=bool(reasons.get(issue.request_id or "")))
         if issue.severity == "warning"
         else issue
-        for rule in RULES
+        for rule in rules
         for issue in rule(student, requests, catalog)
     ]
     return sorted(issues, key=lambda issue: issue.severity != "error")

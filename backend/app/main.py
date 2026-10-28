@@ -15,6 +15,7 @@ from app.models import RequestSource, RequestType, ReviewStatus
 from app.rules import Severity
 from app.seed import ensure_seeded, reset
 from app.service import (
+    CheckRow,
     CourseService,
     RequestView,
     ServiceError,
@@ -127,6 +128,17 @@ class CourseRequestOut(BaseModel):
     issues: list[IssueOut]
 
 
+class CheckOut(BaseModel):
+    rule: str
+    name: str
+    description: str
+    note: str | None
+    severity: Severity
+    enabled: bool
+    locked: bool
+    student_count: int
+
+
 # Request bodies
 
 
@@ -138,6 +150,10 @@ class AddRequestIn(BaseModel):
 class UpdateRequestIn(BaseModel):
     type: RequestType | None = None
     reason: str | None = Field(default=None, description="Omit to leave unchanged; null clears")
+
+
+class CheckIn(BaseModel):
+    enabled: bool
 
 
 class ReviewIn(BaseModel):
@@ -176,6 +192,22 @@ def detail_out(detail: StudentDetail) -> StudentDetailOut:
         requests=[request_out(v) for v in detail.requests],
         issues=[IssueOut.model_validate(i) for i in detail.issues],
     )
+
+
+def checks_out(rows: list[CheckRow]) -> list[CheckOut]:
+    return [
+        CheckOut(
+            rule=row.check.id,
+            name=row.check.name,
+            description=row.check.description,
+            note=row.check.note,
+            severity=row.check.severity,
+            enabled=row.enabled,
+            locked=row.check.locked,
+            student_count=row.student_count,
+        )
+        for row in rows
+    ]
 
 
 def count_out(row: UnknownCourseRow) -> CourseCountOut:
@@ -295,6 +327,16 @@ async def course_requests(course_code: str, service: Service) -> list[CourseRequ
         )
         for row in service.course_requests(course_code)
     ]
+
+
+@api.get("/checks")
+async def checks(service: Service) -> list[CheckOut]:
+    return checks_out(service.checks())
+
+
+@api.put("/checks/{rule}")
+async def set_check(rule: str, body: CheckIn, service: Service) -> list[CheckOut]:
+    return checks_out(service.set_check(rule, body.enabled))
 
 
 @api.post("/reset")
