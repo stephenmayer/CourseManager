@@ -36,7 +36,7 @@ Full schema, constraints and diagram: [schema.md](schema.md). SIS data is stored
 | --- | --- | --- |
 | Student | id, name, grade (upcoming year), profile text | SIS (read-only) |
 | Course | code, name, department, grades, is_ap | SIS (read-only) |
-| Request | id, student_id, course_code, type (priority/elective), source (sis/app), edited_in_app, reason, removed_at, sis_key + base fields (Q18) | App |
+| Request | id, student_id, course_code, type (priority/elective), source (sis/app), edited_in_app, reason, removed_at, sis_key, base_import_id, sis_conflict (Q18) | App |
 | Review | student_id, status (not started / in progress / on hold / done), hold_reason | App |
 | Request alternates (Q16, not built) | alternate_for (request id), rank | App |
 | Transcript entry (Q15, not built) | student_id, course_code, school_year, grade_earned, credits | SIS (read-only) |

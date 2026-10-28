@@ -65,9 +65,7 @@ erDiagram
         bool edited_in_app
         text reason "nullable"
         text sis_key "null when added in app"
-        int base_import_id "import last agreed with"
-        text base_course_code "SIS values at that import"
-        text base_type
+        int base_import_id "import last agreed with; base values come from its snapshot"
         text sis_conflict "nullable flag, Q2"
         timestamp removed_at "soft delete"
         timestamp created_at
@@ -158,9 +156,7 @@ CREATE TABLE request (
   reason           TEXT,                         -- Q1: why a warning was kept
   -- Q18: the SIS base this request last agreed with (all NULL when added in the app)
   sis_key          TEXT,
-  base_import_id   INTEGER REFERENCES sis_import (id),
-  base_course_code TEXT,
-  base_type        TEXT,
+  base_import_id   INTEGER REFERENCES sis_import (id),  -- base values = sis_request at (base_import_id, sis_key)
   sis_conflict     TEXT,                         -- set by a reconcile when both sides changed (Q2)
   removed_at       TEXT,                         -- soft delete, see below
   created_at       TEXT NOT NULL,
@@ -183,7 +179,7 @@ Choices worth reviewing:
 
 - **No foreign key from `request.course_code` to the catalog.** Aisha's SS303 has to load so the app can flag it (Q5). The unknown-course rule catches it instead.
 - **No unique constraint on (student, course).** Aisha's duplicate SS402 has to load too (Q5). The duplicate rule catches it and blocks Done.
-- **The base fields make the three-way compare possible** (Q18). "Did the SIS change this, or did the counselor?" is answered by comparing base vs new SIS, and base vs the app's current values. `edited_in_app` stays as the quick flag the UI and rollback use.
+- **`sis_key` + `base_import_id` make the three-way compare possible** (Q18): the base values are read from that import's snapshot, not copied onto the request. "Did the SIS change this, or did the counselor?" is answered by comparing base vs new SIS, and base vs the app's current values. `edited_in_app` stays as the quick flag the UI and rollback use.
 - **Soft delete (`removed_at`).** If a counselor removes a SIS request and we deleted the row, the next import would add it back. The removed row, with its `sis_key`, tells a reconcile "the counselor removed this" (Q2). It costs one `WHERE removed_at IS NULL` on reads, and gives the README a cheap answer on audit history (M7).
 - **Changing type or reason, or removing, sets `edited_in_app = 1`.** Adding from the catalog creates a row with `source = 'app'` and no `sis_key`.
 - **`reason` lives on the request**, because warnings are computed (below) and a request has at most one reason in the designs.
@@ -224,7 +220,7 @@ CREATE TABLE sync_change (
 );
 ```
 
-Retention: keep the last N imports (N to set with Stephen; trivial at 10 students).
+Retention: keep the last N imports (N to set with Stephen; trivial at 10 students), and never prune an import that an active request still names as its `base_import_id`.
 
 ## 7. Not in this schema: add-ons (designed, not built)
 
