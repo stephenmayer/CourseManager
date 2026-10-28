@@ -26,6 +26,24 @@ Needs Python 3.12 and [uv](https://docs.astral.sh/uv/), Node 22 with npm, and GN
 
 `make dev` starts the API on `127.0.0.1:8000` (auto-reload) and the app on `localhost:5173`. Vite proxies `/api` to the API, so the browser only talks to one origin. Check it with `curl localhost:5173/api/health`.
 
+## Data and API
+
+The API keeps its data in `backend/data/coursemanager.sqlite3` (override with `COURSEMANAGER_DB`), seeded from `backend/seed/sis_export.json` on first start. `POST /api/reset` (or deleting the file while the API is stopped) restores the seed. Endpoints (all under `/api`, JSON; every write returns the full updated student; errors are `{"detail": "<plain message>"}` with 404, 409 or 422):
+
+| Method and path | What |
+| --- | --- |
+| `GET /sis/current-import` | `{id, received_at, source}` of the import the app reads ("SIS data as of") |
+| `GET /students` | `{sis_as_of, students: [{id, name, grade, profile, status, priority_count, elective_count, error_count, warning_count}]}` |
+| `GET /students/{id}` | Profile, status, hold reason, requests (priority first) and issues |
+| `POST /students/{id}/requests` | `{course_code, type?}` add from the catalog (default elective); 409 if already on the list |
+| `PATCH /requests/{id}` | `{type?, reason?}`; `reason: null` clears it |
+| `DELETE /requests/{id}` | Soft remove |
+| `PUT /students/{id}/review` | `{status, hold_reason?}`; Done refused while errors remain; On hold needs a reason |
+| `GET /catalog` | The current catalog |
+| `GET /courses` | `{courses: [catalog course + priority, elective, total], not_in_catalog: [{code, priority, elective, total}]}` |
+| `GET /courses/{code}/requests` | For the course dialog: `[{student_id, student_name, request, issues}]` |
+| `POST /reset` | Re-seed |
+
 ## Test first
 
 Every issue follows `implement-change`: commit the failing tests (`test(<part>): ...`), then the code, then refactor. Inner loop: run only the tests near the change (`uv run pytest tests/test_x.py`, `npx vitest run src/x.test.tsx`).
