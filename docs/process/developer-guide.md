@@ -63,6 +63,6 @@ Every issue follows `implement-change`: commit the failing tests (`test(<part>):
 Two workflows run on pull requests to `main`:
 
 - **verify**: `make verify` on a clean checkout (also on pushes to `main`).
-- **tests-required**: fails when the PR changes non-test files under `backend/app/` or `frontend/src/` and adds or changes no test file (`backend/tests/**`, `frontend/src/**/*.test.ts(x)`). A PR body containing `no new tests` (with the reason) passes it. Editing the PR body re-runs only this check.
+- **tests-required**: fails when the PR changes non-test files under `backend/app/` or `frontend/src/` and adds or changes no test file (`backend/tests/**/test_*.py`, `frontend/src/**/*.test.ts(x)`; fixtures such as `conftest.py` alone don't count). A PR body containing `no new tests` (with the reason) passes it. Editing the PR body re-runs only this check.
 
 Both should be marked required in `main`'s branch protection (Settings > Branches), which only the repo owner can do.

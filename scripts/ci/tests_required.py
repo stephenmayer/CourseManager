@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 CODE_ROOTS = ("backend/app/", "frontend/src/")
-TEST_FILE = re.compile(r"^(backend/tests/.+|frontend/src/.+\.test\.tsx?)$")
+TEST_FILE = re.compile(r"^(backend/tests/(.+/)?test_[^/]+\.py|frontend/src/.+\.test\.tsx?)$")
 OPT_OUT = re.compile(r"no new tests", re.IGNORECASE)
 
 

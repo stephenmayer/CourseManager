@@ -36,11 +36,13 @@ Run the issue's Verification commands verbatim. UI changes: run component tests 
 
 ## 7. Before any PR exists, in this order
 
+The two passes are the **`simplify` and `code-review` skills, invoked with the Skill tool** (`/simplify`, then `/code-review <base>..HEAD`). Re-reading your own diff does not count as either pass, and a PR body must not say a pass ran unless the skill ran.
+
 1. Verification passes.
-2. **Simplify** pass (reuse, simplification, efficiency); it applies edits.
+2. **Invoke `/simplify`** on the issue's diff; it applies edits.
 3. **Re-run the proof.** The simplify step does not check behaviour survived; this re-run is load-bearing.
-4. **Code review** pass; fix findings or explain in the PR why not.
-5. Re-run the proof if fixes changed anything.
+4. **Invoke `/code-review`** on the issue's diff; fix each finding (test first when it changes behaviour) or record why not.
+5. Re-run the proof if fixes changed anything. If the fixes were more than trivial, run `/code-review` once more on the fix commits.
 6. **Review lenses** for risky diffs: spawn a fresh reviewer per lens the diff touches (e.g. tenancy/security; money/ledger correctness). Give each only the issue and the base branch, never your PR text or opinion, so it judges the diff cold. Verdict is `PASS` or `CHANGES`; `CHANGES` blocks. Fix, re-run the proof, re-run that lens only; at most two rounds, then open as draft with unresolved findings verbatim.
 7. Final commit, merge-gate command on the final commit, push, open PR.
 
@@ -48,7 +50,7 @@ Scope both passes to the issue's own diff. Things noticed outside it go through 
 
 ## 8. The PR
 
-Opened **ready for review**, automatically. Draft only if a lens is still `CHANGES` after two rounds. Body: `Closes #<issue>`; what simplify changed; how each review finding was addressed; the verify receipt verbatim; whether it touches a migration, auth or money; what was filed as follow-ups. Add a **Manual Testing** comment: numbered steps to exercise it by hand, or "Not applicable - reason". Then hand off to `pr-flow`.
+Opened **ready for review**, automatically. Draft only if a lens is still `CHANGES` after two rounds. Body: `Closes #<issue>`; what `/simplify` changed; each `/code-review` finding and how it was addressed (fixed in which commit, or why not); the verify receipt verbatim; whether it touches a migration, auth or money; what was filed as follow-ups. Add a **Manual Testing** comment: numbered steps to exercise it by hand, or "Not applicable - reason". Then hand off to `pr-flow`.
 
 ## Engineering standards
 

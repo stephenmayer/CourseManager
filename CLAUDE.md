@@ -33,6 +33,7 @@ Stephen restarted this project from scratch on 2026-10-24 and set the order:
 - Test-driven development is mandatory (`implement-change`): for each issue, write its TDD plan's tests first and commit them failing (`test(<part>): ...`), then the minimum code to pass, then refactor with the suite green.
 - A change adding behaviour with no new or changed test is rejected, unless the issue says "no new tests". CI enforces this on every PR (#1), next to `make verify`.
 - Never skip, disable or quarantine a test, or weaken an assertion, to get green.
+- Before opening any PR, invoke the `/simplify` skill and then the `/code-review` skill on the PR's diff (Skill tool), as `implement-change` §7 orders them. Your own re-read is not a substitute, and the PR body lists each finding and what was done about it. Stephen asked for this on 2026-10-28 after the first four build PRs skipped it.
 
 ## Filing issues
 

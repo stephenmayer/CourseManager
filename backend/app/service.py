@@ -1,14 +1,20 @@
 """The one service behind the routes: reads join SIS data, app data and the rules;
-every write goes through `_apply_request_change` (seams S6) and returns the full student."""
+every write goes through `_apply_request_change` (seams S6) and returns the full student.
 
-from collections import Counter
+The rules always see a student's active requests in the store's order (the order they were
+added), on every screen, so order-dependent checks ("the first copy", "the last AP") point
+at the same request everywhere. Screens sort for display afterwards.
+"""
+
+from collections import Counter, defaultdict
 from collections.abc import Callable
-from dataclasses import dataclass
+from contextlib import AbstractContextManager
+from dataclasses import dataclass, replace
 
 from app.models import Course, CourseCounts, Request, RequestType, ReviewStatus, SisImport, Student
-from app.rules import Issue, check_student, duplicate_course
+from app.rules import Issue, check_student, duplicate_course, first_name
 from app.sis.reader import SisSource
-from app.store import UNSET, RequestStore, Unset
+from app.store import UNSET, HoldReasonRequired, RequestStore, Unset
 
 
 class ServiceError(Exception):
@@ -57,11 +63,19 @@ class StudentRow:
 
 
 @dataclass(frozen=True)
-class CourseRow:
-    code: str
-    course: Course | None
+class CatalogCourseRow:
+    course: Course
     counts: CourseCounts
     duplicates: int = 0  # copies the duplicate_course rule flags ("Requested twice")
+
+
+@dataclass(frozen=True)
+class UnknownCourseRow:
+    """A code students requested that isn't in the catalog (Q5)."""
+
+    code: str
+    counts: CourseCounts
+    duplicates: int = 0
 
 
 @dataclass(frozen=True)
@@ -71,11 +85,21 @@ class CourseRequest:
     issues: list[Issue]  # the issues that sit on this request
 
 
+Atomic = Callable[[], AbstractContextManager[object]]
+
+
 class CourseService:
-    def __init__(self, sis: SisSource, store: RequestStore, reseed: Callable[[], None]) -> None:
+    def __init__(
+        self,
+        sis: SisSource,
+        store: RequestStore,
+        reseed: Callable[[], None],
+        atomic: Atomic,
+    ) -> None:
         self.sis = sis
         self.store = store
         self.reseed = reseed
+        self.atomic = atomic  # wraps each write so an edit and its reopen land together
 
     # Reads
 
@@ -87,14 +111,17 @@ class CourseService:
 
     def list_students(self) -> list[StudentRow]:
         catalog = self._catalog()
+        by_student = self._active_by_student()
+        reviews = self.store.list_reviews()
         rows = []
         for student in self.sis.students():
-            requests = self.store.list_active(student.id)
+            requests = by_student.get(student.id, [])
             issues = check_student(student, requests, catalog)
+            review = reviews.get(student.id) or self.store.get_review(student.id)
             rows.append(
                 StudentRow(
                     student=student,
-                    status=self.store.get_review(student.id).status,
+                    status=review.status,
                     priority_count=sum(r.type == "priority" for r in requests),
                     elective_count=sum(r.type == "elective" for r in requests),
                     error_count=sum(i.severity == "error" for i in issues),
@@ -106,31 +133,32 @@ class CourseService:
     def student_detail(self, student_id: str) -> StudentDetail:
         student = self._student(student_id)
         catalog = self._catalog()
-        requests = sorted(self.store.list_active(student_id), key=lambda r: r.type != "priority")
+        requests = self.store.list_active(student_id)
         review = self.store.get_review(student_id)
+        shown = sorted(requests, key=lambda r: r.type != "priority")
         return StudentDetail(
             student=student,
             status=review.status,
             hold_reason=review.hold_reason,
-            requests=[RequestView(r, catalog.get(r.course_code)) for r in requests],
+            requests=[RequestView(r, catalog.get(r.course_code)) for r in shown],
             issues=check_student(student, requests, catalog),
         )
 
-    def courses(self) -> tuple[list[CourseRow], list[CourseRow]]:
+    def courses(self) -> tuple[list[CatalogCourseRow], list[UnknownCourseRow]]:
         """Every catalog course with its counts, then codes requested but not in the catalog.
 
         Counts come from the store's one count query, which excludes removed requests
-        like every other read, so they always agree with the student list (S16).
+        like every other read, so they agree with the student list (S16, tested).
         """
         counts = self.store.counts_by_course()
         catalog = self._catalog()
         duplicates = self._duplicates_by_course(catalog)
         in_catalog = [
-            CourseRow(c.code, c, counts.get(c.code, CourseCounts(0, 0)), duplicates[c.code])
+            CatalogCourseRow(c, counts.get(c.code, CourseCounts(0, 0)), duplicates[c.code])
             for c in catalog.values()
         ]
         not_in_catalog = [
-            CourseRow(code, None, count, duplicates[code])
+            UnknownCourseRow(code, count, duplicates[code])
             for code, count in sorted(counts.items())
             if code not in catalog
         ]
@@ -138,11 +166,8 @@ class CourseService:
 
     def _duplicates_by_course(self, catalog: dict[str, Course]) -> Counter[str]:
         """How many copies of each course the duplicate_course rule flags, across students."""
-        active = self.store.list_active()
-        codes = {r.id: r.course_code for r in active}
-        by_student: dict[str, list[Request]] = {}
-        for request in active:
-            by_student.setdefault(request.student_id, []).append(request)
+        by_student = self._active_by_student()
+        codes = {r.id: r.course_code for requests in by_student.values() for r in requests}
         flagged: Counter[str] = Counter()
         for student in self.sis.students():
             for issue in duplicate_course(student, by_student.get(student.id, []), catalog):
@@ -155,10 +180,16 @@ class CourseService:
         requests = self.store.list_active(course_code=course_code)
         if course_code not in catalog and not requests:
             raise NotFound(f"No course with code {course_code}.")
+        issues_by_student: dict[str, tuple[Student, list[Issue]]] = {}
+        for student_id in {r.student_id for r in requests}:
+            student = self._student(student_id)
+            issues_by_student[student_id] = (
+                student,
+                check_student(student, self.store.list_active(student_id), catalog),
+            )
         rows = []
         for request in requests:
-            student = self._student(request.student_id)
-            issues = check_student(student, self.store.list_active(student.id), catalog)
+            student, issues = issues_by_student[request.student_id]
             rows.append(
                 CourseRequest(
                     student=student,
@@ -180,7 +211,7 @@ class CourseService:
         if course is None:
             raise Invalid(f"{course_code} isn't in the course catalog.")
         if any(r.course_code == course_code for r in self.store.list_active(student_id)):
-            raise Conflict(f"{course.name} is already on {_first_name(student)}'s list.")
+            raise Conflict(f"{course.name} is already on {first_name(student)}'s list.")
         return self._apply_request_change(
             student_id, lambda: self.store.add(student_id, course_code, type)
         )
@@ -193,7 +224,11 @@ class CourseService:
         reason: str | None | Unset = UNSET,
     ) -> StudentDetail:
         request = self._active_request(request_id)
-        if type is None and isinstance(reason, Unset):
+        if isinstance(reason, str) and not reason.strip():
+            reason = None  # a blank reason is no reason
+        unchanged_type = type is None or type == request.type
+        unchanged_reason = isinstance(reason, Unset) or reason == request.reason
+        if unchanged_type and unchanged_reason:
             return self.student_detail(request.student_id)
         return self._apply_request_change(
             request.student_id, lambda: self.store.update(request_id, type=type, reason=reason)
@@ -206,17 +241,18 @@ class CourseService:
     def set_review(
         self, student_id: str, status: ReviewStatus, hold_reason: str | None = None
     ) -> StudentDetail:
-        """Q3: Done is refused while errors remain; On hold needs a reason."""
+        """Q3: Done is refused while errors remain; On hold needs a reason (the store's rule)."""
         detail = self.student_detail(student_id)
         if status == "done":
             errors = sum(i.severity == "error" for i in detail.issues)
             if errors:
                 noun = "error" if errors == 1 else "errors"
                 raise Conflict(f"Fix {errors} {noun} to mark Done.")
-        if status == "on_hold" and not (hold_reason and hold_reason.strip()):
-            raise Invalid("Say why the student is on hold.")
-        self.store.set_review(student_id, status, hold_reason)
-        return self.student_detail(student_id)
+        try:
+            review = self.store.set_review(student_id, status, hold_reason)
+        except HoldReasonRequired:
+            raise Invalid("Say why the student is on hold.") from None
+        return replace(detail, status=review.status, hold_reason=review.hold_reason)
 
     def reset(self) -> SisImport:
         self.reseed()
@@ -225,10 +261,11 @@ class CourseService:
     # Internals
 
     def _apply_request_change(self, student_id: str, change: Callable[[], object]) -> StudentDetail:
-        """Run one request edit, then Q3's rule: editing a Done student reopens it."""
-        change()
-        if self.store.get_review(student_id).status == "done":
-            self.store.set_review(student_id, "in_progress")
+        """Run one request edit and Q3's rule (editing a Done student reopens it) as one write."""
+        with self.atomic():
+            change()
+            if self.store.get_review(student_id).status == "done":
+                self.store.set_review(student_id, "in_progress")
         return self.student_detail(student_id)
 
     def _student(self, student_id: str) -> Student:
@@ -243,9 +280,12 @@ class CourseService:
             raise NotFound(f"No request with id {request_id}.")
         return request
 
+    def _active_by_student(self) -> dict[str, list[Request]]:
+        """All active requests in one query, grouped by student, in store order."""
+        grouped: dict[str, list[Request]] = defaultdict(list)
+        for request in self.store.list_active():
+            grouped[request.student_id].append(request)
+        return grouped
+
     def _catalog(self) -> dict[str, Course]:
         return {course.code: course for course in self.sis.catalog()}
-
-
-def _first_name(student: Student) -> str:
-    return student.name.split()[0]
