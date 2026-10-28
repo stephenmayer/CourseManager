@@ -13,7 +13,8 @@ import {
   type StudentDetail,
 } from "../api/client";
 import type { CourseDialogProps } from "../courses/CourseDialog";
-import { errorText, gradeList, plural } from "../courses/format";
+import { errorText, useLoad } from "../api/useLoad";
+import { gradeList, plural } from "../courses/format";
 
 // The course dialog belongs to the Courses screen (#8); App passes it in, tests pass a stand-in.
 export type { CourseDialogProps };
@@ -42,8 +43,7 @@ function StudentDetailScreen({ id, courseDialog: CourseDialog }: { id: string } 
   const [student, setStudent] = useState<StudentDetail | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [catalog, setCatalog] = useState<CatalogCourse[]>([]);
-  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const [catalogLoad] = useLoad(api.catalog);
   const [openCourse, setOpenCourse] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const writing = useRef(false);
@@ -64,20 +64,6 @@ function StudentDetailScreen({ id, courseDialog: CourseDialog }: { id: string } 
     };
   }, [id]);
 
-  useEffect(() => {
-    let current = true;
-    api.catalog().then(
-      (loaded) => {
-        if (current) setCatalog(loaded);
-      },
-      (error: unknown) => {
-        if (current) setCatalogError(errorText(error));
-      },
-    );
-    return () => {
-      current = false;
-    };
-  }, []);
 
   // Only the newest read or write may replace the student, so a slow reload can't undo
   // a later edit. Resolves to whether the request succeeded.
@@ -165,8 +151,8 @@ function StudentDetailScreen({ id, courseDialog: CourseDialog }: { id: string } 
         />
         <AddFromCatalog
           student={student}
-          catalog={catalog}
-          catalogError={catalogError}
+          catalog={catalogLoad.state === "ready" ? catalogLoad.data : []}
+          catalogError={catalogLoad.state === "failed" ? catalogLoad.message : null}
           busy={busy}
           onAdd={(code) => write(() => api.addRequest(student.id, code))}
         />
