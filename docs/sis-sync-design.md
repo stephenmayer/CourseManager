@@ -50,7 +50,7 @@ Each row names the options and the recommendation; the linked file has the full 
 | D1 | Who wins when the SIS and a counselor disagree on a request ([Q2](decisions/q002-request-ownership.md)) | SIS always wins; app owns after first import; **edited requests are kept and differences flagged**; two-way latest-write-wins | Keep the counselor's edit and flag the SIS difference for them to accept or dismiss. Untouched requests keep updating from the SIS. |
 | D2 | One-way or two-way sync ([Q19](decisions/q019-one-way-sync-baseline.md)) | **One-way baseline, optional write-back per district**; require two-way; one-way only | Assume one-way and always merge. Two-way doesn't remove the merge: the SIS can change between a write-back and the next import, and write-backs fail. Write-back is a separate job where the SIS allows it. |
 | D3 | How imports relate to each other and to app data ([Q18](decisions/q018-sis-import-versioning.md)) | **Immutable versioned snapshots + three-way merge**; overwrite in place; two-way diff of SIS vs app | Snapshots plus a three-way merge. A two-way diff can't tell a SIS correction from a counselor edit; only the old SIS value can. |
-| D4 | How snapshots are stored | **Full copy per import, always**; store a row only when it changes (valid-from and valid-to import IDs); full now, changed rows at scale | **Decided by Stephen (2026-10-28): full copies always.** Simplest to read, diff and reason about. Trade-off accepted: storage grows as students × imports (about 730,000 student rows a year for 2,000 students synced nightly, almost all identical, [schema.md](architecture/schema.md#2-sis-snapshots-read-only-one-set-per-import)), so retention (section 5) does the work of keeping it bounded. Changed-rows storage stays the known fallback if volume ever demands it; it gives the same answers. |
+| D4 | How snapshots are stored | **Full copy per import, always**; store a row only when it changes (valid-from and valid-to import IDs); full now, changed rows at scale | **Decided ([Q23](decisions/q023-full-snapshots-school-year.md)): full copies always.** Simplest to read, diff and reason about. Trade-off accepted: storage grows as students × imports (about 730,000 student rows a year for 2,000 students synced nightly, almost all identical, [schema.md](architecture/schema.md#2-sis-snapshots-read-only-one-set-per-import)), so retention (section 5) does the work of keeping it bounded. Changed-rows storage stays the known fallback if volume ever demands it; it gives the same answers. |
 | D5 | What a sync run is, and how to recover from a bad one ([Q13](decisions/q013-sis-sync-runs.md)) | **Versioned runs with one-action rollback**; approve before applying; fix by hand | A run applies in one transaction, records every change with its old value, and can be rolled back. No approval gate. |
 | D6 | Where runs execute and how staff see them ([Q14](decisions/q014-sis-sync-on-queue.md)) | **Jobs on Timely's RabbitMQ with a jobs view**; cron per district; a new workflow engine | Reuse the queue, worker and job states Timely runs for the optimizer today (F7). Per-district limits are enforced where jobs leave the queue. |
 | D7 | Bad data from the SIS ([Q5](decisions/q005-bad-sis-request-data.md)) | Clean before load; drop on import; **load, flag, block Done**; flag and suggest a fix | Load exactly what the SIS sent, show errors on the student, block only the Done status. Each run reports how many errors it brought in. Suggested fixes are a later add-on. |
@@ -187,7 +187,7 @@ Two kinds of failure, handled differently:
 
 **Testing adapters:** every adapter passes one shared contract test suite, run against recorded sample exports for its SIS, so a new adapter proves it produces the same normalized shape. In the prototype, the seed file is the one adapter.
 
-**Who sets it up (RQ12, decided by Stephen 2026-10-28, to confirm with Timely):** the district's PowerSchool admin installs our plugin and hands over the client ID and secret; Timely's implementation team does the mapping, dry run and go-live on an internal setup screen. No district-facing setup screen in the MVP; self-service comes once mappings repeat.
+**Who sets it up ([Q26](decisions/q026-connection-setup-by-timely.md), to confirm with Timely):** the district's PowerSchool admin installs our plugin and hands over the client ID and secret; Timely's implementation team does the mapping, dry run and go-live on an internal setup screen. No district-facing setup screen in the MVP; self-service comes once mappings repeat.
 
 ### 3.4 Versioned SIS data: telling one import from the next
 
@@ -208,7 +208,7 @@ Every import is a **version** of the district's SIS data with its own ID (`sis_i
 
 **App data points at versions, not copies.** Each request records the import it last agreed with (`base_import_id`), and a conflict flag records the import that raised it, so a counselor sees "the SIS changed this on Oct 26" rather than just "the SIS differs". Rollback moves the current pointer to an earlier version (3.7).
 
-An identical export still records an import (with zero changes), so the header shows that the SIS was checked last night, not that the sync stopped.
+**Decided ([Q27](decisions/q027-zero-change-imports.md)):** an identical export still records an import (with zero changes), so the header shows that the SIS was checked last night, not that the sync stopped.
 
 ### 3.5 One sync run, end to end
 
@@ -257,7 +257,7 @@ Students and courses aren't merged: they are SIS-owned and read-only, so the new
 
 ### 3.7 Rollback
 
-**Decided by Stephen (2026-10-28): restore to any kept import, newest first.** Rolling back a completed run points "current" back at the previous import and restores each request's old value from that run's `sync_change` rows, skipping any request a counselor has edited since the run ([Q13](decisions/q013-sis-sync-runs.md)). To go back further, a restore to import N undoes every run after N, newest first, so the merge's bases stay consistent. Example: #41 marked every grade-11 student as grade 12, and #42 and #43 repeated the bug; restoring to #40 undoes #43, #42 and #41 in one action, and the app holds at #40 until the SIS is fixed.
+**Decided ([Q24](decisions/q024-restore-to-kept-import.md)): restore to any kept import, newest first.** Rolling back a completed run points "current" back at the previous import and restores each request's old value from that run's `sync_change` rows, skipping any request a counselor has edited since the run ([Q13](decisions/q013-sis-sync-runs.md)). To go back further, a restore to import N undoes every run after N, newest first, so the merge's bases stay consistent. Example: #41 marked every grade-11 student as grade 12, and #42 and #43 repeated the bug; restoring to #40 undoes #43, #42 and #41 in one action, and the app holds at #40 until the SIS is fixed.
 
 Why this is enough: students and courses are full snapshots and untouched requests follow the three-way merge, so a good run after a bad one already heals the bad one's SIS data. Rollback is the emergency brake for when the SIS is still wrong or a planning meeting can't wait. It can't undo what a counselor did in response to bad data (Q2 keeps their edits). Undoing one old run while keeping later runs was considered and rejected: later runs were merged on top of it.
 
@@ -299,7 +299,7 @@ A squad of 2-3 engineers over one quarter (about 13 weeks), working with one or 
 
 ## 5. Open questions for this review
 
-1. ~~Should a run whose change count is far above normal pause for a person?~~ **Decided by Stephen (2026-10-28): apply and alert.** The run applies as usual; support is alerted (3.9) and the jobs view highlights it; a person restores the previous import if it is wrong (3.7). No pause, so Q13's "no approval step" holds. Revisit after the pilot.
+1. ~~Should a run whose change count is far above normal pause for a person?~~ **Decided ([Q25](decisions/q025-abnormal-runs-apply-and-alert.md)): apply and alert.** The run applies as usual; support is alerted (3.9) and the jobs view highlights it; a person restores the previous import if it is wrong (3.7). No pause, so Q13's "no approval step" holds. Revisit after the pilot.
 2. Does an unresolved SIS conflict block Done? The plan's default is yes ([phases.md](plan/phases.md)).
-3. ~~How many imports do we keep?~~ **Decided by Stephen (2026-10-28):** every import for the whole school year, archived to S3 at year-end rollover; an import a request still uses as its base is never pruned.
+3. ~~How many imports do we keep?~~ **Decided ([Q23](decisions/q023-full-snapshots-school-year.md)):** every import for the whole school year, archived to S3 at year-end rollover; an import a request still uses as its base is never pruned.
 4. Who may roll back a run (RQ11)?

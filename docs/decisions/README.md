@@ -32,3 +32,8 @@ One file per decision (`q0NN-<slug>.md`, template in `.claude/process-kit/templa
 | [Q18](q018-sis-import-versioning.md) | SIS imports are versioned snapshots; requests keep their SIS base and reconcile three ways; schema now, compare logic if time | current | 2026-10-28, Stephen |
 | [Q19](q019-one-way-sync-baseline.md) | Assume one-way SIS sync; the app always merges (Q18); write-back is an optional per-district job that reduces conflicts | current | 2026-10-28, Stephen |
 | [Q22](q022-powerschool-first.md) | First SIS target is PowerSchool: OneRoster for students and courses, a PowerQuery for requests; plus a CSV file connection; both tested against a PowerSchool mock (#34, #35) | current | 2026-10-28, Stephen |
+| [Q23](q023-full-snapshots-school-year.md) | SIS imports are full copies at every scale, kept for the school year then archived to S3; never prune a base | current | 2026-10-28, Stephen |
+| [Q24](q024-restore-to-kept-import.md) | Rollback restores to any kept import, undoing later runs newest first; counselor edits untouched | current | 2026-10-28, Stephen |
+| [Q25](q025-abnormal-runs-apply-and-alert.md) | A sync with abnormally many changes applies and alerts; no pause (keeps Q13) | current | 2026-10-28, Stephen |
+| [Q26](q026-connection-setup-by-timely.md) | Timely's implementation team sets up each district's SIS connection; the district admin installs the plugin (to confirm with Timely) | current | 2026-10-28, Stephen |
+| [Q27](q027-zero-change-imports.md) | A sync with nothing new still records an import with zero changes | current | 2026-10-28, Stephen |
