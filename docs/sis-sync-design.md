@@ -29,7 +29,7 @@ These are questions, not answers. Each one changes the design, so each says what
 | RQ7 | Which SIS platforms come first, and how do they deliver data (API, scheduled file export, push)? | Decides which connector we build first. (gaps.md G21) | One file-based connector first; an API connector second. |
 | RQ8 | Are student IDs and course codes stable from year to year? | Every link between a request and the SIS hangs off them. (gaps.md G25) | Stable within a school year. Year rollover is out of scope for the MVP. |
 | RQ9 | Does the SIS send a full export every time, or only changes since a date? | A delta feed is cheaper to pull but can silently miss rows; a full export lets us detect removals. | Full export. If only deltas exist, we run a periodic full pull to catch drift. |
-| RQ10 | Does the SIS carry alternate requests ("if not this, then that") or group requests ("any one Arts & Tech elective")? | Alternates change the request shape the connector must normalize. (gaps.md G32) | No. Alternates are entered in the app ([Q16](decisions/q016-alternate-requests.md)). |
+| RQ10 | Does the SIS carry alternate requests ("if not this, then that") or group requests ("any one Arts & Tech elective")? | Alternates change the request shape the connector must normalize. (gaps.md G32) | Likely yes: PowerSchool tracks primary and alternate requests (3.1). The connector maps them to Q16's fields ([Q16](decisions/q016-alternate-requests.md)). |
 | RQ11 | Who at the district can see sync results, and who is allowed to roll one back? | Rollback is powerful; it shouldn't be one click for every counselor. | District admins and Timely support. Roles are out of scope for the prototype (requirements M10). |
 | RQ12 | Who sets up a district's SIS connection, and what does the district provide (credentials, file drop, field meanings)? | Decides whether we need a setup screen for districts or only an internal one, and how long onboarding takes. | Timely's implementation team sets it up; the district provides credentials and answers mapping questions. |
 
@@ -75,7 +75,9 @@ Both run as the same queued job and feed the same merge. They differ only in the
 | Build cost | Low: parse and normalize | Higher: auth, paging, retries, vendor quirks |
 | Choose when | The district offers an export; nightly is fresh enough (RQ4) | Counselors need same-day changes, or write-back is wanted |
 
-**Recommendation:** build A first. It works with almost every SIS, it is cheap, and nightly is fresh enough under our RQ4 assumption. Build B second, for the districts that need on-demand sync or write-back.
+**What common platforms offer (checked 2026-10-28).** Assume PowerSchool SIS, with Infinite Campus and Skyward next; public share figures are dated, so this is a working assumption, not a measurement. PowerSchool and Infinite Campus both offer [OneRoster](https://kb.infinitecampus.com/help/oneroster-partner-documentation) (the edtech rostering standard: schools, terms, users, classes, enrollments), which covers students and courses but **not course requests**. Requests need a vendor path: in PowerSchool, an installed plugin (OAuth client credentials) running a PowerQuery, or a scheduled Data Export Manager file to SFTP. The only documented SIS write is the OneRoster gradebook push. A comparable course-planning product, [SchooLinks](https://support.schoolinks.com/en/articles/12391924-staff-export-course-requests), moves course requests one way as a scheduled SFTP file in a per-SIS layout and never writes into the SIS. PowerSchool tracks primary and alternate requests, so alternates can arrive from the SIS (RQ10).
+
+**Decided ([Q20](decisions/q020-powerschool-first.md)):** PowerSchool first, through the API: OneRoster for students and courses, a PowerQuery through our plugin for requests. Committing to one vendor removes the main cost of B, and it gives same-day sync and real auth, paging and rate-limit paths to test. The adapter is built and tested against a PowerSchool mock (#34). A CSV file adapter (A) is built alongside it behind the same `ExportSource` (#35), to show that a second connection changes nothing downstream; it also serves districts that only offer exports.
 
 ### 3.2 Components
 
@@ -90,7 +92,7 @@ flowchart LR
         Q[[RabbitMQ<br/>sync and write-back jobs]]
         W[Worker]
         subgraph Ports
-            EX[SisExportSource<br/>file or API connector, per district]
+            EX[ExportSource<br/>file or API connector, per district]
             SS[SisSource<br/>reads the current import]
             WB[SisWriter<br/>optional, per district]
         end
@@ -122,11 +124,11 @@ The three ports, each with one job:
 
 | Port | Direction | What it does | Implementations |
 | --- | --- | --- | --- |
-| `SisExportSource` | SIS to Timely | Fetch one district's export and normalize it to the import shape (students, courses, requests, each request with a `sis_key`) | File connector (approach A), API connector per vendor (approach B), the seed file in the prototype |
+| `ExportSource` | SIS to Timely | Fetch one district's export and normalize it to the import shape (students, courses, requests, each request with a `sis_key`) | File connector (approach A), API connector per vendor (approach B), the seed file in the prototype |
 | `SisSource` | Inside the app | Read students, catalog and SIS requests from the **current** import, so the rest of the app never sees versions | One, over the import tables (built in the prototype, issue #2) |
 | `SisWriter` | Timely to SIS | Push counselor edits back, field by field, where the district allows it | None in the MVP; one per vendor that accepts writes |
 
-`SisSource` is already in the prototype's plan. `SisExportSource` and `SisWriter` are the names this design proposes for the other two; neither is built.
+`ExportSource` and `SisSource` are built in the prototype (`backend/app/sis/`); today `ExportSource` has only `fetch()`, implemented by the seed file. `SisWriter` is the name this design proposes for write-back; it is not built.
 
 ### 3.3 SIS configuration and adapters
 
@@ -134,7 +136,7 @@ The three ports, each with one job:
 
 | Setting | What it holds | Example |
 | --- | --- | --- |
-| Adapter | Which `SisExportSource` implementation to use | `csv_file`, `oneroster_api`, a vendor-specific adapter |
+| Adapter | Which `ExportSource` implementation to use | `csv_file`, `oneroster_api`, a vendor-specific adapter |
 | Where | File location, or API base URL | SFTP path and file-name pattern; S3 prefix; `https://sis.district.example/api` |
 | Credential | A reference to a secret in the secrets vault, never the secret itself | `sis/district-42/api-key` |
 | Scope | Which schools and which school year to pull | Two high schools, 2027-28 requests |
@@ -155,12 +157,26 @@ Every change to the configuration is saved as a new version, and each import rec
 So a new district on a SIS we already support is configuration only; a new SIS platform is usually a new format layer; a new transport is rare. The adapter contract, in outline:
 
 ```python
-class SisExportSource(Protocol):
+class ExportSource(Protocol):  # built with fetch() only; the other two arrive with the first real adapter
     def check_connection(self, config: SisConnection) -> ConnectionCheck: ...
     def fetch(self, config: SisConnection) -> RawExport: ...             # bytes, archived to S3 by import ID
     def normalize(self, raw: RawExport, config: SisConnection) -> NormalizedExport: ...
     # NormalizedExport: students, courses, requests (each with sis_key), plus rows it could not read
 ```
+
+**Mapping for PowerSchool, the first target.** Students and courses come from OneRoster, which is vendor-neutral. Requests come from a PowerQuery run by our PowerSchool plugin, because OneRoster has no course requests: its *classes* and *enrollments* are scheduled sections, which exist only after the master schedule that requests feed. Request field names below are illustrative until the PowerQuery is written.
+
+| Ours | From | Note |
+| --- | --- | --- |
+| `student.id` | OneRoster user `identifier` (also store `sourcedId`) | `sourcedId` survives a renumbered student ID (RQ8) |
+| `student.name` | `givenName` + `familyName` | |
+| `student.grade` | OneRoster `grades` + 1, or PowerSchool's next-year grade | OneRoster gives the current grade; we plan with the upcoming one |
+| `student.profile` | Not in OneRoster: a PowerSchool field or counselor-notes source | To confirm with the pilot |
+| `course.code`, `name`, `grades`, `department` | OneRoster course `courseCode`, `title`, `grades`, `subjects` | `is_ap` still derived from the title (G9) |
+| `request.sis_key` | PowerSchool request ID | Answers RQ2 for PowerSchool: a changed course is a change, not remove-and-add |
+| `request.student_id`, `course_code` | Request student number and course number | |
+| `request.type` | District code, such as `R` for required to priority | Lives in the field mapping |
+| Alternates | Request alternate flag | To Q16's fields (RQ10) |
 
 Two kinds of failure, handled differently:
 
@@ -201,7 +217,7 @@ sequenceDiagram
     participant S as Schedule or "sync now"
     participant Q as RabbitMQ
     participant W as Worker
-    participant X as SisExportSource
+    participant X as ExportSource
     participant D as Database
     S->>Q: publish sync job (district)  [submitted]
     Q->>W: deliver when the district has no running sync
@@ -256,7 +272,7 @@ Where `SisWriter` exists for a district (RQ1), each counselor edit publishes a w
 
 ### 3.10 Designed, not in the MVP: transcripts and alternates
 
-- **Transcript feed.** `SisExportSource` gains a fourth entity, transcript entries (course, school year, grade earned, credits), stored per import like the others and read through `SisSource`. A graduation progress rule plugs in as one more check over it ([Q15](decisions/q015-history-and-grad-rules.md)).
+- **Transcript feed.** `ExportSource` gains a fourth entity, transcript entries (course, school year, grade earned, credits), stored per import like the others and read through `SisSource`. A graduation progress rule plugs in as one more check over it ([Q15](decisions/q015-history-and-grad-rules.md)).
 - **Alternates from the SIS.** If a SIS sends alternates (RQ10), the connector normalizes them to the app's alternate fields (`alternate_for`, `rank`, [Q16](decisions/q016-alternate-requests.md)), and the merge treats a changed rank or backup like any other field: apply if only the SIS changed it, flag if both did.
 
 ## 4. Path to an MVP
@@ -266,9 +282,9 @@ A squad of 2-3 engineers over one quarter (about 13 weeks), working with one or 
 | Weeks | Milestone | Done when |
 | --- | --- | --- |
 | 1-2 | **Answer the requirements.** RQ1-RQ12 with the pilot districts and their SIS vendors; pick the first connector | Each RQ has an answer or a recorded assumption; the first SIS and its export format are chosen |
-| 3-6 | **One-way sync, file connector.** District connection config with dry run, `SisExportSource` file adapter, import snapshots, three-way merge, runs as jobs on RabbitMQ, failed runs write nothing | A pilot district's nightly file lands in the app; counselor edits survive it; a broken file leaves yesterday's data in place |
+| 3-6 | **One-way sync, PowerSchool.** District connection config with dry run, the PowerSchool `ExportSource` adapter (OneRoster + PowerQuery, Q20) proven against the mock, import snapshots, three-way merge, runs as jobs on RabbitMQ, failed runs write nothing | A pilot PowerSchool district syncs nightly and on demand; counselor edits survive it; a broken export leaves yesterday's data in place |
 | 7-9 | **Recover and see.** Conflict review in the request editor (Add-on F), rollback, jobs view, Datadog logs and alerts, S3 error reports | A bad sync is rolled back in one action from the jobs view; counselors resolve flagged requests |
-| 10-12 | **Second district, limits.** Changed-rows storage (D4), per-district concurrency and throttling, "sync now", first API connector if a pilot needs it | Two districts sync nightly side by side without interfering |
+| 10-12 | **Second district, limits.** Changed-rows storage (D4), per-district concurrency and throttling, "sync now", the CSV file adapter for a district that only offers exports | Two districts sync nightly side by side without interfering |
 | 13 | Buffer and pilot review | The pilot districts tell us what to fix next |
 
 **Cut from the MVP**, in the order we'd add them back: write-back (`SisWriter`, D2), provisional students (D8), transcript feed and graduation progress (Q15), suggested fixes for bad codes (Q5 option D), alternates ([Q16](decisions/q016-alternate-requests.md)), school-year rollover (RQ8), near-real-time sync (webhooks or push).
