@@ -33,5 +33,5 @@ Stephen (2026-10-27): there's no way to plan for a student "missing" from the SI
 
 - [x] Requirements: `requirements/gaps.md` (G33)
 - [x] Design: `design/README.md` add-on row, `AddonProvisional.dc.html` board
-- [ ] SIS sync design doc: not written yet; it must cover match-on-sync and on-demand sync
+- [x] SIS sync design doc: [sis-sync-design.md](../sis-sync-design.md)
 - [x] Decisions index row

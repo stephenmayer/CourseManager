@@ -30,5 +30,5 @@ Prototype (assumption, tell Stephen): the localhost prototype does not run Rabbi
 
 - [x] Requirements: `requirements/interview-feedback.md` (F7, F8)
 - [x] Architecture: `architecture/overview.md` (sync seam)
-- [ ] SIS sync design doc: not written yet; it must show the queue, worker and jobs view
+- [x] SIS sync design doc: [sis-sync-design.md](../sis-sync-design.md)
 - [x] Decisions index row

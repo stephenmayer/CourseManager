@@ -29,5 +29,5 @@ Stephen (2026-10-28): "This all really depends on whether we have two-way sync w
 ## Impacts (all updated in the same change)
 
 - [x] Requirements: `requirements/gaps.md` (G24)
-- [ ] SIS sync design doc: not written yet; requirements and key decisions must include this
+- [x] SIS sync design doc: [sis-sync-design.md](../sis-sync-design.md)
 - [x] Decisions index row
