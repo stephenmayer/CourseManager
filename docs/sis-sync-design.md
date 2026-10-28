@@ -31,7 +31,7 @@ These are questions, not answers. Each one changes the design, so each says what
 | RQ9 | Does the SIS send a full export every time, or only changes since a date? | A delta feed is cheaper to pull but can silently miss rows; a full export lets us detect removals. | Full export. If only deltas exist, we run a periodic full pull to catch drift. |
 | RQ10 | Does the SIS carry alternate requests ("if not this, then that") or group requests ("any one Arts & Tech elective")? | Alternates change the request shape the connector must normalize. (gaps.md G32) | Likely yes: PowerSchool tracks primary and alternate requests (3.1). The connector maps them to Q16's fields ([Q16](decisions/q016-alternate-requests.md)). |
 | RQ11 | Who at the district can see sync results, and who is allowed to roll one back? | Rollback is powerful; it shouldn't be one click for every counselor. | District admins and Timely support. Roles are out of scope for the prototype (requirements M10). |
-| RQ12 | Who sets up a district's SIS connection, and what does the district provide (credentials, file drop, field meanings)? | Decides whether we need a setup screen for districts or only an internal one, and how long onboarding takes. | Timely's implementation team sets it up; the district provides credentials and answers mapping questions. |
+| RQ12 | Who sets up a district's SIS connection, and what does the district provide (credentials, file drop, field meanings)? | Decides whether we need a setup screen for districts or only an internal one, and how long onboarding takes. | Decided (Stephen): Timely's implementation team sets it up on an internal screen; the district admin installs the plugin and provides credentials (3.3). Still to confirm with Timely. |
 
 Non-functional requirements we hold ourselves to, whatever the answers:
 
@@ -187,7 +187,7 @@ Two kinds of failure, handled differently:
 
 **Testing adapters:** every adapter passes one shared contract test suite, run against recorded sample exports for its SIS, so a new adapter proves it produces the same normalized shape. In the prototype, the seed file is the one adapter.
 
-Who sets up a connection is a requirement to confirm (RQ12). Assumption: Timely's implementation team, through an internal setup screen, with the district's IT providing credentials; district self-service comes later.
+**Who sets it up (RQ12, decided by Stephen 2026-10-28, to confirm with Timely):** the district's PowerSchool admin installs our plugin and hands over the client ID and secret; Timely's implementation team does the mapping, dry run and go-live on an internal setup screen. No district-facing setup screen in the MVP; self-service comes once mappings repeat.
 
 ### 3.4 Versioned SIS data: telling one import from the next
 
