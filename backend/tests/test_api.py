@@ -402,3 +402,14 @@ def test_a_failed_reopen_rolls_back_the_edit(conn: Connection) -> None:
         service.remove_request(rid)
 
     assert rid in [r.id for r in service.store.list_active("S001")]
+
+
+def test_a_blank_reason_is_no_reason(client: TestClient) -> None:
+    set_status(client, "S001", "done")
+    rid = request_id(client, "S001", "MTH101", "priority")
+
+    body = client.patch(f"/api/requests/{rid}", json={"reason": "  "}).json()
+
+    assert body["status"] == "done"
+    request = next(r for r in body["requests"] if r["id"] == rid)
+    assert (request["reason"], request["edited_in_app"]) == (None, False)
