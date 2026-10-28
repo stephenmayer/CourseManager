@@ -17,6 +17,7 @@ vi.mock("./api/client", async (importOriginal) => {
       courseRequests: vi.fn(() => new Promise(() => {})),
       student: vi.fn(),
       catalog: vi.fn(),
+      checks: vi.fn(() => new Promise(() => {})),
     },
   };
 });
@@ -80,7 +81,7 @@ afterEach(() => {
   delete document.documentElement.dataset.theme;
 });
 
-test("the header shows the app name, the signed-in name and both nav links", async () => {
+test("the header shows the app name, the signed-in name and the nav links", async () => {
   await renderAt("/");
 
   const header = screen.getByRole("banner");
@@ -89,12 +90,14 @@ test("the header shows the app name, the signed-in name and both nav links", asy
   const nav = screen.getByRole("navigation", { name: "Main" });
   expect(nav).toContainElement(screen.getByRole("link", { name: "Students" }));
   expect(nav).toContainElement(screen.getByRole("link", { name: "Courses" }));
+  expect(nav).toContainElement(screen.getByRole("link", { name: "Settings" }));
 });
 
 test.each([
   ["/", "Students", "Courses"],
   ["/students/S001", "Students", "Courses"],
   ["/courses", "Courses", "Students"],
+  ["/settings", "Settings", "Courses"],
 ])("at %s the nav marks %s as the current page", async (path, current, other) => {
   await renderAt(path);
 
@@ -102,11 +105,12 @@ test.each([
   expect(screen.getByRole("link", { name: other })).not.toHaveAttribute("aria-current");
 });
 
-test("a path outside both sections marks neither nav link as current", async () => {
+test("a path outside every section marks no nav link as current", async () => {
   await renderAt("/not-a-page");
 
   expect(screen.getByRole("link", { name: "Students" })).not.toHaveAttribute("aria-current");
   expect(screen.getByRole("link", { name: "Courses" })).not.toHaveAttribute("aria-current");
+  expect(screen.getByRole("link", { name: "Settings" })).not.toHaveAttribute("aria-current");
 });
 
 test("an unknown path shows a not-found page", async () => {
@@ -120,6 +124,7 @@ test.each([
   ["/", "Students"],
   ["/students/S001", "Alex Rivera"],
   ["/courses", "Courses"],
+  ["/settings", "Settings"],
 ])("%s routes to the %s page", async (path, heading) => {
   await renderAt(path);
 

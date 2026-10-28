@@ -67,7 +67,7 @@ Scope decided in [Q6](../decisions/q006-timebox-and-mvp-scope.md).
 | # | Candidate | User value | Cost | My lean |
 | --- | --- | --- | --- | --- |
 | M1 | Data-error checks: unknown course code, duplicate course | Stops bad SIS data reaching scheduling (S008) | Low | In; errors block Done ([Q5](../decisions/q005-bad-sis-request-data.md)) |
-| M2 | Judgment warnings: out-of-grade, missing core subject, heavy AP load, override with a reason | Counselor stays in control; reason is visible to the AP | Low-medium | In, as warnings not blocks (decided for grade levels: [Q1](../decisions/q001-out-of-grade-courses.md)) |
+| M2 | Judgment warnings: out-of-grade, missing core subject, heavy AP load, override with a reason | Counselor stays in control; reason is visible to the AP | Low-medium | In, as warnings not blocks (decided for grade levels: [Q1](../decisions/q001-out-of-grade-courses.md)); each can be switched off ([Q20](../decisions/q020-checks-on-off.md)) |
 | M3 | Per-student review status (not started / in progress / done / on hold) and a caseload filter | Turns the list into a work queue; covers S010 "on hold" | Low | In ([Q3](../decisions/q003-student-review-status.md)) |
 | M4 | Request source: from SIS vs added in app | Needed for any safe SIS sync; links the prototype to the design doc | Low | In (data only, small UI cue); sync rule in [Q2](../decisions/q002-request-ownership.md) |
 | M5 | Notes on a student or request | Captures why (retake, early AP) | Low | Maybe: fold into M2's reason |
@@ -81,7 +81,7 @@ Scope decided in [Q6](../decisions/q006-timebox-and-mvp-scope.md).
 
 - A1. One school, one upcoming year, about 10 students in the seed but the UI should still work at a few hundred per counselor.
 - A2. Seeded suggested requests are what came from the SIS, loaded as-is with their errors.
-- A3. Graduation rules are not given; any "missing core subject" check uses a stated simple rule that a school would configure ([Q4](../decisions/q004-priority-core-check.md)).
+- A3. Graduation rules are not given; any "missing core subject" check uses a stated simple rule that a school would configure ([Q4](../decisions/q004-priority-core-check.md)). Staff can switch that check off on the Settings screen ([Q20](../decisions/q020-checks-on-off.md)).
 - A4. Counselor edits persist across restarts in a SQLite file ([Q8](../decisions/q008-prototype-storage.md)).
 
 ## 8. Questions walked through (all answered 2026-10-24)
