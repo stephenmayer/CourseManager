@@ -8,45 +8,68 @@ updated: 2026-10-28
 
 # Data schema (core build)
 
-Covers what we will build: the student list, student detail, Courses screen and course dialog (Q1-Q5, Q11, Q12), plus the "if time" sync demo (Q9, Q13). Add-ons that are designed but not built (Q15-Q17) are listed at the end with the field each would add. This is a spec for review, not code.
+Covers what we will build: the student list, student detail, Courses screen and course dialog (Q1-Q5, Q11, Q12), plus SIS import versioning (Q18) and the "if time" sync demo (Q9, Q13). Add-ons that are designed but not built (Q15-Q17) are listed at the end with the field each would add. This is a spec for review, not code.
 
 ![Schema diagram](img/schema.png)
 
 ```mermaid
 erDiagram
-    STUDENT ||--o{ REQUEST : "has"
-    STUDENT ||--|| REVIEW : "has one"
-    COURSE |o--o{ REQUEST : "course_code (may not match)"
-    STUDENT ||--o{ SIS_REQUEST : "seeded with"
-    SYNC_RUN ||--o{ SYNC_CHANGE : "records"
+    SIS_IMPORT ||--o{ SIS_STUDENT : "snapshot of"
+    SIS_IMPORT ||--o{ SIS_COURSE : "snapshot of"
+    SIS_IMPORT ||--o{ SIS_REQUEST : "snapshot of"
+    SIS_STUDENT ||--o{ REQUEST : "has"
+    SIS_STUDENT ||--|| REVIEW : "has one"
+    SIS_COURSE |o--o{ REQUEST : "course_code (may not match)"
+    SIS_REQUEST |o--o| REQUEST : "sis_key (base)"
+    SIS_IMPORT ||--o{ REQUEST : "base_import_id"
+    SIS_IMPORT ||--o{ SYNC_CHANGE : "records (if time)"
 
-    STUDENT {
+    SIS_IMPORT {
+        int id PK "1 = the seed"
+        text state "submitted, started, completed, errored"
+        bool is_current "exactly one"
+        text source "seed, file, api"
+        timestamp received_at
+        timestamp finished_at
+        int changes
+        int errors_in
+    }
+    SIS_STUDENT {
+        int import_id PK
         text id PK "S003"
         text name
-        int grade "upcoming grade, 9-12"
-        text profile "free text from the SIS"
+        int grade "upcoming grade"
+        text profile
     }
-    COURSE {
+    SIS_COURSE {
+        int import_id PK
         text code PK "MTH101"
         text name
         text department
-        int_list grades "e.g. 9,10"
-        bool is_ap "derived from name in the seed adapter"
+        text grades "e.g. 9,10"
+        bool is_ap
     }
     SIS_REQUEST {
-        text student_id FK
-        text course_code "not checked against catalog"
-        text type "priority or elective"
+        int import_id PK
+        text sis_key PK "SIS id, or student+course+type"
+        text student_id
+        text course_code "not checked"
+        text type
     }
     REQUEST {
-        text id PK "generated"
-        text student_id FK
-        text course_code "not a foreign key, see Q5"
+        text id PK
+        text student_id
+        text course_code "not a foreign key, Q5"
         text type "priority or elective"
         text source "sis or app"
         bool edited_in_app
-        text reason "why a warning was kept, nullable"
-        timestamp removed_at "nullable, see note"
+        text reason "nullable"
+        text sis_key "null when added in app"
+        int base_import_id "import last agreed with"
+        text base_course_code "SIS values at that import"
+        text base_type
+        text sis_conflict "nullable flag, Q2"
+        timestamp removed_at "soft delete"
         timestamp created_at
         timestamp updated_at
     }
@@ -56,60 +79,91 @@ erDiagram
         text hold_reason "required when on_hold"
         timestamp updated_at
     }
-    SYNC_RUN {
-        int id PK "if time"
-        text state "submitted, started, completed, errored"
-        timestamp started_at
-        timestamp finished_at
-        int changes
-        int errors_in
-    }
     SYNC_CHANGE {
-        int run_id FK "if time"
-        text entity "request or student"
-        text entity_id
+        int import_id FK
+        text request_id
         text old_value "JSON"
         text new_value "JSON"
     }
 ```
 
-## 1. Two stores, split by who owns the data
+## 1. Two kinds of data, split by who owns it
 
-| Store | Holds | Owner | Prototype | Production |
+| Data | Holds | Owner | Prototype | Production |
 | --- | --- | --- | --- | --- |
-| `SisSource` (read-only) | Student, Course, SIS request | SIS | Seed data in code, from the exercise appendix | SIS API or file, via sync |
-| `RequestStore` (read/write) | Request, Review (+ sync runs if time) | App | SQLite file, built-in `sqlite3`, plain SQL (Q8) | MongoDB at Timely |
+| SIS snapshots, read via `SisSource` | `sis_import`, `sis_student`, `sis_course`, `sis_request` | SIS | SQLite; the seed loads as import #1 | Same shape, filled by the sync job (Q14) |
+| App data, via `RequestStore` | `request`, `review` (+ `sync_change` if time) | App | SQLite file, built-in `sqlite3`, plain SQL (Q8) | MongoDB at Timely |
 
-The app never writes to Student or Course. That's the non-negotiable, and it holds because those entities have no write path at all.
+The app never writes to SIS snapshots from a user action. Only an import writes them, and an import never edits an older snapshot ([Q18](../decisions/q018-sis-import-versioning.md)). `SisSource` reads the current import, so the rest of the app doesn't know versions exist.
 
-## 2. SIS-owned entities (read-only)
+## 2. SIS snapshots (read-only, one set per import)
 
-| Entity | Field | Type | Notes |
-| --- | --- | --- | --- |
-| Student | `id` | text, PK | SIS ID, e.g. `S003` |
-| | `name` | text | |
-| | `grade` | int | The **upcoming** grade (overview §2) |
-| | `profile` | text | Shown as "From SIS profile"; short note on the student list is a trimmed version |
-| Course | `code` | text, PK | e.g. `MTH101` |
-| | `name`, `department` | text | Department groups Courses and the catalog table |
-| | `grades` | list of int | `9/10` in the appendix becomes `[9, 10]`; drives the out-of-grade warning and the catalog grade checkboxes |
-| | `is_ap` | bool | Derived from the name in the seed adapter only (G9); drives the AP load warning |
-| SIS request | `student_id`, `course_code`, `type` | text | The suggested requests from the appendix, loaded as-is with their errors (Q5). Used once, to seed `request` |
+```sql
+CREATE TABLE sis_import (
+  id          INTEGER PRIMARY KEY,
+  state       TEXT NOT NULL CHECK (state IN ('submitted', 'started', 'completed', 'errored')),
+  is_current  INTEGER NOT NULL DEFAULT 0,
+  source      TEXT NOT NULL,                    -- 'seed' in the prototype
+  received_at TEXT NOT NULL,
+  finished_at TEXT,
+  changes     INTEGER NOT NULL DEFAULT 0,
+  errors_in   INTEGER NOT NULL DEFAULT 0
+);
+CREATE UNIQUE INDEX one_current_import ON sis_import (is_current) WHERE is_current = 1;
 
-## 3. App-owned tables (SQLite)
+CREATE TABLE sis_student (
+  import_id INTEGER NOT NULL REFERENCES sis_import (id),
+  id        TEXT NOT NULL,          -- SIS ID, e.g. S003
+  name      TEXT NOT NULL,
+  grade     INTEGER NOT NULL,       -- the upcoming grade (overview §2)
+  profile   TEXT,
+  PRIMARY KEY (import_id, id)
+);
+
+CREATE TABLE sis_course (
+  import_id  INTEGER NOT NULL REFERENCES sis_import (id),
+  code       TEXT NOT NULL,         -- e.g. MTH101
+  name       TEXT NOT NULL,
+  department TEXT NOT NULL,
+  grades     TEXT NOT NULL,         -- '9,10'; appendix '9/10'
+  is_ap      INTEGER NOT NULL,      -- derived from the name in the seed adapter only (G9)
+  PRIMARY KEY (import_id, code)
+);
+
+CREATE TABLE sis_request (
+  import_id   INTEGER NOT NULL REFERENCES sis_import (id),
+  sis_key     TEXT NOT NULL,        -- the SIS's request ID; in the seed, 'S008|SS402|elective'
+  student_id  TEXT NOT NULL,
+  course_code TEXT NOT NULL,        -- loaded as-is with errors (Q5)
+  type        TEXT NOT NULL CHECK (type IN ('priority', 'elective')),
+  PRIMARY KEY (import_id, sis_key)
+);
+```
+
+- **An import is a Q13 sync run.** The table replaces the earlier `sync_run`. Its states are Timely's job states (Q13, Q14).
+- **An errored import is never marked current**, so a failed run changes nothing anyone sees.
+- **The sis_key includes the type** because the seed has no request IDs and Aisha's SS402 appears twice (P and E). The trade-off: a SIS change from priority to elective looks like one removal plus one addition (Q18).
+
+## 3. App-owned tables
 
 ```sql
 CREATE TABLE request (
-  id            TEXT PRIMARY KEY,
-  student_id    TEXT NOT NULL,
-  course_code   TEXT NOT NULL,            -- no FK to course: unknown codes must load (Q5)
-  type          TEXT NOT NULL CHECK (type IN ('priority', 'elective')),
-  source        TEXT NOT NULL CHECK (source IN ('sis', 'app')),
-  edited_in_app INTEGER NOT NULL DEFAULT 0, -- Q2: a sync never overwrites an edited request
-  reason        TEXT,                       -- Q1: why a warning was kept
-  removed_at    TEXT,                       -- soft delete, see note
-  created_at    TEXT NOT NULL,
-  updated_at    TEXT NOT NULL
+  id               TEXT PRIMARY KEY,
+  student_id       TEXT NOT NULL,
+  course_code      TEXT NOT NULL,     -- no FK to the catalog: unknown codes must load (Q5)
+  type             TEXT NOT NULL CHECK (type IN ('priority', 'elective')),
+  source           TEXT NOT NULL CHECK (source IN ('sis', 'app')),
+  edited_in_app    INTEGER NOT NULL DEFAULT 0,   -- Q2
+  reason           TEXT,                         -- Q1: why a warning was kept
+  -- Q18: the SIS base this request last agreed with (all NULL when added in the app)
+  sis_key          TEXT,
+  base_import_id   INTEGER REFERENCES sis_import (id),
+  base_course_code TEXT,
+  base_type        TEXT,
+  sis_conflict     TEXT,                         -- set by a reconcile when both sides changed (Q2)
+  removed_at       TEXT,                         -- soft delete, see below
+  created_at       TEXT NOT NULL,
+  updated_at       TEXT NOT NULL
 );
 CREATE INDEX request_by_student ON request (student_id) WHERE removed_at IS NULL;
 CREATE INDEX request_by_course  ON request (course_code) WHERE removed_at IS NULL;
@@ -128,49 +182,48 @@ Choices worth reviewing:
 
 - **No foreign key from `request.course_code` to the catalog.** Aisha's SS303 has to load so the app can flag it (Q5). The unknown-course rule catches it instead.
 - **No unique constraint on (student, course).** Aisha's duplicate SS402 has to load too (Q5). The duplicate rule catches it and blocks Done.
-- **Soft delete (`removed_at`) for removed requests.** If a counselor removes a SIS request and we deleted the row, the next sync would add it back. Keeping a removed marker lets a sync see "the counselor removed this" and leave it alone (Q2). It costs one `WHERE removed_at IS NULL` on reads. Removed rows also give the README a cheap answer on audit history (M7).
-- **Changing type or reason sets `edited_in_app = 1`.** So does removing. Adding a course from the catalog creates a row with `source = 'app'`.
-- **`reason` lives on the request**, not on a separate warning table, because warnings are computed (below) and a request has at most one reason in the designs.
+- **The base fields make the three-way compare possible** (Q18). "Did the SIS change this, or did the counselor?" is answered by comparing base vs new SIS, and base vs the app's current values. `edited_in_app` stays as the quick flag the UI and rollback use.
+- **Soft delete (`removed_at`).** If a counselor removes a SIS request and we deleted the row, the next import would add it back. The removed row, with its `sis_key`, tells a reconcile "the counselor removed this" (Q2). It costs one `WHERE removed_at IS NULL` on reads, and gives the README a cheap answer on audit history (M7).
+- **Changing type or reason, or removing, sets `edited_in_app = 1`.** Adding from the catalog creates a row with `source = 'app'` and no `sis_key`.
+- **`reason` lives on the request**, because warnings are computed (below) and a request has at most one reason in the designs.
 - **Timestamps are ISO-8601 text**, SQLite's usual convention. IDs are generated in-process (overview §7).
 
 ## 4. Derived, never stored
 
 | Derived | Computed from | Used by |
 | --- | --- | --- |
-| Issues (errors and warnings) | Student + active requests + catalog, via the pure rule functions (overview §3) | Student detail, check pills, Done gate, checks filter |
+| Issues (errors and warnings) | Current-import student and catalog + active requests, via the pure rule functions (overview §3) | Student detail, check pills, Done gate, checks filter |
 | Student list row | Student + review + request counts + issue counts | Screen 1 |
-| Course counts (P, E, total) and the "Not in catalog" row | `SELECT course_code, type, COUNT(*) ... WHERE removed_at IS NULL GROUP BY course_code, type`, joined to the catalog in code | Screen 3 (Q12) |
+| Course counts (P, E, total) and the "Not in catalog" row | Active requests grouped by course and type, joined to the current catalog in code | Screen 3 (Q12) |
 | Course dialog list | Active requests for one course code, with student names | Course dialog |
 | Review status after an edit | Q3 rule: editing a Done student sets `in_progress` | Every write |
+| "SIS data as of" in the header | `received_at` of the current import | Every screen |
 
-Storing none of these means no stale state: every read reflects the latest edit.
+Storing none of these means no stale state: every read reflects the latest edit and the current import.
 
 ## 5. Seed and reset
 
-On first run, or on reset, the app deletes the SQLite file, then creates one `request` per SIS request (`source = 'sis'`, `edited_in_app = 0`) and one `review` per student (`not_started`). Tests do the same against an in-memory database (Q8). The design boards show a mid-season state (some edits, Done and On hold students); a "demo state" seed for the video is a possible extra, not part of this schema.
+On first run, or on reset, the app deletes the SQLite file and loads the appendix as **import #1** (`source = 'seed'`, completed, current). It then creates one `request` per SIS request (`source = 'sis'`, `edited_in_app = 0`, `sis_key` and base fields set from import #1) and one `review` per student (`not_started`). Tests do the same against an in-memory database (Q8).
 
-## 6. If time: sync demo (Q9, Q13)
+## 6. If time: reconcile a second import (Q9, Q13, Q18)
 
-Only if the counselor flow is done first.
+Built only if the counselor flow is done first. A second seed file stands in for the SIS's next export and loads as import #2:
+
+1. Diff import #1 and #2 by `sis_key` (DuckDB, Q7).
+2. For each request, compare base, app and new SIS: apply SIS-only changes, keep app-only changes, set `sis_conflict` when both changed, add new SIS requests, remove gone ones if untouched or flag them if edited.
+3. Write one `sync_change` row per request touched, then mark #2 current, all in one transaction. An error leaves #1 current and writes nothing.
+4. Rollback: point `is_current` back at #1 and replay `old_value` for the run's changes, skipping requests edited since (Q13).
 
 ```sql
-CREATE TABLE sync_run (
-  id          INTEGER PRIMARY KEY,
-  state       TEXT NOT NULL CHECK (state IN ('submitted', 'started', 'completed', 'errored')),
-  started_at  TEXT, finished_at TEXT,
-  changes     INTEGER NOT NULL DEFAULT 0,
-  errors_in   INTEGER NOT NULL DEFAULT 0
-);
 CREATE TABLE sync_change (
-  run_id    INTEGER NOT NULL REFERENCES sync_run (id),
-  entity    TEXT NOT NULL,            -- 'request' or 'student'
-  entity_id TEXT NOT NULL,
-  old_value TEXT,                     -- JSON; NULL when the change was an insert
-  new_value TEXT                      -- JSON; NULL when the change was a delete
+  import_id  INTEGER NOT NULL REFERENCES sis_import (id),
+  request_id TEXT NOT NULL,
+  old_value  TEXT,          -- JSON; NULL when the change was an insert
+  new_value  TEXT           -- JSON; NULL when the change was a removal
 );
 ```
 
-A run applies its changes in one transaction, so an errored run writes nothing. Rollback replays `old_value` for the run's changes and skips any request with `edited_in_app = 1` (Q13). In the prototype, a "sync" would read a second seed file standing in for the SIS's next export.
+Retention: keep the last N imports (N to set with Stephen; trivial at 10 students).
 
 ## 7. Not in this schema: add-ons (designed, not built)
 
