@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router";
+import { Link, MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 import {
@@ -660,4 +660,78 @@ test("a hold the server refuses keeps the form open with the server's message", 
 
   expect(screen.getByLabelText("Why is this student on hold?")).toHaveValue("Waiting");
   expect(screen.getByRole("alert")).toHaveTextContent("Say why the student is on hold.");
+});
+
+// Review fixes: state belongs to one student; writes and reloads can't overwrite newer data
+
+test("following a student link from the course dialog shows that student fresh", async () => {
+  function LinkingDialog({ code }: CourseDialogProps) {
+    return (
+      <div role="dialog" aria-label={`Course ${code}`}>
+        <Link to="/students/S008">Aisha Johnson</Link>
+      </div>
+    );
+  }
+  await renderStudent("S003", { courseDialog: LinkingDialog });
+  fireEvent.click(screen.getByRole("checkbox", { name: "Grade 9" }));
+  await click(screen.getByRole("button", { name: "Put on hold…" }));
+  await click(screen.getByRole("button", { name: "MTH101" }));
+
+  await click(screen.getByRole("link", { name: "Aisha Johnson" }));
+
+  expect(screen.getByRole("heading", { level: 1, name: "Aisha Johnson" })).toBeInTheDocument();
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(screen.queryByLabelText("Why is this student on hold?")).not.toBeInTheDocument();
+  expect(screen.getByRole("checkbox", { name: "Grade 9" })).not.toBeChecked();
+  expect(screen.getByRole("checkbox", { name: "Grade 12" })).toBeChecked();
+});
+
+test("a catalog that can't be loaded says so in the catalog panel, and a later edit doesn't hide it", async () => {
+  mocked.catalog.mockRejectedValue(new ApiError("Can't reach the CourseManager server.", undefined));
+  mocked.updateRequest.mockResolvedValue(jordan());
+  await renderStudent("S003");
+
+  const panel = screen.getByRole("complementary", { name: "Add from catalog" });
+  expect(within(panel).getByRole("alert")).toHaveTextContent("Can't reach the CourseManager server.");
+  expect(panel).not.toHaveTextContent("No courses match.");
+
+  await click(within(requestRow("ENG201")).getByRole("button", { name: "Make elective" }));
+
+  expect(within(panel).getByRole("alert")).toHaveTextContent("Can't reach the CourseManager server.");
+});
+
+test("while a change is saving, the other actions are disabled", async () => {
+  mocked.addRequest.mockReturnValue(new Promise(() => {}));
+  await renderStudent("S003");
+
+  await click(screen.getByRole("button", { name: "Add AT201 Web Design" }));
+
+  expect(screen.getByRole("button", { name: "Add AT101 Introduction to Computing" })).toBeDisabled();
+  expect(within(requestRow("ENG201")).getByRole("button", { name: "Make elective" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Remove ENG201 English 10" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Mark Done" })).toBeDisabled();
+});
+
+test("a reload that finishes after a newer edit doesn't overwrite it", async () => {
+  function ChangingDialog({ onChange }: CourseDialogProps) {
+    return (
+      <div role="dialog" aria-label="Course">
+        <button type="button" onClick={onChange}>
+          Changed
+        </button>
+      </div>
+    );
+  }
+  let finishReload: (student: StudentDetail) => void = () => {};
+  await renderStudent("S003", { courseDialog: ChangingDialog });
+  await click(screen.getByRole("button", { name: "MTH101" }));
+  mocked.student.mockReturnValue(new Promise((resolve) => (finishReload = resolve)));
+  await click(screen.getByRole("button", { name: "Changed" }));
+
+  mocked.updateRequest.mockResolvedValue(jordanWithMth101({ type: "elective" }));
+  await click(within(requestRow("MTH101")).getByRole("button", { name: "Make elective" }));
+  await act(async () => finishReload(jordan()));
+
+  const elective = screen.getByRole("list", { name: "Elective" });
+  expect(within(elective).getByTestId("request-MTH101")).toBeInTheDocument();
 });
