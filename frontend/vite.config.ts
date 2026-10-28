@@ -15,5 +15,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test-setup.ts"],
+    // Dates in tests are written in UTC.
+    env: { TZ: "UTC" },
   },
 });
