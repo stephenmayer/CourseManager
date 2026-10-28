@@ -15,6 +15,10 @@ class Unset:
 UNSET: Final = Unset()
 
 
+class HoldReasonRequired(ValueError):
+    """On hold needs a reason (Q3); the review table's CHECK enforces it too."""
+
+
 class RequestStore(Protocol):
     def list_active(
         self, student_id: str | None = None, *, course_code: str | None = None
@@ -133,7 +137,7 @@ class SqliteRequestStore:
         self, student_id: str, status: ReviewStatus, hold_reason: str | None = None
     ) -> Review:
         if status == "on_hold" and not (hold_reason and hold_reason.strip()):
-            raise ValueError("On hold needs a reason")
+            raise HoldReasonRequired("On hold needs a reason")
         self.conn.execute(
             "INSERT INTO review (student_id, status, hold_reason, updated_at) VALUES (?, ?, ?, ?)"
             " ON CONFLICT (student_id) DO UPDATE SET status = excluded.status,"

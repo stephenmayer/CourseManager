@@ -2,6 +2,7 @@ import os
 import sqlite3
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from dataclasses import asdict
 from pathlib import Path
 from typing import Annotated
 
@@ -262,11 +263,7 @@ async def courses(service: Service) -> CoursesOut:
     return CoursesOut(
         courses=[
             CatalogCourseCountOut(
-                code=row.course.code,
-                name=row.course.name,
-                department=row.course.department,
-                grades=row.course.grades,
-                is_ap=row.course.is_ap,
+                **asdict(row.course),
                 priority=row.counts.priority,
                 elective=row.counts.elective,
                 total=row.counts.total,

@@ -8,13 +8,13 @@ at the same request everywhere. Screens sort for display afterwards.
 
 from collections import defaultdict
 from collections.abc import Callable
-from contextlib import AbstractContextManager, nullcontext
+from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
 
 from app.models import Course, CourseCounts, Request, RequestType, ReviewStatus, SisImport, Student
 from app.rules import Issue, check_student, first_name
 from app.sis.reader import SisSource
-from app.store import UNSET, RequestStore, Unset
+from app.store import UNSET, HoldReasonRequired, RequestStore, Unset
 
 
 class ServiceError(Exception):
@@ -92,7 +92,7 @@ class CourseService:
         sis: SisSource,
         store: RequestStore,
         reseed: Callable[[], None],
-        atomic: Atomic = nullcontext,
+        atomic: Atomic,
     ) -> None:
         self.sis = sis
         self.store = store
@@ -115,11 +115,11 @@ class CourseService:
         for student in self.sis.students():
             requests = by_student.get(student.id, [])
             issues = check_student(student, requests, catalog)
-            review = reviews.get(student.id)
+            review = reviews.get(student.id) or self.store.get_review(student.id)
             rows.append(
                 StudentRow(
                     student=student,
-                    status=review.status if review else "not_started",
+                    status=review.status,
                     priority_count=sum(r.type == "priority" for r in requests),
                     elective_count=sum(r.type == "elective" for r in requests),
                     error_count=sum(i.severity == "error" for i in issues),
@@ -165,13 +165,12 @@ class CourseService:
         requests = self.store.list_active(course_code=course_code)
         if course_code not in catalog and not requests:
             raise NotFound(f"No course with code {course_code}.")
-        by_student = self._active_by_student()
         issues_by_student: dict[str, tuple[Student, list[Issue]]] = {}
         for student_id in {r.student_id for r in requests}:
             student = self._student(student_id)
             issues_by_student[student_id] = (
                 student,
-                check_student(student, by_student[student_id], catalog),
+                check_student(student, self.store.list_active(student_id), catalog),
             )
         rows = []
         for request in requests:
@@ -210,6 +209,8 @@ class CourseService:
         reason: str | None | Unset = UNSET,
     ) -> StudentDetail:
         request = self._active_request(request_id)
+        if isinstance(reason, str) and not reason.strip():
+            reason = None  # a blank reason is no reason
         unchanged_type = type is None or type == request.type
         unchanged_reason = isinstance(reason, Unset) or reason == request.reason
         if unchanged_type and unchanged_reason:
@@ -234,7 +235,7 @@ class CourseService:
                 raise Conflict(f"Fix {errors} {noun} to mark Done.")
         try:
             review = self.store.set_review(student_id, status, hold_reason)
-        except ValueError:
+        except HoldReasonRequired:
             raise Invalid("Say why the student is on hold.") from None
         return replace(detail, status=review.status, hold_reason=review.hold_reason)
 
