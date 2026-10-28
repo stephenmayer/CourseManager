@@ -1,6 +1,6 @@
 import { afterEach, expect, test, vi } from "vitest";
 
-import { ApiError, api, getJson } from "./client";
+import { ApiError, api, getJson, sendJson } from "./client";
 
 function stubFetch(impl: (input: string) => Promise<Response>) {
   const fetchMock = vi.fn(impl);
@@ -67,4 +67,62 @@ test("a success response that isn't JSON surfaces a plain message", async () => 
   await expect(getJson("/students")).rejects.toThrow(
     "The server sent a response CourseManager couldn't read. Try again.",
   );
+});
+
+test("sendJson sends a JSON body with the method and returns the parsed body", async () => {
+  const fetchMock = vi.fn(async (_input: string, _init?: RequestInit) => jsonResponse({ id: "S001" }));
+  vi.stubGlobal("fetch", fetchMock);
+
+  await expect(sendJson("PATCH", "/requests/r1", { type: "elective" })).resolves.toEqual({
+    id: "S001",
+  });
+  const [url, init] = fetchMock.mock.calls[0];
+  expect(url).toBe("/api/requests/r1");
+  expect(init?.method).toBe("PATCH");
+  expect(init?.body).toBe(JSON.stringify({ type: "elective" }));
+  expect(new Headers(init?.headers).get("Content-Type")).toBe("application/json");
+});
+
+test("sendJson without a body sends none", async () => {
+  const fetchMock = vi.fn(async (_input: string, _init?: RequestInit) => jsonResponse({ id: "S001" }));
+  vi.stubGlobal("fetch", fetchMock);
+
+  await api.removeRequest("r1");
+
+  const [url, init] = fetchMock.mock.calls[0];
+  expect(url).toBe("/api/requests/r1");
+  expect(init?.method).toBe("DELETE");
+  expect(init?.body).toBeUndefined();
+});
+
+test("sendJson surfaces the server's plain message on an error", async () => {
+  stubFetch(async () => jsonResponse({ detail: "Algebra I is already on Alex's list." }, 409));
+
+  await expect(sendJson("POST", "/students/S001/requests", {})).rejects.toThrow(
+    "Algebra I is already on Alex's list.",
+  );
+});
+
+test.each([
+  ["courses", () => api.courses(), "/api/courses"],
+  ["courseRequests", () => api.courseRequests("SS402"), "/api/courses/SS402/requests"],
+  ["catalog", () => api.catalog(), "/api/catalog"],
+])("%s reads %s", async (_name, call, url) => {
+  const fetchMock = stubFetch(async () => jsonResponse([]));
+
+  await call();
+
+  expect(fetchMock).toHaveBeenCalledWith(url, expect.anything());
+});
+
+test("updateRequest patches only the fields given", async () => {
+  const fetchMock = vi.fn(async (_input: string, _init?: RequestInit) => jsonResponse({}));
+  vi.stubGlobal("fetch", fetchMock);
+
+  await api.updateRequest("r7", { type: "priority" });
+
+  const [url, init] = fetchMock.mock.calls[0];
+  expect(url).toBe("/api/requests/r7");
+  expect(init?.method).toBe("PATCH");
+  expect(JSON.parse(String(init?.body))).toEqual({ type: "priority" });
 });
