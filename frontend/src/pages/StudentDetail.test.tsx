@@ -651,3 +651,17 @@ test("an unknown code is plain text, not a link to the dialog", async () => {
   expect(screen.queryByRole("button", { name: "SS303" })).not.toBeInTheDocument();
   expect(screen.getAllByRole("button", { name: "SS402" })).toHaveLength(2);
 });
+
+test("a hold the server refuses keeps the form open with the server's message", async () => {
+  mocked.setReview.mockRejectedValue(new ApiError("Say why the student is on hold.", 422));
+  await renderStudent("S003");
+
+  await click(screen.getByRole("button", { name: "Put on hold…" }));
+  fireEvent.change(screen.getByLabelText("Why is this student on hold?"), {
+    target: { value: "Waiting" },
+  });
+  await click(screen.getByRole("button", { name: "Put on hold" }));
+
+  expect(screen.getByLabelText("Why is this student on hold?")).toHaveValue("Waiting");
+  expect(screen.getByRole("alert")).toHaveTextContent("Say why the student is on hold.");
+});
