@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router";
+import { Link, matchPath, useLocation } from "react-router";
 
 import { api } from "../api/client";
 import type { Theme } from "../theme";
@@ -11,22 +11,18 @@ const sisDateFormat = new Intl.DateTimeFormat("en-US", {
   minute: "2-digit",
 });
 
-type SisDate = { state: "loading" } | { state: "ready"; text: string } | { state: "failed" };
-
 // The current import's time (S12), not a fixed sample date.
-function useSisDate(): SisDate {
-  const [sisDate, setSisDate] = useState<SisDate>({ state: "loading" });
+function useSisDateLabel(): string {
+  const [label, setLabel] = useState("SIS data as of …");
 
   useEffect(() => {
     let live = true;
     api.currentImport().then(
       (sisImport) => {
-        if (live) {
-          setSisDate({ state: "ready", text: sisDateFormat.format(new Date(sisImport.received_at)) });
-        }
+        if (live) setLabel(`SIS data as of ${sisDateFormat.format(new Date(sisImport.received_at))}`);
       },
       () => {
-        if (live) setSisDate({ state: "failed" });
+        if (live) setLabel("SIS data date unavailable");
       },
     );
     return () => {
@@ -34,21 +30,13 @@ function useSisDate(): SisDate {
     };
   }, []);
 
-  return sisDate;
+  return label;
 }
 
-function sisDateLabel(sisDate: SisDate): string {
-  switch (sisDate.state) {
-    case "ready":
-      return `SIS data as of ${sisDate.text}`;
-    case "failed":
-      return "SIS data date unavailable";
-    case "loading":
-      return "SIS data as of …";
-  }
-}
-
-function NavItem({ to, current, children }: { to: string; current: boolean; children: string }) {
+// Each nav item is current on its own routes, using the router's matching.
+function NavItem({ to, match, children }: { to: string; match: string[]; children: string }) {
+  const { pathname } = useLocation();
+  const current = match.some((pattern) => matchPath(pattern, pathname));
   return (
     <Link to={to} className="nav-link" aria-current={current ? "page" : undefined}>
       {children}
@@ -74,10 +62,9 @@ function SunIcon() {
 }
 
 export default function Header({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
-  const { pathname } = useLocation();
-  const onCourses = pathname.startsWith("/courses");
-  const sisDate = useSisDate();
+  const sisDateLabel = useSisDateLabel();
   const dark = theme === "dark";
+  const toggleLabel = `Switch to ${dark ? "light" : "dark"} mode`;
 
   return (
     <header className="app-header">
@@ -89,22 +76,22 @@ export default function Header({ theme, onToggleTheme }: { theme: Theme; onToggl
         <span>CourseManager</span>
       </div>
       <nav aria-label="Main" className="app-nav">
-        <NavItem to="/" current={!onCourses}>
+        <NavItem to="/" match={["/", "/students/*"]}>
           Students
         </NavItem>
-        <NavItem to="/courses" current={onCourses}>
+        <NavItem to="/courses" match={["/courses/*"]}>
           Courses
         </NavItem>
       </nav>
       <div className="app-header-spacer" />
-      <span className="muted">2027–28 course requests · {sisDateLabel(sisDate)}</span>
+      <span className="muted">2027–28 course requests · {sisDateLabel}</span>
       {/* Placeholder until there is sign-in. */}
       <span className="app-user">Ms. Lee · Counselor</span>
       <button
         type="button"
         className="theme-toggle"
-        aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-        title={dark ? "Switch to light mode" : "Switch to dark mode"}
+        aria-label={toggleLabel}
+        title={toggleLabel}
         onClick={onToggleTheme}
       >
         {dark ? <SunIcon /> : <MoonIcon />}

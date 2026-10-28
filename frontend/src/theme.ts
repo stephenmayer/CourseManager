@@ -1,6 +1,6 @@
 // Light/dark theme: defaults to the system setting, remembered per browser (S14).
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 export type Theme = "light" | "dark";
 
@@ -31,7 +31,8 @@ function storeTheme(theme: Theme) {
 export function useTheme(): [Theme, () => void] {
   const [theme, setTheme] = useState<Theme>(() => storedTheme() ?? systemTheme());
 
-  useEffect(() => {
+  // Before paint, so a dark-mode user never sees a light frame first.
+  useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
