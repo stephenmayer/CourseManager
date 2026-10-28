@@ -123,28 +123,29 @@ class CourseService:
         like every other read, so they always agree with the student list (S16).
         """
         counts = self.store.counts_by_course()
-        duplicates = self._duplicates_by_course()
-        catalog = self.sis.catalog()
-        known = {course.code for course in catalog}
+        catalog = self._catalog()
+        duplicates = self._duplicates_by_course(catalog)
         in_catalog = [
             CourseRow(c.code, c, counts.get(c.code, CourseCounts(0, 0)), duplicates[c.code])
-            for c in catalog
+            for c in catalog.values()
         ]
         not_in_catalog = [
             CourseRow(code, None, count, duplicates[code])
             for code, count in sorted(counts.items())
-            if code not in known
+            if code not in catalog
         ]
         return in_catalog, not_in_catalog
 
-    def _duplicates_by_course(self) -> Counter[str]:
+    def _duplicates_by_course(self, catalog: dict[str, Course]) -> Counter[str]:
         """How many copies of each course the duplicate_course rule flags, across students."""
-        catalog = self._catalog()
+        active = self.store.list_active()
+        codes = {r.id: r.course_code for r in active}
+        by_student: dict[str, list[Request]] = {}
+        for request in active:
+            by_student.setdefault(request.student_id, []).append(request)
         flagged: Counter[str] = Counter()
         for student in self.sis.students():
-            requests = self.store.list_active(student.id)
-            codes = {r.id: r.course_code for r in requests}
-            for issue in duplicate_course(student, requests, catalog):
+            for issue in duplicate_course(student, by_student.get(student.id, []), catalog):
                 if issue.request_id is not None:
                     flagged[codes[issue.request_id]] += 1
         return flagged

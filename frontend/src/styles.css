@@ -425,14 +425,8 @@ a:hover {
   top: 14px;
   right: 14px;
   width: 44px;
-  height: 44px;
-  border-radius: 8px;
-  border: 1px solid var(--border-strong);
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
+  padding: 0;
   font-size: 16px;
-  cursor: pointer;
 }
 
 .dialog-eyebrow {

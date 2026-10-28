@@ -1,5 +1,3 @@
-import { ApiError } from "../api/client";
-
 export function plural(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? "" : "s"}`;
 }
@@ -12,8 +10,4 @@ export function gradeList(grades: number[]): string {
 /** "grade 12" or "grades 11/12" as in the course dialog. */
 export function gradesLabel(grades: number[]): string {
   return `${grades.length === 1 ? "grade" : "grades"} ${gradeList(grades)}`;
-}
-
-export function errorText(error: unknown): string {
-  return error instanceof ApiError ? error.message : "Something went wrong. Try again.";
 }

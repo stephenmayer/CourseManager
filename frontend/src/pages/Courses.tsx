@@ -1,19 +1,19 @@
 // Screen 3 (Q12): request counts per catalog course, codes not in the catalog, and the
 // course dialog. The catalog is SIS-owned and read-only here; requests can be edited.
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
 import { api, type CatalogCourseCount, type CourseRequest, type CoursesResponse } from "../api/client";
+import { errorText, useLoad } from "../api/useLoad";
 import CourseDialog from "../courses/CourseDialog";
-import { errorText, gradeList, plural } from "../courses/format";
+import { gradeList, plural } from "../courses/format";
+import ErrorText from "../shell/ErrorText";
 
 interface CoursesData {
   courses: CatalogCourseCount[];
   // Requests for each code the catalog doesn't have, to name the students (E10).
   notInCatalog: CourseRequest[];
 }
-
-type Load = { state: "loading" } | { state: "ready"; data: CoursesData } | { state: "failed"; message: string };
 
 async function fetchCourses(): Promise<CoursesData> {
   const { courses, not_in_catalog }: CoursesResponse = await api.courses();
@@ -29,7 +29,9 @@ function matches(query: string, ...fields: string[]): boolean {
 function departments(courses: CatalogCourseCount[]): [string, CatalogCourseCount[]][] {
   const byName = new Map<string, CatalogCourseCount[]>();
   for (const course of courses) {
-    byName.set(course.department, [...(byName.get(course.department) ?? []), course]);
+    const list = byName.get(course.department) ?? [];
+    list.push(course);
+    byName.set(course.department, list);
   }
   return [...byName];
 }
@@ -125,30 +127,11 @@ function NotInCatalog({ rows, onRemove }: { rows: CourseRequest[]; onRemove: (id
 }
 
 export default function CoursesPage() {
-  const [load, setLoad] = useState<Load>({ state: "loading" });
+  const [load, reload] = useLoad(fetchCourses);
   const [writeError, setWriteError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const selected = searchParams.get("course");
-
-  // Bumped after each edit, here or in the dialog, to fetch the counts again.
-  const [version, setVersion] = useState(0);
-  const reload = () => setVersion((v) => v + 1);
-
-  useEffect(() => {
-    let live = true;
-    fetchCourses().then(
-      (data) => {
-        if (live) setLoad({ state: "ready", data });
-      },
-      (e: unknown) => {
-        if (live) setLoad({ state: "failed", message: errorText(e) });
-      },
-    );
-    return () => {
-      live = false;
-    };
-  }, [version]);
 
   async function remove(requestId: string) {
     setWriteError(null);
@@ -191,16 +174,8 @@ export default function CoursesPage() {
       </div>
 
       {load.state === "loading" && <p className="muted">Loading courses…</p>}
-      {load.state === "failed" && (
-        <p role="alert" className="error-text">
-          {load.message}
-        </p>
-      )}
-      {writeError && (
-        <p role="alert" className="error-text">
-          {writeError}
-        </p>
-      )}
+      {load.state === "failed" && <ErrorText message={load.message} />}
+      <ErrorText message={writeError} />
       {unknown.length > 0 && <NotInCatalog rows={unknown} onRemove={(id) => void remove(id)} />}
       {tables.map((d) => (
         <DepartmentTable

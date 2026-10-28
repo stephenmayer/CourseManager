@@ -1,11 +1,13 @@
 // The course dialog (Q12): who requested a course, with the same edits as the student page.
 // Opened from the Courses screen and from any course code on a student page, so it
 // fetches its own data and takes only the code.
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router";
 
-import { api, type CatalogCourse, type CourseRequest } from "../api/client";
-import { errorText, gradesLabel, plural } from "./format";
+import { api, type CourseRequest, type IssueOut } from "../api/client";
+import { errorText, useLoad } from "../api/useLoad";
+import ErrorText from "../shell/ErrorText";
+import { gradesLabel, plural } from "./format";
 
 export interface CourseDialogProps {
   code: string;
@@ -13,11 +15,6 @@ export interface CourseDialogProps {
   /** Called after an edit inside the dialog succeeds, so the opener can reload. */
   onChange: () => void;
 }
-
-type Load =
-  | { state: "loading" }
-  | { state: "ready"; course: CatalogCourse | undefined; rows: CourseRequest[] }
-  | { state: "failed"; message: string };
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -36,34 +33,25 @@ function countLabel(rows: CourseRequest[]): string {
   return parts.length > 0 ? `${total} (${parts.join(", ")})` : total;
 }
 
-function RequestNote({ row, rows }: { row: CourseRequest; rows: CourseRequest[] }) {
-  return row.issues.map((issue) => {
-    if (issue.rule === "duplicate_course") {
-      const original = rows.find((r) => r.request.id === issue.related_request_id);
-      return (
-        <p key={issue.rule} className="request-note">
-          <b>Requested twice.</b>{" "}
-          {original
-            ? `${firstName(row.student_name)} already has this as a ${original.request.type}. Remove this copy.`
-            : `${issue.message} ${issue.detail}`}
-        </p>
-      );
-    }
-    if (issue.rule === "out_of_grade") {
-      return (
-        <p key={issue.rule} className="request-note">
-          {issue.kept
-            ? `Out of grade, kept with reason: "${row.request.reason ?? ""}"`
-            : `Out of grade. ${issue.message}`}
-        </p>
-      );
-    }
+// The boards' wording for this dialog; other issues use the API's message as is.
+function noteText(issue: IssueOut, row: CourseRequest, rows: CourseRequest[]): ReactNode {
+  if (issue.rule === "duplicate_course") {
+    const original = rows.find((r) => r.request.id === issue.related_request_id);
     return (
-      <p key={issue.rule} className="request-note">
-        {issue.message}
-      </p>
+      <>
+        <b>Requested twice.</b>{" "}
+        {original
+          ? `${firstName(row.student_name)} already has this as a ${original.request.type}. Remove this copy.`
+          : `${issue.message} ${issue.detail}`}
+      </>
     );
-  });
+  }
+  if (issue.rule === "out_of_grade") {
+    return issue.kept
+      ? `Out of grade, kept with reason: "${row.request.reason ?? ""}"`
+      : `Out of grade. ${issue.message}`;
+  }
+  return issue.message;
 }
 
 function cardClass(row: CourseRequest): string {
@@ -73,7 +61,15 @@ function cardClass(row: CourseRequest): string {
 }
 
 export default function CourseDialog({ code, onClose, onChange }: CourseDialogProps) {
-  const [load, setLoad] = useState<Load>({ state: "loading" });
+  const fetcher = useCallback(
+    () =>
+      Promise.all([api.courseRequests(code), api.catalog()]).then(([rows, catalog]) => ({
+        rows,
+        course: catalog.find((c) => c.code === code),
+      })),
+    [code],
+  );
+  const [load, reload] = useLoad(fetcher);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -82,24 +78,6 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
   useEffect(() => {
     onCloseRef.current = onClose;
   });
-
-  // Bumped after each edit to fetch the requests again.
-  const [version, setVersion] = useState(0);
-
-  useEffect(() => {
-    let live = true;
-    Promise.all([api.courseRequests(code), api.catalog()]).then(
-      ([rows, catalog]) => {
-        if (live) setLoad({ state: "ready", course: catalog.find((c) => c.code === code), rows });
-      },
-      (e: unknown) => {
-        if (live) setLoad({ state: "failed", message: errorText(e) });
-      },
-    );
-    return () => {
-      live = false;
-    };
-  }, [code, version]);
 
   // Focus moves in on open and goes back to whatever opened the dialog on close.
   useEffect(() => {
@@ -117,7 +95,6 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
       const dialog = dialogRef.current;
       if (!dialog) return;
       if (event.key === "Escape") {
-        event.stopPropagation();
         onCloseRef.current();
         return;
       }
@@ -147,7 +124,7 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
     try {
       await action();
       onChange();
-      setVersion((v) => v + 1);
+      reload();
     } catch (e) {
       setError(errorText(e));
     } finally {
@@ -155,7 +132,7 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
     }
   }
 
-  const course = load.state === "ready" ? load.course : undefined;
+  const course = load.state === "ready" ? load.data.course : undefined;
   const title = course ? `${code} ${course.name}` : code;
 
   return (
@@ -172,35 +149,27 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
         aria-labelledby="course-dialog-title"
         className="dialog"
       >
-        <button ref={closeRef} type="button" className="dialog-close" aria-label="Close" onClick={onClose}>
+        <button ref={closeRef} type="button" className="button dialog-close" aria-label="Close" onClick={onClose}>
           ✕
         </button>
         <div className="dialog-eyebrow">Requests for this course</div>
         <h2 id="course-dialog-title">{title}</h2>
 
         {load.state === "loading" && <p className="muted">Loading requests…</p>}
-        {load.state === "failed" && (
-          <p role="alert" className="error-text">
-            {load.message}
-          </p>
-        )}
+        {load.state === "failed" && <ErrorText message={load.message} />}
         {load.state === "ready" && (
           <>
             <p className="muted">
               {course
-                ? `${course.department} · ${gradesLabel(course.grades)} · ${countLabel(load.rows)}`
-                : `Not in the catalog · ${countLabel(load.rows)}`}
+                ? `${course.department} · ${gradesLabel(course.grades)} · ${countLabel(load.data.rows)}`
+                : `Not in the catalog · ${countLabel(load.data.rows)}`}
             </p>
-            {error && (
-              <p role="alert" className="error-text">
-                {error}
-              </p>
-            )}
-            {load.rows.length === 0 ? (
+            <ErrorText message={error} />
+            {load.data.rows.length === 0 ? (
               <p>No one has requested this course.</p>
             ) : (
               <ul className="request-cards">
-                {load.rows.map((row) => {
+                {load.data.rows.map((row) => {
                   const { request } = row;
                   const duplicate = row.issues.some((i) => i.rule === "duplicate_course");
                   const other = request.type === "priority" ? "elective" : "priority";
@@ -217,7 +186,11 @@ export default function CourseDialog({ code, onClose, onChange }: CourseDialogPr
                           {request.type === "priority" ? "Priority" : "Elective"}
                         </span>
                       </div>
-                      <RequestNote row={row} rows={load.rows} />
+                      {row.issues.map((issue) => (
+                        <p key={issue.rule} className="request-note">
+                          {noteText(issue, row, load.data.rows)}
+                        </p>
+                      ))}
                       <div className="request-card-actions">
                         {!duplicate && (
                           <button
