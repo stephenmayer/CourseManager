@@ -76,6 +76,13 @@ test.each([
   expect(screen.getByRole("link", { name: other })).not.toHaveAttribute("aria-current");
 });
 
+test("a path outside both sections marks neither nav link as current", async () => {
+  await renderAt("/not-a-page");
+
+  expect(screen.getByRole("link", { name: "Students" })).not.toHaveAttribute("aria-current");
+  expect(screen.getByRole("link", { name: "Courses" })).not.toHaveAttribute("aria-current");
+});
+
 test.each([
   ["/", "Students"],
   ["/students/S001", "Student S001"],
