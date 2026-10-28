@@ -326,3 +326,13 @@ def test_reset_restores_the_seed(client: TestClient) -> None:
 
     assert student(client, "S001")["status"] == "not_started"
     assert len(student(client, "S008")["issues"]) == 2
+
+
+def test_an_empty_patch_changes_nothing(client: TestClient) -> None:
+    set_status(client, "S001", "done")
+    rid = request_id(client, "S001", "MTH101", "priority")
+
+    body = client.patch(f"/api/requests/{rid}", json={}).json()
+
+    assert body["status"] == "done"
+    assert next(r for r in body["requests"] if r["id"] == rid)["edited_in_app"] is False

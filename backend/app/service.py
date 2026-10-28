@@ -174,6 +174,8 @@ class CourseService:
         reason: str | None | Unset = UNSET,
     ) -> StudentDetail:
         request = self._active_request(request_id)
+        if type is None and isinstance(reason, Unset):
+            return self.student_detail(request.student_id)
         return self._apply_request_change(
             request.student_id, lambda: self.store.update(request_id, type=type, reason=reason)
         )
