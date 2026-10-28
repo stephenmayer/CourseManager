@@ -143,7 +143,7 @@ function clip(text: string, length: number): string {
   return text.length > length ? `${text.slice(0, length)}…` : text;
 }
 
-function ProfilePreview({ profile }: { profile: string }) {
+function ProfilePreview({ name, profile }: { name: string; profile: string }) {
   const [expanded, setExpanded] = useState(false);
 
   if (profile.length <= PROFILE_PREVIEW) return <span>{profile}</span>;
@@ -154,6 +154,7 @@ function ProfilePreview({ profile }: { profile: string }) {
         type="button"
         className="link-button"
         aria-expanded={expanded}
+        aria-label={`${expanded ? "less" : "more"}: ${name} profile`}
         onClick={() => setExpanded(!expanded)}
       >
         {expanded ? "less" : "more"}
@@ -162,7 +163,7 @@ function ProfilePreview({ profile }: { profile: string }) {
   );
 }
 
-function StudentTable({ students }: { students: StudentSummary[] }) {
+function StudentTable({ students, empty }: { students: StudentSummary[]; empty: string }) {
   return (
     <div className="table-frame">
       <table className="data-table">
@@ -180,21 +181,21 @@ function StudentTable({ students }: { students: StudentSummary[] }) {
           {students.length === 0 && (
             <tr>
               <td colSpan={6} className="empty-row">
-                No students match
+                {empty}
               </td>
             </tr>
           )}
           {students.map((s) => (
             <tr key={s.id}>
               <td>
-                <Link to={`/students/${s.id}`} className="student-link">
+                <Link to={`/students/${encodeURIComponent(s.id)}`} className="student-link">
                   {s.name}
                 </Link>
                 <div className="cell-sub">{s.id}</div>
               </td>
               <td>{s.grade}</td>
               <td className="muted profile-cell">
-                <ProfilePreview profile={s.profile} />
+                <ProfilePreview name={s.name} profile={s.profile} />
               </td>
               <td>{`${s.priority_count} P · ${s.elective_count} E`}</td>
               <td>
@@ -246,24 +247,26 @@ export default function StudentListPage() {
         </div>
       </div>
 
-      <div className="filters">
-        <ChipGroup
-          name="status"
-          label="Status"
-          options={STATUS_FILTERS}
-          students={all}
-          value={status}
-          onChange={setStatus}
-        />
-        <ChipGroup
-          name="checks"
-          label="Checks"
-          options={CHECKS_FILTERS}
-          students={all}
-          value={checks}
-          onChange={setChecks}
-        />
-      </div>
+      {load.state === "ready" && (
+        <div className="filters">
+          <ChipGroup
+            name="status"
+            label="Status"
+            options={STATUS_FILTERS}
+            students={all}
+            value={status}
+            onChange={setStatus}
+          />
+          <ChipGroup
+            name="checks"
+            label="Checks"
+            options={CHECKS_FILTERS}
+            students={all}
+            value={checks}
+            onChange={setChecks}
+          />
+        </div>
+      )}
 
       {load.state === "loading" && <p className="muted">Loading students…</p>}
       {load.state === "failed" && (
@@ -271,7 +274,12 @@ export default function StudentListPage() {
           {load.message}
         </p>
       )}
-      {load.state === "ready" && <StudentTable students={shown} />}
+      {load.state === "ready" && (
+        <StudentTable
+          students={shown}
+          empty={all.length === 0 ? "No students in the current SIS import" : "No students match"}
+        />
+      )}
 
       <p className="footnote muted">Errors block Done until fixed. Warnings can be kept with a reason.</p>
     </div>
