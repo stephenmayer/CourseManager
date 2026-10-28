@@ -143,4 +143,15 @@ export const api = {
     sendJson<StudentDetail>("PATCH", `/requests/${encodeURIComponent(id)}`, changes),
   removeRequest: (id: string) =>
     sendJson<StudentDetail>("DELETE", `/requests/${encodeURIComponent(id)}`),
+  student: (id: string) => getJson<StudentDetail>(`/students/${encodeURIComponent(id)}`),
+  addRequest: (studentId: string, courseCode: string) =>
+    sendJson<StudentDetail>("POST", `/students/${encodeURIComponent(studentId)}/requests`, {
+      course_code: courseCode,
+    }),
+  setReview: (studentId: string, status: ReviewStatus, holdReason?: string) =>
+    sendJson<StudentDetail>(
+      "PUT",
+      `/students/${encodeURIComponent(studentId)}/review`,
+      holdReason === undefined ? { status } : { status, hold_reason: holdReason },
+    ),
 };

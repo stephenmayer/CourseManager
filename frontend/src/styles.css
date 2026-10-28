@@ -24,6 +24,10 @@
   --neutral-text: #3f4652;
   --hold-bg: #f4ebff;
   --hold-text: #6927da;
+  --on-accent: #ffffff;
+  --warn-surface: #fff8eb;
+  --disabled-bg: #e2e5ea;
+  --disabled-text: #6b7280;
   color-scheme: light;
 }
 
@@ -52,6 +56,10 @@
   --neutral-text: #c9ced6;
   --hold-bg: #2e2340;
   --hold-text: #d6bbfb;
+  --on-accent: #0f1115;
+  --warn-surface: #2e2312;
+  --disabled-bg: #242934;
+  --disabled-text: #7d8594;
   color-scheme: dark;
 }
 
@@ -493,4 +501,518 @@ a:hover {
 .request-card-actions {
   display: flex;
   gap: 8px;
+}
+
+/* Screen 2: Student detail. Classes are prefixed sd- so they never collide with other screens. */
+
+/* Controls (touch targets 44px, per the boards; the boards' "+ Add" table buttons are 40px) */
+
+/* On top of the shared .card */
+.sd-card {
+  padding: 24px;
+}
+
+.sd-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sd-status-not_started,
+.sd-tag-sis {
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
+}
+
+.sd-status-in_progress {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.sd-status-on_hold {
+  background: var(--hold-bg);
+  color: var(--hold-text);
+}
+
+.sd-status-done,
+.sd-tag-app {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+
+.sd-btn {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.sd-btn:not(.sd-btn-primary):disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sd-btn-primary {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.sd-btn-primary:disabled {
+  background: var(--disabled-bg);
+  color: var(--disabled-text);
+  cursor: not-allowed;
+}
+
+.sd-btn-dark {
+  padding: 0 16px;
+  border: none;
+  background: var(--text);
+  color: var(--surface);
+  font-weight: 600;
+}
+
+.sd-btn-small {
+  padding: 0 12px;
+  font-weight: 400;
+}
+
+.sd-btn-icon {
+  width: 44px;
+  padding: 0;
+  font-weight: 400;
+}
+
+.sd-input {
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.sd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sd-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.sd-field-error {
+  flex-basis: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--err-text);
+}
+
+.sd-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.sd-page-error {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--err-bg);
+  color: var(--err-text);
+  font-weight: 600;
+}
+
+.sd-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.sd-error-text {
+  color: var(--err-text);
+}
+
+.sd-warn-text {
+  color: var(--warn-text);
+}
+
+/* Layout */
+
+.app-main:has(.sd-detail) {
+  padding-top: 24px;
+}
+
+.sd-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sd-back-link {
+  align-self: flex-start;
+  color: var(--accent-text);
+  font-weight: 500;
+}
+
+.sd-student-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.sd-student-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 999 1 520px;
+  min-width: 0;
+}
+
+.sd-student-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.sd-hold-reason {
+  color: var(--hold-text);
+  font-weight: 500;
+}
+
+.sd-profile {
+  margin: 4px 0 0;
+  max-width: 720px;
+  line-height: 1.5;
+}
+
+.sd-profile-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.sd-student-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 240px;
+}
+
+.sd-hold-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sd-hold-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.sd-hold-buttons .sd-btn {
+  flex: 1;
+}
+
+.sd-detail-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.sd-requests {
+  flex: 999 1 560px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sd-requests-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.sd-requests h2,
+.sd-catalog h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.sd-requests > p {
+  margin: 0;
+}
+
+.sd-requests > .sd-hint {
+  font-size: 13px;
+}
+
+.sd-sis-banner {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--neutral-bg);
+  line-height: 1.5;
+}
+
+.sd-group-heading {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sd-request-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sd-request {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.sd-request-warn,
+.sd-student-issues {
+  padding: 14px 16px;
+  background: var(--warn-surface);
+  border-color: var(--warn-border);
+}
+
+.sd-request-error {
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--err-bg);
+  border-color: var(--err-border);
+}
+
+.sd-student-issues {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 10px;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.sd-request-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.sd-course-code {
+  min-width: 72px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.sd-link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.sd-request-name {
+  flex-grow: 1;
+}
+
+.sd-issue {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.sd-issue svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.sd-keep-reason {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.sd-keep-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 320px;
+}
+
+.sd-keep-field .sd-field-label {
+  color: var(--warn-text);
+}
+
+.sd-kept-note {
+  align-self: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ok-text);
+}
+
+.sd-catalog {
+  flex: 1 1 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sd-catalog > p {
+  margin: 0;
+}
+
+.sd-grade-filter {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sd-grade-filter legend {
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.sd-grade-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.sd-chip input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.sd-chip-on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.sd-table-scroll {
+  overflow-x: auto;
+}
+
+.sd-catalog-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sd-catalog-table thead th {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--muted);
+}
+
+.sd-catalog-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sd-catalog-table .sd-col-code {
+  width: 72px;
+  padding-left: 0;
+}
+
+.sd-catalog-table td.sd-col-code {
+  font-weight: 700;
+}
+
+.sd-catalog-table .sd-col-grades {
+  width: 56px;
+}
+
+.sd-catalog-table .sd-col-action {
+  width: 76px;
+  padding-right: 0;
+  text-align: right;
+}
+
+.sd-catalog-table .sd-dept-heading {
+  padding: 14px 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--muted);
+}
+
+.sd-on-list {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ok-text);
+}
+
+.sd-btn-add {
+  height: 40px;
+  padding: 0 12px;
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
 }

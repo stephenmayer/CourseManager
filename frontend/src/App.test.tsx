@@ -9,12 +9,20 @@ vi.mock("./api/client", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./api/client")>();
   return {
     ...actual,
-    // Screens' own reads never settle here; their tests cover them.
-    api: { currentImport: vi.fn(), courses: vi.fn(() => new Promise(() => {})) },
+    // Screens' own reads never settle here unless a test says so; their tests cover them.
+    api: {
+      currentImport: vi.fn(),
+      courses: vi.fn(() => new Promise(() => {})),
+      courseRequests: vi.fn(() => new Promise(() => {})),
+      student: vi.fn(),
+      catalog: vi.fn(),
+    },
   };
 });
 
 const currentImport = vi.mocked(api.currentImport);
+const student = vi.mocked(api.student);
+const catalog = vi.mocked(api.catalog);
 
 function systemPrefersDark(dark: boolean) {
   vi.stubGlobal(
@@ -48,6 +56,17 @@ beforeEach(() => {
     received_at: "2026-10-28T13:05:00Z",
     source: "seed",
   });
+  student.mockResolvedValue({
+    id: "S001",
+    name: "Alex Rivera",
+    grade: 9,
+    profile: "On track.",
+    status: "done",
+    hold_reason: null,
+    requests: [],
+    issues: [],
+  });
+  catalog.mockResolvedValue([]);
   systemPrefersDark(false);
 });
 
@@ -96,7 +115,7 @@ test("an unknown path shows a not-found page", async () => {
 
 test.each([
   ["/", "Students"],
-  ["/students/S001", "Student S001"],
+  ["/students/S001", "Alex Rivera"],
   ["/courses", "Courses"],
 ])("%s routes to the %s page", async (path, heading) => {
   await renderAt(path);
@@ -166,4 +185,37 @@ test("with storage throwing the app still renders in the system theme and toggle
   expect(theme()).toBe("dark");
   fireEvent.click(screen.getByRole("button", { name: "Switch to light mode" }));
   expect(theme()).toBe("light");
+});
+
+test("on a student page a course code opens the course dialog", async () => {
+  student.mockResolvedValue({
+    id: "S003",
+    name: "Jordan Williams",
+    grade: 10,
+    profile: "Retaking Algebra I.",
+    status: "in_progress",
+    hold_reason: null,
+    requests: [
+      {
+        id: "r-mth101",
+        course_code: "MTH101",
+        course_name: "Algebra I",
+        department: "Math",
+        grades: [9],
+        is_ap: false,
+        type: "priority",
+        source: "sis",
+        edited_in_app: false,
+        reason: null,
+      },
+    ],
+    issues: [],
+  });
+  await renderAt("/students/S003");
+
+  fireEvent.click(screen.getByRole("button", { name: "MTH101" }));
+  await act(async () => {});
+
+  expect(screen.getByRole("dialog")).toHaveTextContent("Requests for this course");
+  expect(api.courseRequests).toHaveBeenCalledWith("MTH101");
 });
