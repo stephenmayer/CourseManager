@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router";
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 import { ApiError, api } from "../api/client";
@@ -27,6 +27,15 @@ function LocationProbe() {
   return <output data-testid="location">{here.pathname + here.search}</output>;
 }
 
+function BackButton() {
+  const navigate = useNavigate();
+  return (
+    <button type="button" onClick={() => void navigate(-1)}>
+      Back
+    </button>
+  );
+}
+
 function location() {
   return screen.getByTestId("location").textContent;
 }
@@ -43,14 +52,15 @@ afterEach(() => {
   vi.resetAllMocks();
 });
 
-async function renderCourses(path = "/courses") {
+async function renderCourses(path = "/courses", before: string[] = []) {
   render(
-    <MemoryRouter initialEntries={[path]}>
+    <MemoryRouter initialEntries={[...before, path]}>
       <Routes>
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/students/:id" element={<h1>Student page</h1>} />
       </Routes>
       <LocationProbe />
+      <BackButton />
     </MemoryRouter>,
   );
   await act(async () => {});
@@ -200,7 +210,10 @@ test("a change in the dialog refreshes the counts", async () => {
 test("the catalog is read-only: no way to add, edit or delete a course", async () => {
   await renderCourses();
 
-  const buttons = screen.getAllByRole("button").map((b) => b.textContent);
+  const buttons = screen
+    .getAllByRole("button")
+    .map((b) => b.textContent)
+    .filter((t) => t !== "Back"); // the test harness's own button
   expect(buttons.filter((t) => !/^[A-Z]+\d+$/.test(t ?? ""))).toEqual(["Remove"]);
 });
 
@@ -210,4 +223,34 @@ test("a failed load says so plainly", async () => {
   await renderCourses();
 
   expect(screen.getByRole("alert")).toHaveTextContent("Can't reach the CourseManager server.");
+});
+
+test("opening and closing the dialog doesn't add history entries", async () => {
+  await renderCourses("/courses", ["/"]);
+
+  fireEvent.click(screen.getByRole("button", { name: "SS402" }));
+  await act(async () => {});
+  fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+  await act(async () => {});
+  fireEvent.click(screen.getByRole("button", { name: "Back" }));
+  await act(async () => {});
+
+  expect(location()).toBe("/");
+});
+
+test("Remove on a code not in the catalog is disabled while it's being removed", async () => {
+  let resolveRemove: () => void = () => {};
+  mocked.removeRequest.mockReturnValue(new Promise((resolve) => (resolveRemove = () => resolve({} as never))));
+  await renderCourses();
+  const remove = within(screen.getByRole("region", { name: /^Not in catalog/ })).getByRole("button", {
+    name: "Remove",
+  });
+
+  fireEvent.click(remove);
+  fireEvent.click(remove);
+  await act(async () => {});
+
+  expect(remove).toBeDisabled();
+  expect(mocked.removeRequest).toHaveBeenCalledTimes(1);
+  await act(async () => resolveRemove());
 });

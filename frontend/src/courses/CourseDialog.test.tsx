@@ -226,3 +226,22 @@ test("after an edit removes the focused card, Escape still closes and Tab goes b
   fireEvent.keyDown(document.body, { key: "Escape" });
   expect(onClose).toHaveBeenCalledTimes(1);
 });
+
+test("after an edit the buttons stay disabled until the fresh list arrives", async () => {
+  const dialog = await openDialog("SS402");
+  let resolveReload: (rows: ReturnType<typeof requestsFor>) => void = () => {};
+  mocked.courseRequests.mockReturnValue(new Promise((resolve) => (resolveReload = resolve)));
+
+  fireEvent.click(within(cards(dialog)[1]).getByRole("button", { name: "Remove" }));
+  await act(async () => {});
+
+  // The removed copy is still on screen while the reload is in flight; it can't be clicked again.
+  expect(cards(dialog)).toHaveLength(3);
+  for (const button of within(dialog).getAllByRole("button", { name: /Remove|Make/ })) {
+    expect(button).toBeDisabled();
+  }
+
+  await act(async () => resolveReload(requestsFor("SS402").filter((r) => r.request.id !== "r-aisha-e")));
+  expect(cards(dialog)).toHaveLength(2);
+  expect(within(cards(dialog)[0]).getByRole("button", { name: "Remove" })).toBeEnabled();
+});
