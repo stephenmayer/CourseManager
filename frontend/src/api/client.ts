@@ -40,7 +40,11 @@ export async function getJson<T>(path: string): Promise<T> {
   if (!response.ok) {
     throw new ApiError(await errorMessage(response), response.status);
   }
-  return (await response.json()) as T;
+  try {
+    return (await response.json()) as T;
+  } catch {
+    throw new ApiError("The server sent a response CourseManager couldn't read. Try again.");
+  }
 }
 
 export const api = {

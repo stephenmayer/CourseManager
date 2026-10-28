@@ -31,7 +31,7 @@ function storeTheme(theme: Theme) {
 export function useTheme(): [Theme, () => void] {
   const [theme, setTheme] = useState<Theme>(() => storedTheme() ?? systemTheme());
 
-  // Before paint, so a dark-mode user never sees a light frame first.
+  // Before React paints, so the app never renders in the wrong theme.
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);

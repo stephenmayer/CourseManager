@@ -1,5 +1,5 @@
-// Stand-ins until the screens land (#6 Student list, #7 Student detail, #8 Courses).
-import { useParams } from "react-router";
+// Stand-ins until the screens land (#6 Student list, #7 Student detail, #8 Courses), and the not-found page.
+import { Link, useParams } from "react-router";
 
 export function StudentListPage() {
   return <h1>Students</h1>;
@@ -12,4 +12,15 @@ export function StudentDetailPage() {
 
 export function CoursesPage() {
   return <h1>Courses</h1>;
+}
+
+export function NotFoundPage() {
+  return (
+    <>
+      <h1>Page not found</h1>
+      <p>
+        <Link to="/">Go to the student list</Link>
+      </p>
+    </>
+  );
 }

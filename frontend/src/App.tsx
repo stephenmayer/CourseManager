@@ -1,6 +1,11 @@
 import { Route, Routes } from "react-router";
 
-import { CoursesPage, StudentDetailPage, StudentListPage } from "./pages/Placeholders";
+import {
+  CoursesPage,
+  NotFoundPage,
+  StudentDetailPage,
+  StudentListPage,
+} from "./pages/Placeholders";
 import Header from "./shell/Header";
 import { useTheme } from "./theme";
 
@@ -15,6 +20,7 @@ export default function App() {
           <Route path="/" element={<StudentListPage />} />
           <Route path="/students/:id" element={<StudentDetailPage />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
     </>
