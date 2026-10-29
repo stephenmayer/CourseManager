@@ -81,44 +81,47 @@ Both run as the same queued job and feed the same merge. They differ only in the
 
 ### 3.2 Components
 
-```mermaid
-flowchart LR
-    subgraph District
-        SIS[(District SIS)]
-    end
-    subgraph Timely
-        API[Sync API<br/>start, cancel, query, roll back]
-        Sched[Nightly schedule]
-        Q[[RabbitMQ<br/>sync and write-back jobs]]
-        W[Worker]
-        subgraph Ports
-            EX[ExportSource<br/>file or API connector, per district]
-            SS[SisSource<br/>reads the current import]
-            WB[SisWriter<br/>optional, per district]
-        end
-        CFG[(District SIS config<br/>secrets in a vault)]
-        DB[(Imports, requests,<br/>sync changes)]
-        RAW[(S3 raw exports<br/>by import)]
-        UI[Counselor app<br/>and jobs view]
-        DD[Datadog logs and metrics]
-        S3[(S3 error reports)]
-    end
-    Sched --> Q
-    API --> Q
-    Q --> W
-    W --> EX
-    CFG --> EX
-    EX -->|pull| SIS
-    EX -->|archive raw| RAW
-    W -->|"normalize, validate,<br/>merge in one transaction"| DB
-    W --> DD
-    W -->|errored run| S3
-    SS --> DB
-    UI --> SS
-    UI --> API
-    W -->|write-back job| WB
-    WB -->|push edits| SIS
-```
+![SIS sync infrastructure: district PowerSchool and SFTP, Timely's scheduler, Sync API, RabbitMQ, sync worker, MongoDB, secrets vault, S3 and Datadog, and the people who use them](img/sis-infrastructure.png)
+
+Solid wires run on every nightly or on-demand sync; dashed wires are the CSV connection and optional write-back. Hosting on AWS is an assumption from Timely's current stack (RabbitMQ, S3, Datadog, MongoDB, F7).
+
+| # | From → to | How | What travels |
+| --- | --- | --- | --- |
+| 1 | Scheduler → RabbitMQ | AMQP publish | A sync job for one district, at its local night time |
+| 2 | Sync API → RabbitMQ | AMQP publish | "Sync now", cancel |
+| 3 | RabbitMQ → worker | AMQP consume | Next job, skipping a district that already has a sync running |
+| 4 | Worker → PowerSchool | HTTPS, OAuth 2 client credentials | Token, then paged OneRoster GETs for students and courses, then the PowerQuery for requests; throttled to the district's rate limit, retries on 429 |
+| 5 | Worker → SFTP | SFTP, SSH key | The CSV connection: newest students, courses and requests files ([Q22](decisions/q022-powerschool-first.md), #35) |
+| 6 | Worker → MongoDB | TLS driver | Reads connection config; writes the snapshot, the merge result and one sync change per request touched, in one transaction |
+| 7 | Worker → secrets vault | AWS API (assumed) | The plugin's client secret or the SFTP key, fetched per run, never stored in the database |
+| 8 | Worker → S3 | S3 API | The raw export for every import (replayable), and a plain-language error report when a run errors |
+| 9 | Worker → Datadog | Datadog agent | Logs and metrics tagged with district and import ID |
+| 10 | Datadog → on-call support | Alert | An errored run, no completed run in a day, or a run far above normal ([Q25](decisions/q025-abnormal-runs-apply-and-alert.md)) |
+| 11 | Support → Sync API | HTTPS JSON | Jobs view and setup screen: start, cancel, query, restore ([Q24](decisions/q024-restore-to-kept-import.md)), dry run |
+| 12 | Sync API → MongoDB | TLS driver | Job states, connection config, restores |
+| 13 | Counselors → course request API | HTTPS JSON | Students, requests, edits, review status |
+| 14 | Course request API → MongoDB | TLS driver | Reads the current import; writes counselor edits |
+| 15 | District admin → PowerSchool | PowerSchool admin UI | Installs our plugin; the client ID and secret go to Timely's team, who store them in the vault ([Q26](decisions/q026-connection-setup-by-timely.md)) |
+| 16 | Worker → PowerSchool | HTTPS, separate job | Write-back of counselor edits where the SIS accepts it ([Q19](decisions/q019-one-way-sync-baseline.md)); not in the MVP |
+
+New infrastructure is small: RabbitMQ, the worker pattern, S3, Datadog and MongoDB are what Timely already runs for optimizer jobs. The sync adds a scheduler entry and a secrets entry per district, our PowerSchool plugin, and SFTP access where a district uses CSV.
+
+#### Inside the software
+
+![Software architecture: React pages and API client, FastAPI routes, CourseService with rules, SisSource and RequestStore, the SIS sync pipeline (ExportSource, Loader, Reconciler), and the database split into app-owned and SIS-owned tables](img/sis-software.png)
+
+Solid boxes are built on `main`; dashed boxes are planned (#12, #34, #35). The counselor app and the sync share one database but no code: the app reads SIS data only through `SisSource` (current import) and writes only through `RequestStore`; the sync writes snapshots through the Loader and merges requests through the Reconciler.
+
+| Seam | What it hides | Swapping it changes |
+| --- | --- | --- |
+| `ExportSource` | Where SIS data comes from: seed file, PowerSchool API, CSV folder | One adapter; a shared contract test proves the same shape (#34, #35) |
+| Loader | How a raw export becomes an import snapshot | Nothing else; every adapter feeds it the same shape |
+| `SisSource` | That imports are versioned; the app sees only the current one | The storage engine, SQLite to MongoDB |
+| `RequestStore` | Where counselor work is stored | The storage engine, SQLite to MongoDB |
+| `rules.py` | What counts as an error or a warning | Adding a check is one function and its tests |
+| Sync job runner | In-process jobs or RabbitMQ | One queue adapter ([Q14](decisions/q014-sis-sync-on-queue.md)) |
+
+Interactive version of both diagrams: [SIS Sync Architecture](https://claude.ai/artifact/62VjbToaLRSDE55cMGjqpT).
 
 The three ports, each with one job:
 
