@@ -8,7 +8,7 @@ updated: 2026-10-29
 
 # SIS design video: outline (5 minutes)
 
-Stephen records this. The exercise asks for "a quick 5 min video to give folks an overview of your approach and key decisions", so the parts follow its three headings: requirements, key decisions, and flow and architecture. The script is about 680 words: just under five minutes at 140 words a minute. Every claim comes from the [SIS sync design](sis-sync-design.md); the **Source** line under each part says where. Read it as a guide, not word for word.
+Stephen records this. The exercise asks for "a quick 5 min video to give folks an overview of your approach and key decisions", so the parts follow its three headings: requirements, key decisions, and flow and architecture. The script is about 690 words: just under five minutes at 140 words a minute. Every claim comes from the [SIS sync design](sis-sync-design.md); the **Source** line under each part says where. Read it as a guide, not word for word.
 
 ## 0:00 The problem
 
@@ -20,17 +20,17 @@ Every spring, counselors build next year's course requests for each student, and
 
 ## 0:25 Requirements: what we'd need to know first
 
-*40s. On screen: [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing).*
+*45s. On screen: [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing).*
 
-Before committing, I'd ask the pilot districts twelve questions. Here are four of the six that change the design most. Does the SIS accept writes to requests? That sets how many conflicts counselors see. Does it send a stable ID per request? Without one, a course change looks like a removal plus an addition. What are its rate limits? That sets how often we can sync. And how fast do enrollments and grade changes reach it? That decides nightly versus on demand. Until we know, we assume no writes, no IDs, per-district limits, and nightly plus "sync now".
+Before committing, I'd ask the pilot districts twelve questions; these six change the design most. Does the SIS accept writes to requests? That sets how many conflicts counselors see. Does it send a stable ID per request? Without one, a changed course looks like a removal plus an addition. What are its rate limits, and how fast do changes reach it? Those set how often we sync. How dirty is the data, and who fixes it today? That sets how loud errors must be. And can we read transcripts? That unlocks graduation checks. Until we know, we assume one-way sync, no IDs, nightly plus "sync now", and bad data loaded as it is.
 
-**Source:** [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing) RQ1-RQ4 (the first six change the most).
+**Source:** [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing) RQ1-RQ6, the six that change the design most.
 
-## 1:05 Key decisions
+## 1:10 Key decisions
 
-*55s. On screen: [key decisions](sis-sync-design.md#2-key-decisions).*
+*50s. On screen: [key decisions](sis-sync-design.md#2-key-decisions).*
 
-Six decisions carry the design. One: when the SIS and a counselor disagree, keep the counselor's edit and flag the difference; untouched requests keep updating from the SIS. Two: assume one-way sync; write-back is an optional job per district, because it never removes the need to merge. Three: every import is an immutable, versioned snapshot, and requests merge three ways against it. Four: a sync is a run that applies in one transaction and can be rolled back in one action, with no approval step. Five: runs are jobs on Timely's existing RabbitMQ queue, with the optimizer's job states. Six: bad SIS data loads as it is, shows as an error, and blocks only Done. The first three are one mechanism seen from three sides.
+Six decisions carry the design. One: when the SIS and a counselor disagree, keep the counselor's edit and flag the difference. Two: assume one-way sync; write-back is an optional job per district, because it never removes the need to merge. Three: every import is an immutable, versioned snapshot, and requests merge three ways against it. Four: a sync is a run that applies in one transaction and can be rolled back in one action, with no approval step. Five: runs are jobs on Timely's existing RabbitMQ queue, with the optimizer's job states. Six: bad SIS data loads as it is, shows as an error, and blocks only Done. The first three are one mechanism seen from three sides.
 
 **Source:** [key decisions](sis-sync-design.md#2-key-decisions) D1 ([Q2](decisions/q002-request-ownership.md)), D2 ([Q19](decisions/q019-one-way-sync-baseline.md)), D3 ([Q18](decisions/q018-sis-import-versioning.md)), D5 ([Q13](decisions/q013-sis-sync-runs.md)), D6 ([Q14](decisions/q014-sis-sync-on-queue.md)), D7 ([Q5](decisions/q005-bad-sis-request-data.md)); the note under the table.
 
