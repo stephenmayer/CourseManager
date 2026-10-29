@@ -3,7 +3,7 @@ id: sis-sync-design
 title: SIS sync design
 status: draft
 owns: "the production design for syncing SIS data into the app: requirements to confirm, key decisions, flow and architecture, and the path to an MVP"
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 # SIS sync design
@@ -286,15 +286,13 @@ Where `SisWriter` exists for a district (RQ1), each counselor edit publishes a w
 
 ## 4. Path to an MVP
 
-A squad of 2-3 engineers over one quarter (about 13 weeks), working with one or two pilot districts. Each milestone ends with something a pilot district can use.
+A squad of 2-3 engineers working with AI coding agents, and one or two pilot districts. **Build time and calendar time are planned separately** (Stephen, 2026-10-29). With agents, each milestone's build is days, not weeks: we estimate the sync against a PowerSchool mock (#34, #12-#14) at about a day of agent work, limited by code review rather than coding. What agents don't shorten is set by districts and vendors: answers to RQ1-RQ12, plugin access and credentials, Timely's security and operations review, and enough nightly runs on real data to trust them. So the plan runs about eight weeks, paced by the calendar. Each milestone ends with something a pilot district can use. The week counts are a proposal for Stephen to set.
 
-| Weeks | Milestone | Done when |
-| --- | --- | --- |
-| 1-2 | **Answer the requirements.** RQ1-RQ12 with the pilot districts and their SIS vendors; pick the first connector | Each RQ has an answer or a recorded assumption; the first SIS and its export format are chosen |
-| 3-6 | **One-way sync, PowerSchool.** District connection config with dry run, the PowerSchool `ExportSource` adapter (OneRoster + PowerQuery, Q22) proven against the mock, import snapshots, three-way merge, runs as jobs on RabbitMQ, failed runs write nothing | A pilot PowerSchool district syncs nightly and on demand; counselor edits survive it; a broken export leaves yesterday's data in place |
-| 7-9 | **Recover and see.** Conflict review in the request editor (Add-on F), restore to any kept import (3.7), jobs view, Datadog logs and alerts, S3 error reports | A bad sync is rolled back in one action from the jobs view; counselors resolve flagged requests |
-| 10-12 | **Second district, limits.** Year-end archive of imports to S3 (section 5), per-district concurrency and throttling, "sync now", the CSV file adapter for a district that only offers exports | Two districts sync nightly side by side without interfering |
-| 13 | Buffer and pilot review | The pilot districts tell us what to fix next |
+| Weeks | Milestone | Build, with agents | Waits on | Done when |
+| --- | --- | --- | --- | --- |
+| 1-2 | **Answer the requirements; build against the mock.** District connection config with dry run, the PowerSchool `ExportSource` adapter (OneRoster + PowerQuery, Q22), import snapshots, three-way merge, runs as jobs on RabbitMQ, failed runs write nothing | Days | RQ1-RQ12 answered by the pilots and their SIS vendor; our plugin installed and credentials issued | Each RQ has an answer or a recorded assumption; the adapter passes the contract tests against the mock |
+| 3-4 | **Real PowerSchool; recover and see.** Connect to the pilot's PowerSchool, "sync now", conflict review in the request editor (Add-on F), restore to any kept import (3.7), jobs view, Datadog logs and alerts, S3 error reports | Days | The pilot's real data; Timely's security and operations review | A pilot district syncs nightly and on demand; counselor edits survive it; a bad sync is rolled back in one action from the jobs view |
+| 5-8 | **Pilot, then a second district.** Per-district concurrency and throttling, the CSV file adapter for a district that only offers exports, year-end archive of imports to S3 (section 5), fixes from the pilot | Days per change | Weeks of nightly runs on real data; a second district's access | Two districts sync nightly side by side without interfering; the pilots tell us what to fix next |
 
 **Cut from the MVP**, in the order we'd add them back: write-back (`SisWriter`, D2), provisional students (D8), transcript feed and graduation progress (Q15), suggested fixes for bad codes (Q5 option D), alternates ([Q16](decisions/q016-alternate-requests.md)), school-year rollover (RQ8), near-real-time sync (webhooks or push).
 
