@@ -2,7 +2,7 @@
 id: developer-guide
 title: Developer guide
 status: current
-owns: "how to set up, run, test and verify the code, and what CI enforces"
+owns: "how to set up, run, test and verify the code, and the local merge gate"
 updated: 2026-10-28
 ---
 
@@ -20,7 +20,7 @@ Needs Python 3.12 and [uv](https://docs.astral.sh/uv/), Node 22 with npm, and GN
 | `backend/tests/` | pytest suite. |
 | `frontend/src/` | React + TypeScript (Vite). Tests sit next to the code as `*.test.ts(x)` (Vitest, Testing Library). |
 | `scripts/dev.sh` | Runs the API and the app together (`make dev`). |
-| `scripts/ci/` | CI helpers and their tests (`tests_required.py`). |
+| `scripts/ci/` | Gate helpers and their tests (`tests_required.py`). |
 
 ## Run
 
@@ -60,11 +60,13 @@ Every issue follows `implement-change`: commit the failing tests (`test(<part>):
 | Typecheck | `mypy` (strict) | `tsc --noEmit` |
 | Test | `pytest` (also runs `scripts/ci` tests) | `vitest run` |
 
-## CI
+## The gate is local
 
-Two workflows run on pull requests to `main`:
+CI/CD is not relied on ([Q21](../decisions/q021-local-merge-gate.md)). The gate is two local commands; run `git fetch origin main` first so the base is current, and both must pass:
 
-- **verify**: `make verify` on a clean checkout (also on pushes to `main`).
-- **tests-required**: fails when the PR changes non-test files under `backend/app/` or `frontend/src/` and adds or changes no test file (`backend/tests/**/test_*.py`, `frontend/src/**/*.test.ts(x)`; fixtures such as `conftest.py` alone don't count). A PR body containing `no new tests` (with the reason) passes it. Editing the PR body re-runs only this check.
+- `make verify` (above).
+- `make tests-required PR_BODY="<the PR body>"`: fails when the branch changes non-test files under `backend/app/` or `frontend/src/` against `origin/main` and adds or changes no test file (`backend/tests/**/test_*.py`, `frontend/src/**/*.test.ts(x)`; fixtures such as `conftest.py` alone don't count), unless the body says `no new tests` with the reason. Pass the PR's actual body text.
 
-Both should be marked required in `main`'s branch protection (Settings > Branches), which only the repo owner can do.
+Run them before opening a PR, and again right before merging on the head brought up to date with `main` (a receipt already posted for that same SHA counts). Any failure blocks the PR or the merge until it is fixed and re-run, including one that also fails on a clean `main`: then fix `main` first. Merge steps: `pr-flow`.
+
+The workflows in `.github/workflows/` may still run on pull requests; they are informational, never the gate.

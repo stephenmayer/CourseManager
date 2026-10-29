@@ -4,7 +4,7 @@ description: >
   Test-driven workflow for implementing an issue or landing any change on the
   main branch: gate checks, red/green/refactor, proof commands, self-review
   passes, PR contents, follow-ups filed by class. Use when starting, continuing,
-  fixing CI on, or opening a PR for an issue.
+  fixing a failing check on, or opening a PR for an issue.
 ---
 
 # Implement a change (TDD is mandatory)
@@ -30,7 +30,9 @@ Production behaviour without a new or changed test is rejected, unless the issue
 
 ## 6. Prove it
 
-Run the issue's Verification commands verbatim. UI changes: run component tests and UI scenarios, **look at every screenshot** against the artboard. Then the project's single merge-gate command (e.g. `pnpm verify`), which must refuse uncommitted changes and print a receipt naming the exact commit. Run checks in the foreground; never background them and idle.
+Run the issue's Verification commands verbatim. UI changes: run component tests and UI scenarios, **look at every screenshot** against the artboard. Then the project's single merge-gate command (`make verify`), which must refuse uncommitted changes and print a receipt naming the exact commit. Run checks in the foreground; never background them and idle.
+
+It is the gate, not CI: any failure blocks the PR, even one you think is unrelated (if it also fails on a clean `main`, say so and fix `main` first).
 
 **The proof is what actually executes the changed lines.** Re-run what you ran to prove the work in the first place (stack scripts, integration path, UI scenarios), not just the directory's unit tests.
 
@@ -44,7 +46,7 @@ The two passes are the **`simplify` and `code-review` skills, invoked with the S
 4. **Invoke `/code-review`** on the issue's diff; fix each finding (test first when it changes behaviour) or record why not.
 5. Re-run the proof if fixes changed anything. If the fixes were more than trivial, run `/code-review` once more on the fix commits.
 6. **Review lenses** for risky diffs: spawn a fresh reviewer per lens the diff touches (e.g. tenancy/security; money/ledger correctness). Give each only the issue and the base branch, never your PR text or opinion, so it judges the diff cold. Verdict is `PASS` or `CHANGES`; `CHANGES` blocks. Fix, re-run the proof, re-run that lens only; at most two rounds, then open as draft with unresolved findings verbatim.
-7. Final commit, merge-gate command on the final commit, push, open PR.
+7. Final commit; `make verify` and `make tests-required` pass on it ([developer guide](../../../docs/process/developer-guide.md#the-gate-is-local)); push; open the PR.
 
 Scope both passes to the issue's own diff. Things noticed outside it go through follow-ups, never silently into the diff.
 
@@ -58,7 +60,7 @@ Opened **ready for review**, automatically. Draft only if a lens is still `CHANG
 - **Bug or flake fix = measured reproduction:** fail N in 20 before, pass N in 20 after. Never skip, disable or quarantine a test; never bump a timeout unless reproduction proves the timeout, not a race, was the cause.
 - **No shotgunning:** several candidate causes: pick one with a stated reason and say why you declined the others.
 - **For every test of your fix ask:** could this pass if the fix were reverted? Prove it cannot. A test that cannot fail is not a test.
-- Where the local harness cannot exercise the change, read CI's own artifacts and logs; do not trust a green badge.
+- Where the local harness cannot exercise the change, say so in the PR body and name what was not run; do not treat a green CI badge as proof.
 - **Migrations:** expand/contract only; must work with the currently deployed revision; no down migrations.
 - Don't re-open decided design questions in a PR; file a question and let `decide` handle it.
 

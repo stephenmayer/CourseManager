@@ -2,25 +2,28 @@
 name: pr-flow
 description: >
   How pull requests move from open to merged without owner babysitting: hand
-  off CI instead of watching it, respond to review and CI events, merge on green
-  in dependency order, run a merge train when PRs conflict, and know which steps
+  off instead of watching, respond to review events, merge on a local
+  gate receipt in dependency order, run a merge train when PRs
+  conflict, and know which steps
   (release, deploy, production changes, paid CI) always need the owner. Use after
   opening a PR, when PRs pile up, or when main is red.
 ---
 
 # PR flow
 
-**Owner ruling:** do not leave PRs parked as drafts or ask before routine steps. Run your own reviews, mark ready, merge when CI is green, in dependency order. The owner was annoyed to find many PRs still drafts.
+**Owner ruling:** do not leave PRs parked as drafts or ask before routine steps. Run your own reviews, mark ready, merge when the local `make verify` passes, in dependency order. The owner was annoyed to find many PRs still drafts.
 
 ## Per PR
 
-1. Open ready (see `implement-change` section 8). Drafts run no CI and are never auto-merged; use them only for unresolved review findings.
-2. **Hand off, don't watch CI.** Subscribe to PR activity and end the turn. No polling, sleeping or self-scheduled wake-ups.
-3. On a wake (red check, review comment, conflict): fix, commit, re-run the merge-gate command, post the new receipt as a PR comment *before* pushing, push once, end turn. A receipt names one commit, so every push needs its own.
-4. A failure that is not this PR's and needs only a re-run: re-run failed jobs, or comment that a re-run is needed after run X completes and name the job.
+The gate is local, not CI ([developer guide](../../../docs/process/developer-guide.md#the-gate-is-local)); GitHub checks are informational.
+
+1. Open ready (see `implement-change` section 8). Drafts are never merged; use them only for unresolved review findings.
+2. **Hand off, don't watch.** Subscribe to PR activity and end the turn. No polling, sleeping or self-scheduled wake-ups.
+3. On a wake (review comment, conflict, check failure): fix, commit, re-run the merge-gate command, post the new receipt as a PR comment *before* pushing, push once, end turn. A receipt names one commit, so every push needs its own.
+4. A failure that is not this PR's: reproduce just that test or tool on a clean `main`, say so on the PR, and fix `main` first (see merge train). Never merge on red.
 5. Echoes of your own comments and duplicates: skip.
-6. Green on the current head with a receipt and review addressed: merge (squash) yourself or let the repo's auto-merge do it, then unsubscribe. A green PR nobody merged gets merged by whoever looks next.
-7. After merge, the main-branch run backs your receipt. Red once: re-run. Red again: revert the merges that could have caused it; re-land by reverting the revert plus the fix, with a fresh receipt.
+6. **Before merging:** merge `main` in if it moved, run the gate on that head (a posted receipt for the same SHA counts), squash-merge only if it passed and review is addressed, then unsubscribe. Never enable auto-merge; nothing checks the gate for it.
+7. If `main` moved between that run and the merge, run `make verify` on the new `main`. Red: revert the merge; re-land by reverting the revert plus the fix, with a fresh receipt.
 
 ## Merge order and conflicts (merge train)
 

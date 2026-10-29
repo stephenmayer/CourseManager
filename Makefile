@@ -1,5 +1,5 @@
 # CourseManager commands. `make verify` is the merge gate.
-.PHONY: install verify test lint typecheck dev clean-tree
+.PHONY: install verify tests-required test lint typecheck dev clean-tree
 
 BACKEND := cd backend &&
 FRONTEND := cd frontend &&
@@ -33,6 +33,12 @@ verify: clean-tree
 	@$(MAKE) --no-print-directory lint typecheck test
 	@$(MAKE) --no-print-directory clean-tree
 	@echo "verify: PASSED at commit $$(git rev-parse HEAD) ($$(git log -1 --format=%s))"
+
+# A branch that changes app code must add or change a test (PR_BODY may say "no new tests").
+BASE ?= origin/main
+export PR_BODY
+tests-required:
+	@changed=$$(git diff --name-only $(BASE)...HEAD) && printf '%s\n' "$$changed" | python3 scripts/ci/tests_required.py /dev/stdin
 
 # Backend on :8000 and frontend on :5173 (proxying /api). Override with API_PORT / WEB_PORT.
 dev: install
