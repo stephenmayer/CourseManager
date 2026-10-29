@@ -36,6 +36,6 @@ Group requests ("any one Arts & Tech elective") stay an open question for the fo
 
 - [x] Requirements: `requirements/gaps.md` (G32)
 - [x] Architecture: `architecture/overview.md` (data model note)
-- [ ] SIS sync design doc: not written yet; it must cover alternates from the SIS
+- [x] SIS sync design doc: [sis-sync-design.md](../sis-sync-design.md)
 - [ ] README: not written yet; name alternates as a seen gap with this plan
 - [x] Decisions index row

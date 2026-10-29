@@ -30,6 +30,6 @@ The two together are one feature, a graduation progress check: required credits 
 
 - [x] Requirements: `requirements/gaps.md` (C2, C3, G2, G3)
 - [x] Architecture: `architecture/overview.md` (shape, data model, rules)
-- [ ] SIS sync design doc: not written yet; it must include the transcript feed
+- [x] SIS sync design doc: [sis-sync-design.md](../sis-sync-design.md)
 - [ ] README: not written yet; name this as the biggest gap
 - [x] Decisions index row

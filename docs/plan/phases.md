@@ -44,6 +44,8 @@ Ordered by value to the follow-up conversation. Items 2.1-2.3 make the SIS story
 | 2.5 ([#16](https://github.com/stephenmayer/CourseManager/issues/16)) | "Did you mean?" for unknown and duplicate codes (Add-on D) | Q5 option D | Phase 1 |
 | 2.6 ([#17](https://github.com/stephenmayer/CourseManager/issues/17)) | Students not in the SIS yet: provisional students and match on sync (Add-on E) | Q17 | 2.1 |
 | 2.7 ([#18](https://github.com/stephenmayer/CourseManager/issues/18)) | Graduation progress and rules setup (Add-on B) | Q15 | Phase 1; needs sample data Stephen approves |
+| 2.8 ([#34](https://github.com/stephenmayer/CourseManager/issues/34)) | PowerSchool mock and the OneRoster + PowerQuery adapter | Q22 | Phase 1; feeds 2.1 |
+| 2.9 ([#35](https://github.com/stephenmayer/CourseManager/issues/35)) | CSV file adapter: a second SIS connection behind `ExportSource` | Q22 | 2.8 |
 
 Open questions that Phase 2 parts depend on (defaults in brackets): does an unresolved SIS change block Done [yes]; does a quiet SIS update reopen a Done student [only if it adds a check or flag]; group requests ("any one Arts & Tech elective") [follow-up question, not built].
 

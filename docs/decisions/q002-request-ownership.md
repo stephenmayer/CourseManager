@@ -30,4 +30,4 @@ The exercise says course requests "may also come from the SIS, and are created a
 - [x] Requirements: `requirements/requirements.md` (M4)
 - [x] Gaps: `requirements/gaps.md` (G23 answered)
 - [x] Decisions index row
-- [ ] SIS sync design doc: not written yet; it must state this rule
+- [x] SIS sync design doc: [sis-sync-design.md](../sis-sync-design.md)

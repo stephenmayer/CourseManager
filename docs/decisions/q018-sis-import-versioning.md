@@ -36,5 +36,5 @@ Key choice (revised 2026-10-28 with Stephen): type is not part of the key, so a 
 
 - [x] Architecture: `architecture/schema.md` (tables, diagram), `architecture/overview.md`
 - [x] Decisions: Q13 (a sync run is an `sis_import`)
-- [ ] SIS sync design doc: not written yet; it must describe the snapshot and three-way reconcile
+- [x] SIS sync design doc: [sis-sync-design.md](../sis-sync-design.md)
 - [x] Decisions index row
