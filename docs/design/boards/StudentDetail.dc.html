@@ -193,7 +193,9 @@ class Component extends DCLogic {
     const pill = (bg, fg) => `display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: ${bg}; color: ${fg}`;
     const tag = { sis: pill(t.sisBg, t.sisText), app: pill(t.appBg, t.appText) };
     const hold = !!this.props.hold;
-    const status = hold ? { label: 'On hold', pill: pill(t.holdBg, t.holdText) } : { label: 'In progress', pill: pill(t.accentSoft, t.accentText) };
+    const statusStyle = { 'In progress': pill(t.accentSoft, t.accentText), 'On hold': pill(t.holdBg, t.holdText) }; // as on Main.dc.html
+    const label = hold ? 'On hold' : 'In progress';
+    const status = { label, pill: statusStyle[label] };
     const priority = [
       { code: 'ENG201', name: 'English 10', dept: 'English', grades: '10' },
       { code: 'SS201', name: 'U.S. History', dept: 'Social Studies', grades: '10' },

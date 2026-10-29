@@ -39,7 +39,7 @@ a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
     <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px">
       <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1">
         <h1 style="margin: 0; font-size: 28px; font-weight: 700">Students</h1>
-        <p style="margin: 0; color: {{t.muted}}">10 students · 1 done · 1 on hold · 5 need attention</p>
+        <p style="margin: 0; color: {{t.muted}}">{{summary}}</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 6px">
         <label for="search" style="font-size: 12px; font-weight: 600; color: {{t.muted}}">Find a student</label>
@@ -145,8 +145,11 @@ class Component extends DCLogic {
       statusStyle: statusStyle[r.status],
       rowStyle: r.hi ? `background: ${t.rowHi}` : ''
     }));
+    // Need attention = not Done with any error or warning, as the app counts it (Stephen, 2026-10-29).
+    const count = (keep) => rows.filter(keep).length;
+    const summary = `${rows.length} students · ${count((r) => r.status === 'Done')} done · ${count((r) => r.status === 'On hold')} on hold · ${count((r) => r.status !== 'Done' && r.tone !== 'ok')} need attention`;
     const mode = { href: dark ? 'Main.dc.html' : 'MainDark.dc.html', label: dark ? 'Switch to light mode' : 'Switch to dark mode', text: dark ? 'Light' : 'Dark', toDark: !dark, toLight: dark };
-    return { t, mode, students };
+    return { t, mode, summary, students };
   }
 }
 </script>

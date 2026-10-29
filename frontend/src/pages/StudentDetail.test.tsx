@@ -367,7 +367,7 @@ test("a student with no requests shows an empty state and the core warnings (E8)
     jordan({
       requests: [],
       issues: ["Math", "English"].map((subject) =>
-        issue("warning", "core_subject", `No ${subject} priority.`, "Add one.", null),
+        issue("warning", "core_subject", `No priority ${subject} course.`, "Add one.", null),
       ),
     }),
   );
