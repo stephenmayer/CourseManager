@@ -8,62 +8,60 @@ updated: 2026-10-29
 
 # SIS design video: outline (5 minutes)
 
-Stephen records this. The script is about 650 words: four and a half minutes at 140 words a minute, leaving room to point at the screen. Every claim comes from the [SIS sync design](sis-sync-design.md); the **Source** line under each part says where. Read it as a guide, not word for word.
+Stephen records this. The exercise asks for "a quick 5 min video to give folks an overview of your approach and key decisions", so the parts follow its three headings: requirements, key decisions, and flow and architecture. The script is about 600 words: four and a quarter minutes at 140 words a minute, leaving room to point at the screen. Every claim comes from the [SIS sync design](sis-sync-design.md); the **Source** line under each part says where. Read it as a guide, not word for word.
 
-## 0:00 The problem and who it's for
+## 0:00 The problem
 
-*30s. On screen: the design doc's opening paragraphs.*
+*25s. On screen: the design doc's opening paragraphs.*
 
-Every spring, a counselor builds next year's course requests for every student on their caseload, and those requests feed the master schedule. Students, the catalog and sometimes draft requests come from the district's SIS. This design keeps that data current every night. It never loses counselor work, lets bad data in without breaking anything, and recovers from a bad sync. It's for an engineering team and a product partner.
+Every spring, counselors build next year's course requests for each student, and those requests feed the master schedule. Students and the catalog come from the district's SIS and are read-only; requests can come from the SIS too, and counselors edit them in the app. The sync has to keep that data current without ever losing counselor work.
 
 **Source:** the [design doc's](sis-sync-design.md) opening paragraphs; [requirements](requirements/requirements.md#1-the-problem-as-i-understand-it).
 
-## 0:30 Who owns what, and why that one split drives the design
+## 0:25 Requirements: what we'd need to know first
 
-*45s. On screen: [key decisions](sis-sync-design.md#2-key-decisions), D1.*
+*45s. On screen: [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing).*
 
-The SIS owns students and the catalog; they are read-only in the app. Requests can start in the SIS, but counselors edit them in the app. So when the SIS and a counselor disagree, we keep the counselor's edit and flag the SIS difference for them to accept or dismiss. Requests nobody touched keep updating from the SIS. That one rule decides how we store imports, how we merge them and how we roll back: it's one mechanism seen from three sides.
+Before committing, I'd ask the pilot districts twelve questions; four change the design most. Does the SIS accept writes to requests? That sets how many conflicts counselors see. Does it send a stable ID per request? Without one, a course change looks like a removal plus an addition. What are its rate limits? That sets how often we can sync. And how fast do enrollments and grade changes reach it? That decides nightly versus on demand. Until we know, we assume no writes, no IDs, per-district limits, and nightly plus "sync now".
 
-**Source:** [key decisions](sis-sync-design.md#2-key-decisions) D1 ([Q2](decisions/q002-request-ownership.md)) and the note under the table.
+**Source:** [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing) RQ1-RQ4 (the first six change the most).
 
-## 1:15 The sync as versioned runs on Timely's queue
+## 1:10 Key decisions
 
-*75s. On screen: the [infrastructure diagram](img/sis-infrastructure.png); the [jobs board](design/boards/AddonJobs.dc.html) for the last sentence.*
+*60s. On screen: [key decisions](sis-sync-design.md#2-key-decisions).*
 
-Each sync is a job on Timely's existing RabbitMQ queue, with the states the optimizer already uses: submitted, started, completed, errored. No new workflow engine. A per-district connector fetches the export. PowerSchool comes first: OneRoster for students and courses, and a PowerQuery in our plugin for requests, because OneRoster has no course requests. A CSV file connector sits behind the same interface.
+Six decisions carry the design. One: when the SIS and a counselor disagree, keep the counselor's edit and flag the difference; untouched requests keep updating from the SIS. Two: assume one-way sync; write-back is an optional job per district, because it never removes the need to merge. Three: every import is an immutable, versioned snapshot, and requests merge three ways against it. Four: a sync is a run that applies in one transaction and can be rolled back in one action, with no approval step. Five: runs are jobs on Timely's existing RabbitMQ queue, with the optimizer's job states. Six: bad SIS data loads as it is, shows as an error, and blocks only Done. The first three are one mechanism seen from three sides.
 
-Each export becomes an immutable, versioned import, a full copy kept for the school year. A run applies in one transaction. If anything fails, it writes nothing and yesterday's data stays current. If a run succeeds but the data is wrong, say every grade 11 student became grade 12, there's still no approval step. It applies, support is alerted because the change count is far above normal, and a person restores to any kept import in one action, skipping requests counselors have edited since. Every run shows on a jobs view and in Datadog, and an errored run leaves a plain-language report in S3.
+**Source:** [key decisions](sis-sync-design.md#2-key-decisions) D1 ([Q2](decisions/q002-request-ownership.md)), D2 ([Q19](decisions/q019-one-way-sync-baseline.md)), D3 ([Q18](decisions/q018-sis-import-versioning.md)), D5 ([Q13](decisions/q013-sis-sync-runs.md)), D6 ([Q14](decisions/q014-sis-sync-on-queue.md)), D7 ([Q5](decisions/q005-bad-sis-request-data.md)); the note under the table.
 
-**Source:** [two approaches](sis-sync-design.md#31-two-approaches-to-getting-the-data) ([Q22](decisions/q022-powerschool-first.md)), [one sync run](sis-sync-design.md#35-one-sync-run-end-to-end), [rollback](sis-sync-design.md#37-rollback) ([Q24](decisions/q024-restore-to-kept-import.md)), [monitoring](sis-sync-design.md#39-limits-monitoring-and-errors) ([Q25](decisions/q025-abnormal-runs-apply-and-alert.md)); key decisions D4 ([Q23](decisions/q023-full-snapshots-school-year.md)), D5 ([Q13](decisions/q013-sis-sync-runs.md)), D6 ([Q14](decisions/q014-sis-sync-on-queue.md)); versioned imports ([Q18](decisions/q018-sis-import-versioning.md)).
+## 2:10 Flow and architecture: two approaches, one run
 
-## 2:30 Conflicts: one-way baseline, three-way merge
+*60s. On screen: [two approaches](sis-sync-design.md#31-two-approaches-to-getting-the-data), then the [infrastructure diagram](img/sis-infrastructure.png).*
 
-*60s. On screen: the [merge table](sis-sync-design.md#36-the-three-way-merge), then the [conflict board](design/boards/AddonSisConflict.dc.html).*
+There are two ways to get the data: a nightly file the SIS drops on SFTP, or pulling from the SIS's API. Both run as the same job and feed the same merge; only the connector differs. We start with PowerSchool's API: OneRoster for students and courses, and a PowerQuery in our plugin for requests, because OneRoster has no course requests. A CSV connector sits behind the same interface.
 
-We assume one-way sync. The only documented SIS write we found is the gradebook push. And even where a SIS accepts writes, write-back doesn't remove the merge: the SIS can change between a write-back and the next import, and write-backs fail. So every import is merged three ways: what the SIS said last time, what the app has now, and what the SIS says now.
+Each run writes a full copy of the export, kept for the school year. If anything fails, it writes nothing and yesterday's data stays current. If a run succeeds but the data is wrong, it still applies, support is alerted because the change count is far above normal, and a person restores any kept import in one action.
 
-PowerSchool sends an ID for each request, so a changed course stays the same request. Monday, the SIS has Jordan's elective as Web Design. Tuesday, Ms. Lee changes it to Music Theory. Wednesday, the SIS still says Web Design. Only the counselor changed it, so Music Theory stays and there's no flag. If Wednesday's import had named a third course, both sides changed: Music Theory still stays, and Ms. Lee sees "the SIS has a different value."
+**Source:** [two approaches](sis-sync-design.md#31-two-approaches-to-getting-the-data) ([Q22](decisions/q022-powerschool-first.md)), [one sync run](sis-sync-design.md#35-one-sync-run-end-to-end), [rollback](sis-sync-design.md#37-rollback) ([Q24](decisions/q024-restore-to-kept-import.md)), [monitoring](sis-sync-design.md#39-limits-monitoring-and-errors) ([Q25](decisions/q025-abnormal-runs-apply-and-alert.md)); key decision D4 ([Q23](decisions/q023-full-snapshots-school-year.md)).
 
-**Source:** key decisions D2 ([Q19](decisions/q019-one-way-sync-baseline.md)), the platform notes in [two approaches](sis-sync-design.md#31-two-approaches-to-getting-the-data), the [three-way merge](sis-sync-design.md#36-the-three-way-merge) and its worked example (AT201, AT202, AT203), the PowerSchool mapping in [SIS configuration](sis-sync-design.md#33-sis-configuration-and-adapters), [write-back](sis-sync-design.md#38-write-back-optional-per-district).
+## 3:10 The three-way merge: what the counselor sees
 
-## 3:30 What we need to learn first, and the MVP path
+*50s. On screen: the [merge table](sis-sync-design.md#36-the-three-way-merge), then the [conflict board](design/boards/AddonSisConflict.dc.html).*
+
+Each import compares three values: what the SIS said last time, what the app has now, and what the SIS says now. PowerSchool sends an ID per request, so a changed course stays the same request. Monday, the SIS has Jordan's elective as Web Design. Tuesday, Ms. Lee changes it to Music Theory. Wednesday, the SIS still says Web Design. Only the counselor changed it, so Music Theory stays, no flag. If Wednesday had named a third course, both sides changed: Music Theory still stays, and Ms. Lee sees "the SIS has a different value."
+
+**Source:** the [three-way merge](sis-sync-design.md#36-the-three-way-merge) and its worked example (AT201, AT202, AT203); the PowerSchool mapping in [SIS configuration](sis-sync-design.md#33-sis-configuration-and-adapters).
+
+## 4:00 The path to an MVP, and the biggest gap
 
 *60s. On screen: the [milestones table](sis-sync-design.md#4-path-to-an-mvp).*
 
-Before committing, the design lists twelve questions for the pilot districts. Among the ones that change the most: does the SIS accept writes to requests? Does it send a stable ID for each request? Without one, a course change looks like a removal plus an addition. What are its rate limits? And how fast do enrollment and grade changes reach it?
+The MVP is two or three engineers over one quarter. Weeks one and two: answer the requirements with the pilots. Three to six: one-way PowerSchool sync, nightly. Seven to nine: conflict review, restore, the jobs view and alerts. Ten to twelve: a second district, throttling, "sync now" and the CSV connector. Then buffer and pilot review.
 
-The MVP is a squad of two or three engineers over one quarter. Weeks one and two: answer those questions. Weeks three to six: one-way PowerSchool sync, nightly. Weeks seven to nine: conflict review for counselors, restore, the jobs view and alerts. Weeks ten to twelve: a second district side by side, per-district throttling, "sync now", the year-end archive, and the CSV connector. Week thirteen is buffer and pilot review.
+The biggest gap is student history. Without transcripts, we can't check graduation progress or prerequisites. The design adds transcripts as one more read-only feed and one more check, so my next question to the pilots is whether their SIS holds transcripts we can read.
 
-**Source:** [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing) RQ1-RQ4 (the first six change the most); [path to an MVP](sis-sync-design.md#4-path-to-an-mvp), milestones and risks.
-
-## 4:30 What I'd do next, and the biggest gap
-
-*30s. On screen: [transcripts and alternates](sis-sync-design.md#310-designed-not-in-the-mvp-transcripts-and-alternates).*
-
-The biggest gap is student history. Without transcripts, the app can't check graduation progress or prerequisites, so today's core-subject check is a stated stand-in. The design adds transcripts as one more read-only feed from the SIS, and graduation progress as one more check over it. Next, I'd ask the pilots whether their SIS holds transcripts we can read.
-
-**Source:** [transcripts and alternates](sis-sync-design.md#310-designed-not-in-the-mvp-transcripts-and-alternates) ([Q15](decisions/q015-history-and-grad-rules.md)); RQ6 in [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing); [README known gaps](../README.md#6-known-gaps-left-on-purpose).
+**Source:** [path to an MVP](sis-sync-design.md#4-path-to-an-mvp), milestones; [transcripts and alternates](sis-sync-design.md#310-designed-not-in-the-mvp-transcripts-and-alternates) ([Q15](decisions/q015-history-and-grad-rules.md)); RQ6 in [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing).
 
 ## Before recording
 
-Anything still undecided is said as an assumption: check the design doc's [open questions](sis-sync-design.md#5-open-questions-for-this-review) and RQ11-RQ12 in [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing) on the day.
+Anything still undecided is said as an assumption: check the design doc's [open questions](sis-sync-design.md#5-open-questions-for-this-review) and RQ11-RQ12 in [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing) on the day. A slide deck that follows these parts, with this script as speaker notes, is linked from PR #37.
