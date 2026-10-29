@@ -133,20 +133,27 @@ def test_switching_a_core_priority_to_elective_raises_the_core_warning(conn: Con
     ]
 
     assert warning.severity == "warning"
-    assert warning.message == "No English priority."
+    assert warning.message == "No priority English course."
+    assert warning.detail == (
+        "Grade 10 needs a priority course in English. "
+        "Add one from the catalog, or make one of the English courses priority."
+    )
     assert warning.request_id is None
 
 
 def test_removing_a_core_priority_raises_the_core_warning(conn: Connection) -> None:
     issues = issues_for(conn, "S001", {"SCI101": {"course_code": "AT102"}})
 
-    assert [i.message for i in issues if i.rule == "core_subject"] == ["No Science priority."]
+    [warning] = [i for i in issues if i.rule == "core_subject"]
+    assert warning.message == "No priority Science course."
+    assert warning.detail == "Grade 9 needs a priority course in Science. Add one from the catalog."
 
 
 def test_grade_12_needs_only_an_english_priority(conn: Connection) -> None:
     assert [i for i in issues_for(conn, "S010") if i.rule == "core_subject"] == []
     issues = issues_for(conn, "S010", {"ENG403": {"type": "elective"}})
-    assert [i.message for i in issues if i.rule == "core_subject"] == ["No English priority."]
+    core = [i.message for i in issues if i.rule == "core_subject"]
+    assert core == ["No priority English course."]
 
 
 def test_unknown_course_does_not_count_toward_core(conn: Connection) -> None:

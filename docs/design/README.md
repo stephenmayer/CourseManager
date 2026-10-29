@@ -16,6 +16,7 @@ Site map: [site-map.md](site-map.md).
 | --- | --- | --- | --- |
 | `Main.dc.html` | 1. Student list | Mid-season seed data; filters by status and checks; search | Q3, Q5, Q1 |
 | `StudentDetail.dc.html` | 2. Student detail | Jordan in the meeting: out-of-grade warning kept with a reason, elective swapped in app | Q1, Q2, Q3, Q11 |
+| `StudentDetailHold.dc.html` | 2d. Student detail | Jordan on hold: the header says why (sample reason). Added 2026-10-29, with "Kept with reason" on `StudentDetail.dc.html`, to match what was built (Stephen's call) | Q3 |
 | `StudentErrors.dc.html` | 2b. Student detail | Aisha: two SIS data errors, Done locked | Q5 |
 | `Courses.dc.html` | 3. Courses | Counts by department, Not-in-catalog row, course dialog open (SS402) | Q12 |
 | `StudentCourse.dc.html` | 2c. Course dialog from a student page | MTH101 opened from Jordan's page | Q12 |

@@ -110,19 +110,21 @@ def out_of_grade(student: Student, requests: list[Request], catalog: Catalog) ->
 
 def core_subject(student: Student, requests: list[Request], catalog: Catalog) -> list[Issue]:
     """Q4: each core subject for the grade needs at least one priority course."""
-    covered = {
-        catalog[r.course_code].department
-        for r in requests
-        if r.type == "priority" and r.course_code in catalog
-    }
+    known = [r for r in requests if r.course_code in catalog]
+    requested = {catalog[r.course_code].department for r in known}
+    covered = {catalog[r.course_code].department for r in known if r.type == "priority"}
     return [
         Issue(
             severity="warning",
             rule="core_subject",
-            message=f"No {subject} priority.",
+            message=f"No priority {subject} course.",
             detail=(
                 f"Grade {student.grade} needs a priority course in {subject}. "
-                f"Add one from the catalog, or make a {subject} course priority."
+                + (
+                    f"Add one from the catalog, or make one of the {subject} courses priority."
+                    if subject in requested
+                    else "Add one from the catalog."
+                )
             ),
         )
         for subject in CORE_SUBJECTS.get(student.grade, [])

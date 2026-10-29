@@ -345,8 +345,8 @@ test("a student-level warning (no core priority) shows above the lists", async (
         issue(
           "warning",
           "core_subject",
-          "No English priority.",
-          "Grade 10 needs a priority course in English. Add one from the catalog, or make a English course priority.",
+          "No priority English course.",
+          "Grade 10 needs a priority course in English. Add one from the catalog, or make one of the English courses priority.",
           null,
         ),
       ],
@@ -358,7 +358,7 @@ test("a student-level warning (no core priority) shows above the lists", async (
   const section = screen.getByRole("region", { name: "Requests for 2027–28" });
   expect(section).toHaveTextContent("4 priority · 1 elective · 2 warnings");
   expect(within(section).getByTestId("student-issues")).toHaveTextContent(
-    "No English priority. Grade 10 needs a priority course in English.",
+    "No priority English course. Grade 10 needs a priority course in English.",
   );
 });
 
@@ -367,7 +367,7 @@ test("a student with no requests shows an empty state and the core warnings (E8)
     jordan({
       requests: [],
       issues: ["Math", "English"].map((subject) =>
-        issue("warning", "core_subject", `No ${subject} priority.`, "Add one.", null),
+        issue("warning", "core_subject", `No priority ${subject} course.`, "Add one.", null),
       ),
     }),
   );
@@ -377,8 +377,8 @@ test("a student with no requests shows an empty state and the core warnings (E8)
   const section = screen.getByRole("region", { name: "Requests for 2027–28" });
   expect(section).toHaveTextContent("0 priority · 0 elective · 2 warnings");
   expect(section).toHaveTextContent("No requests yet. Add courses from the catalog.");
-  expect(section).toHaveTextContent("No Math priority.");
-  expect(section).toHaveTextContent("No English priority.");
+  expect(section).toHaveTextContent("No priority Math course.");
+  expect(section).toHaveTextContent("No priority English course.");
   expect(within(section).queryByRole("list")).not.toBeInTheDocument();
 });
 
