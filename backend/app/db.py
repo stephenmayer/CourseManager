@@ -1,13 +1,17 @@
-"""SQLite connection, schema (docs/architecture/schema.md §2-3), reset and first-run seeding."""
+"""SQLite connection, schema (docs/architecture/schema.md §2-3) and transactions."""
 
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from uuid import uuid4
 
-from app.sis.export import ExportSource
+# Q20. IF NOT EXISTS so startup can add it to a database made before it existed.
+CHECK_SETTING = """CREATE TABLE IF NOT EXISTS check_setting (
+  rule       TEXT PRIMARY KEY,
+  enabled    INTEGER NOT NULL,
+  updated_at TEXT NOT NULL
+)"""
 
 SCHEMA = [
     """CREATE TABLE sis_import (
@@ -71,10 +75,19 @@ SCHEMA = [
   updated_at  TEXT NOT NULL,
   CHECK (status <> 'on_hold' OR hold_reason IS NOT NULL)
 )""",
+    CHECK_SETTING,
 ]
 
 # Children before parents, so foreign keys never block the drop.
-TABLES = ["request", "review", "sis_request", "sis_course", "sis_student", "sis_import"]
+TABLES = [
+    "check_setting",
+    "request",
+    "review",
+    "sis_request",
+    "sis_course",
+    "sis_student",
+    "sis_import",
+]
 
 
 def now() -> str:
@@ -98,61 +111,3 @@ def transaction(conn: sqlite3.Connection) -> Iterator[None]:
         conn.execute("ROLLBACK")
         raise
     conn.execute("COMMIT")
-
-
-def reset(conn: sqlite3.Connection, sis: ExportSource) -> None:
-    """Drop everything, recreate the schema and load `sis` as import #1, in one transaction.
-
-    Works on an open connection, so the app never has to delete its file (seams S13).
-    """
-    from app.sis.loader import write_import  # the loader builds on this module
-
-    export = sis.fetch()
-    with transaction(conn):
-        for table in TABLES:
-            conn.execute(f"DROP TABLE IF EXISTS {table}")
-        for statement in SCHEMA:
-            conn.execute(statement)
-        import_id = write_import(conn, export, source="seed")
-        _start_app_data(conn, import_id)
-
-
-def ensure_seeded(conn: sqlite3.Connection, sis: ExportSource) -> None:
-    """Seed a new database; leave one that already has a current import alone."""
-    has_imports = conn.execute(
-        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'sis_import'"
-    ).fetchone()
-    if (
-        not has_imports
-        or not conn.execute("SELECT 1 FROM sis_import WHERE is_current = 1").fetchone()
-    ):
-        reset(conn, sis)
-
-
-def _start_app_data(conn: sqlite3.Connection, import_id: int) -> None:
-    """One SIS-sourced request per SIS request and one not-started review per student."""
-    stamp = now()
-    for row in conn.execute(
-        "SELECT sis_key, student_id, course_code, type FROM sis_request"
-        " WHERE import_id = ? ORDER BY rowid",
-        (import_id,),
-    ).fetchall():
-        conn.execute(
-            "INSERT INTO request (id, student_id, course_code, type, source, sis_key,"
-            " base_import_id, created_at, updated_at) VALUES (?, ?, ?, ?, 'sis', ?, ?, ?, ?)",
-            (
-                uuid4().hex,
-                row["student_id"],
-                row["course_code"],
-                row["type"],
-                row["sis_key"],
-                import_id,
-                stamp,
-                stamp,
-            ),
-        )
-    conn.execute(
-        "INSERT INTO review (student_id, updated_at) SELECT id, ? FROM sis_student"
-        " WHERE import_id = ?",
-        (stamp, import_id),
-    )

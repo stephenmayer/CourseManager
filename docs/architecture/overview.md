@@ -30,7 +30,7 @@ SIS data arrives in three layers (built in 1.2, seams S1):
 Designed, not built (Q15): SisSource gains a transcript feed; a GraduationRules config (per district) joins it.
 ```
 
-The two ports split the data by **who owns it**, which is the exercise's own split: the SIS owns students and the catalog; the app owns what counselors do. That one seam answers "how is the data layer abstracted so the source is easy to swap?" Swapping the seed for a real SIS means writing a new Source that returns the same raw export shape (`app/sis/export.py`); the Loader, `SisSource`, rules and UI do not change. Only the Loader knows the export's quirks (`9/10` grades, `P`/`E`, AP from the name). and is the same seam the SIS sync design hangs off ([Q2](../decisions/q002-request-ownership.md)).
+The two ports split the data by **who owns it**, which is the exercise's own split: the SIS owns students and the catalog; the app owns what counselors do. That one seam answers "how is the data layer abstracted so the source is easy to swap?" Swapping the seed for a real SIS means writing a new Source that returns the same raw export shape (`app/sis/export.py`); the Loader, `SisSource`, rules and UI do not change. Only the Loader knows the export's quirks (`9/10` grades, `P`/`E`, AP from the name). It is also the seam the SIS sync design hangs off ([Q2](../decisions/q002-request-ownership.md)).
 
 ## 2. Data model
 
@@ -64,9 +64,18 @@ Each rule is a pure function `(student, requests, catalog) → issues`, run on e
 | No priority course in a core subject | warning | none until one is removed | [Q4](../decisions/q004-priority-core-check.md) |
 | Heavy AP load (more than 3 APs) | warning, kept with a reason | S006, S009 (5 each) | M2; threshold is an assumption to state |
 
+Checks on and off ([Q20](../decisions/q020-checks-on-off.md)): the Settings screen switches each warning off for the whole tool; the two errors stay on. The service passes only the switched-on rules to `check_student`, so the rules stay pure and nothing is stored about issues. Reset turns every check back on.
+
 Status rules ([Q3](../decisions/q003-student-review-status.md)): Done is refused while any error remains; editing a Done student moves it to In progress; On hold requires a reason.
 
 Designed but not built ([Q15](../decisions/q015-history-and-grad-rules.md)): a graduation progress rule (rules minus earned minus requested credits) that replaces the Q4 core check once transcripts and rules exist, and enables prerequisite checks and a "fills a gap" catalog filter.
+
+Built in 1.3 as `backend/app/rules.py`. Each issue carries a severity, rule id, message and detail (copy from the approved boards for the first three rules), the request it sits on, and `kept` when that request has a reason. Choices made in the build, reversible:
+
+- The duplicate is reported on each later copy and links the first; the unknown-code and core checks ignore unknown codes, so SS303 raises one error only (S8).
+- The core check has no request to sit on, so it cannot be kept; it clears when a priority course in the subject is added.
+- The heavy AP warning sits on the **last** AP request in the list, so a reason there keeps it. Removing APs below four clears it.
+- The rules always see a student's requests in the order they were added, on every screen, so "the first copy" and "the last AP" name the same request on the student page and in the course dialog. Screens sort for display afterwards.
 
 Adding a rule = one function + its tests. That is the "generalize" story: graduation rules or prerequisites plug in the same way once the data exists.
 
@@ -76,14 +85,20 @@ Adding a rule = one function + its tests. That is the "generalize" story: gradua
 2. **Student detail:** profile, requests grouped Priority then Elective, each with source and any issue; add from catalog (grade checkboxes 9-12, the student's grade checked by default); remove; switch P/E; give a reason; set status; select a course code to open the same course dialog as the Courses screen.
 3. **Courses** ([Q12](../decisions/q012-course-view.md)): every course with request counts by department, plus a "Not in catalog" row; select a course to open a dialog showing who requested it, to remove, switch P/E or open the student. Catalog stays read-only.
 
+4. **Settings** ([Q20](../decisions/q020-checks-on-off.md)): switch each warning check on or off for everyone; errors stay on.
+
 ## 5. Testing strategy
 
-- Unit tests on every rule, using the seed's own cases (S003, S006, S008) as fixtures: the bulk of the value.
-- API tests through the service with a fresh in-memory SQLite database per test: add, remove, switch type, Done blocked by an error, edit reopens Done.
-- Frontend: typecheck plus one smoke test of the main flow if time allows.
-- One command runs it all (the kit's merge gate).
+As built in Phase 1 (`backend/tests/`, and `*.test.ts(x)` next to each component):
 
-Pilot vs scale, in one line each for the README: the ports let a pilot run on a nightly SIS file and an in-memory or SQLite store, and move to a real database and SIS API without touching rules or UI; what doesn't scale yet is auth, tenancy (every query scoped by school), and audit history.
+- **Rules:** every check is a pure function, unit-tested on the seed's own students (Jordan's retake, Sofia's grade-12 courses, Aisha's unknown and duplicate codes, the heavy AP loads). A test holds every check's issues to the id and severity the Settings screen switches and locks by. The bulk of the value.
+- **API:** through FastAPI and the service, with a fresh in-memory SQLite database per test: add, remove, switch type, reasons, Done blocked by an error, edits reopening Done, course counts agreeing with the student list, check switches, reset, a failed write rolling back.
+- **Data layer:** seed loading, import versioning, soft delete, an older database gaining new tables on startup.
+- **Screens:** component tests with the API client mocked: filters, search, edits, error states, switches.
+- **Test first:** each issue's failing tests are committed before its code. One command runs it all (`make verify`, the merge gate); a change to app code with no new or changed test is refused ([developer guide](../process/developer-guide.md)).
+- **Not automated, on purpose:** browser end-to-end tests (each screen is checked by running the app and comparing screenshots with its approved board) and load testing (one SQLite file serves one school).
+
+Pilot vs scale: summarised for reviewers in the [README](../../README.md#5-pilot-vs-scale).
 
 ## 6. Choices made with Stephen (all decided)
 

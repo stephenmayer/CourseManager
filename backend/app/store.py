@@ -1,4 +1,4 @@
-"""RequestStore: the app-owned data (requests and reviews). SQLite today (Q8)."""
+"""RequestStore: the app-owned data (requests, reviews, check settings). SQLite today (Q8)."""
 
 import sqlite3
 from typing import Final, Protocol
@@ -8,11 +8,15 @@ from app.db import now
 from app.models import CourseCounts, Request, RequestType, Review, ReviewStatus
 
 
-class _Unset:
+class Unset:
     pass
 
 
-UNSET: Final = _Unset()
+UNSET: Final = Unset()
+
+
+class HoldReasonRequired(ValueError):
+    """On hold needs a reason (Q3); the review table's CHECK enforces it too."""
 
 
 class RequestStore(Protocol):
@@ -26,14 +30,17 @@ class RequestStore(Protocol):
         request_id: str,
         *,
         type: RequestType | None = None,
-        reason: str | None | _Unset = UNSET,
+        reason: str | None | Unset = UNSET,
     ) -> Request: ...
     def remove(self, request_id: str) -> Request: ...
     def counts_by_course(self) -> dict[str, CourseCounts]: ...
     def get_review(self, student_id: str) -> Review: ...
+    def list_reviews(self) -> dict[str, Review]: ...
     def set_review(
         self, student_id: str, status: ReviewStatus, hold_reason: str | None = None
     ) -> Review: ...
+    def disabled_checks(self) -> set[str]: ...
+    def set_check(self, rule: str, enabled: bool) -> None: ...
 
 
 ACTIVE = "removed_at IS NULL"
@@ -76,33 +83,33 @@ class SqliteRequestStore:
         request_id: str,
         *,
         type: RequestType | None = None,
-        reason: str | None | _Unset = UNSET,
+        reason: str | None | Unset = UNSET,
     ) -> Request:
-        """Switch type and/or set the reason. Any change marks the request edited (Q2, S5)."""
+        """Switch type and/or set the reason. A real change marks the request edited (Q2, S5);
+        values equal to the current ones are not an edit."""
+        current = self._must_get(request_id)
         changes: dict[str, object] = {}
-        if type is not None:
+        if type is not None and type != current.type:
             changes["type"] = type
-        if not isinstance(reason, _Unset):
+        if not isinstance(reason, Unset) and reason != current.reason:
             changes["reason"] = reason
         if not changes:
-            return self._must_get(request_id)
+            return current
         assignments = ", ".join(f"{column} = ?" for column in changes)
-        self._write(
+        return self._write(
             f"UPDATE request SET {assignments}, edited_in_app = 1, updated_at = ? WHERE id = ?",
             (*changes.values(), now(), request_id),
             request_id,
         )
-        return self._must_get(request_id)
 
     def remove(self, request_id: str) -> Request:
         """Soft delete, so a later SIS import can tell the counselor removed it (S4)."""
         stamp = now()
-        self._write(
+        return self._write(
             "UPDATE request SET removed_at = ?, edited_in_app = 1, updated_at = ? WHERE id = ?",
             (stamp, stamp, request_id),
             request_id,
         )
-        return self._must_get(request_id)
 
     def counts_by_course(self) -> dict[str, CourseCounts]:
         """Active requests per course code, unknown codes included (S2, S16)."""
@@ -120,24 +127,44 @@ class SqliteRequestStore:
         row = self.conn.execute(
             "SELECT * FROM review WHERE student_id = ?", (student_id,)
         ).fetchone()
-        if row is None:
-            raise KeyError(student_id)
+        if row is None:  # e.g. a student new in a later import: nobody has reviewed them (Q3)
+            return Review(student_id, "not_started", None, now())
         return Review(**row)
+
+    def list_reviews(self) -> dict[str, Review]:
+        rows = self.conn.execute("SELECT * FROM review").fetchall()
+        return {row["student_id"]: Review(**row) for row in rows}
 
     def set_review(
         self, student_id: str, status: ReviewStatus, hold_reason: str | None = None
     ) -> Review:
         if status == "on_hold" and not (hold_reason and hold_reason.strip()):
-            raise ValueError("On hold needs a reason")
+            raise HoldReasonRequired("On hold needs a reason")
         self.conn.execute(
-            "UPDATE review SET status = ?, hold_reason = ?, updated_at = ? WHERE student_id = ?",
-            (status, hold_reason if status == "on_hold" else None, now(), student_id),
+            "INSERT INTO review (student_id, status, hold_reason, updated_at) VALUES (?, ?, ?, ?)"
+            " ON CONFLICT (student_id) DO UPDATE SET status = excluded.status,"
+            " hold_reason = excluded.hold_reason, updated_at = excluded.updated_at",
+            (student_id, status, hold_reason if status == "on_hold" else None, now()),
         )
         return self.get_review(student_id)
 
-    def _write(self, sql: str, args: tuple[object, ...], request_id: str) -> None:
-        if self.conn.execute(sql, args).rowcount == 0:
-            raise KeyError(request_id)
+    def disabled_checks(self) -> set[str]:
+        """Rule ids switched off on the Settings screen (Q20); no row means on."""
+        rows = self.conn.execute("SELECT rule FROM check_setting WHERE NOT enabled").fetchall()
+        return {row["rule"] for row in rows}
+
+    def set_check(self, rule: str, enabled: bool) -> None:
+        self.conn.execute(
+            "INSERT INTO check_setting (rule, enabled, updated_at) VALUES (?, ?, ?)"
+            " ON CONFLICT (rule) DO UPDATE SET enabled = excluded.enabled,"
+            " updated_at = excluded.updated_at",
+            (rule, int(enabled), now()),
+        )
+
+    def _write(self, sql: str, args: tuple[object, ...], request_id: str) -> Request:
+        """Run one UPDATE on a request and return it; KeyError if the id is unknown."""
+        self.conn.execute(sql, args)
+        return self._must_get(request_id)
 
     def _must_get(self, request_id: str) -> Request:
         request = self.get(request_id)

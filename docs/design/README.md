@@ -3,7 +3,7 @@ id: design-index
 title: Approved designs
 status: current
 owns: "the index of screens Stephen approved (light and dark), the site map, and designed-but-not-built add-ons"
-updated: 2026-10-27
+updated: 2026-10-28
 ---
 
 # Approved designs
@@ -20,6 +20,7 @@ Site map: [site-map.md](site-map.md).
 | `Courses.dc.html` | 3. Courses | Counts by department, Not-in-catalog row, course dialog open (SS402) | Q12 |
 | `StudentCourse.dc.html` | 2c. Course dialog from a student page | MTH101 opened from Jordan's page | Q12 |
 | `MainDark.dc.html`, `StudentDetailDark.dc.html` | Dark mode | Same screens, dark theme | |
+| `Checks.board.html` | 4. Settings | Checks section, core-subject check off; light, dark, loading, save failed, 390 wide. Approved 2026-10-28; renamed Settings the same day. Live: https://claude.ai/artifact/Vpuwv6S1AF3yrSqgr4tBCd (plain HTML, opens in a browser) | Q20 |
 
 Design notes (choices made during review, 2026-10-27):
 

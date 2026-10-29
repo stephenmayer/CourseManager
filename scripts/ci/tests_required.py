@@ -1,4 +1,4 @@
-"""CI gate: a PR that changes app code must add or change a test (CLAUDE.md, TDD).
+"""Local gate (Q21): a PR that changes app code must add or change a test (CLAUDE.md, TDD).
 
 Usage: tests_required.py <file listing changed paths>   (PR body in $PR_BODY)
 """
@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 CODE_ROOTS = ("backend/app/", "frontend/src/")
-TEST_FILE = re.compile(r"^(backend/tests/.+|frontend/src/.+\.test\.tsx?)$")
+TEST_FILE = re.compile(r"^(backend/tests/(.+/)?test_[^/]+\.py|frontend/src/.+\.test\.tsx?)$")
 OPT_OUT = re.compile(r"no new tests", re.IGNORECASE)
 
 

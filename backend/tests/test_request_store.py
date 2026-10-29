@@ -3,7 +3,8 @@ from sqlite3 import Connection
 
 import pytest
 
-from app.db import connect, ensure_seeded, reset
+from app.db import connect
+from app.seed import ensure_seeded, reset
 from app.sis.export import SeedFileSource
 from app.store import SqliteRequestStore
 
@@ -135,9 +136,21 @@ def test_on_hold_needs_a_reason(conn: Connection) -> None:
         SqliteRequestStore(conn).set_review("S003", "on_hold")
 
 
-def test_review_for_unknown_student_raises(conn: Connection) -> None:
-    with pytest.raises(KeyError):
-        SqliteRequestStore(conn).get_review("S999")
+def test_a_student_without_a_review_row_is_not_started(conn: Connection) -> None:
+    """Q3: nobody has reviewed a student the store has no row for (e.g. new in an import).
+    Whether the student exists is the SIS's question, answered by the service (404)."""
+    store = SqliteRequestStore(conn)
+
+    assert store.get_review("X1").status == "not_started"
+    assert store.get_review("X1").hold_reason is None
+    assert store.set_review("X1", "in_progress").status == "in_progress"
+
+
+def test_same_values_are_not_an_edit(conn: Connection) -> None:
+    store = SqliteRequestStore(conn)
+    request_id = aisha_ss402(store, 1)
+
+    assert store.update(request_id, type="priority", reason=None).edited_in_app is False
 
 
 def test_reset_restores_the_seed(conn: Connection) -> None:
@@ -165,3 +178,21 @@ def test_ensure_seeded_loads_an_empty_file_once(tmp_path: Path) -> None:
 
     assert SqliteRequestStore(second).get_review("S001").status == "done"
     second.close()
+
+
+def test_ensure_seeded_adds_check_settings_to_an_older_file(tmp_path: Path) -> None:
+    """A database made before Q20 has no check_setting table; startup adds it, keeping data."""
+    path = tmp_path / "old.sqlite3"
+    old = connect(path)
+    ensure_seeded(old, SeedFileSource())
+    SqliteRequestStore(old).set_review("S001", "done")
+    old.execute("DROP TABLE check_setting")
+    old.close()
+
+    reopened = connect(path)
+    ensure_seeded(reopened, SeedFileSource())
+
+    store = SqliteRequestStore(reopened)
+    assert store.disabled_checks() == set()
+    assert store.get_review("S001").status == "done"
+    reopened.close()

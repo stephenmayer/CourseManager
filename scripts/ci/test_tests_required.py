@@ -15,6 +15,8 @@ from tests_required import check
         (["backend/app/main.py"], "Refactor only.\n\nno new tests: rename", True),
         (["backend/app/main.py"], "No New Tests", True),
         (["backend/tests/test_health.py"], "", True),
+        (["backend/app/service.py", "backend/tests/conftest.py"], "", False),
+        (["backend/app/service.py", "backend/tests/api/test_x.py"], "", True),
         (["backend/pyproject.toml", "Makefile"], "", True),
         ([], "", True),
     ],
