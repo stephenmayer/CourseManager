@@ -8,7 +8,7 @@ updated: 2026-10-29
 
 # SIS design video: outline (5 minutes)
 
-Stephen records this. The exercise asks for "a quick 5 min video to give folks an overview of your approach and key decisions", so the parts follow its three headings: requirements, key decisions, and flow and architecture. The script is about 690 words: just under five minutes at 140 words a minute. Every claim comes from the [SIS sync design](sis-sync-design.md); the **Source** line under each part says where. Read it as a guide, not word for word.
+Stephen records this. The exercise asks for "a quick 5 min video to give folks an overview of your approach and key decisions", so the parts follow its three headings: requirements, key decisions, and flow and architecture. The script is about 685 words: just under five minutes at 140 words a minute. Every claim comes from the [SIS sync design](sis-sync-design.md); the **Source** line under each part says where. Read it as a guide, not word for word.
 
 ## 0:00 The problem
 
@@ -22,7 +22,7 @@ Every spring, counselors build next year's course requests for each student, and
 
 *45s. On screen: [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing).*
 
-Before committing, I'd ask the pilot districts twelve questions; these six change the design most. Does the SIS accept writes to requests? That sets how many conflicts counselors see. Does it send a stable ID per request? Without one, a changed course looks like a removal plus an addition. What are its rate limits, and how fast do changes reach it? Those set how often we sync. How dirty is the data, and who fixes it today? That sets how loud errors must be. And can we read transcripts? That unlocks graduation checks. Until we know, we assume one-way sync, no IDs, nightly plus "sync now", and bad data loaded as it is.
+Before committing, I'd ask the pilot districts twelve questions. Six change the design most. Does the SIS accept writes to requests? That sets how many conflicts counselors see. Does it send a stable ID per request? Without one, a changed course looks like a removal plus an addition. What are its rate limits, and how fast do changes reach it? Those set how often we sync. How dirty is the data, and who fixes it today? That sets how loud errors must be. And can we read transcripts? That unlocks graduation checks. Until we know, we assume no request IDs and nightly plus "sync now".
 
 **Source:** [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing) RQ1-RQ6, the six that change the design most.
 
@@ -64,7 +64,7 @@ Each import compares three values: what the SIS said last time, what the app has
 
 The MVP takes about eight weeks, and the calendar sets the pace, not the code. With AI agents, each milestone's build takes days. What takes weeks is answers and access from the pilot districts, Timely's security review, and enough nightly runs on real data to trust them.
 
-The biggest gap is student history: without transcripts, we can't check graduation progress or prerequisites. My next question to the pilots is whether their SIS holds transcripts we can read.
+The biggest gap is student history: without transcripts, we can't check graduation progress or prerequisites. So the pilots' answer to whether their SIS holds transcripts we can read decides what comes next.
 
 **Source:** [path to an MVP](sis-sync-design.md#4-path-to-an-mvp); [transcripts and alternates](sis-sync-design.md#310-designed-not-in-the-mvp-transcripts-and-alternates) ([Q15](decisions/q015-history-and-grad-rules.md)); RQ6 in [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing).
 
