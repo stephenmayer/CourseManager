@@ -184,7 +184,7 @@ def test_switch_type_marks_the_request_edited(client: TestClient) -> None:
     switched = next(r for r in body["requests"] if r["id"] == rid)
     assert switched["type"] == "elective"
     assert switched["edited_in_app"] is True
-    assert "No English priority." in [i["message"] for i in body["issues"]]
+    assert "No priority English course." in [i["message"] for i in body["issues"]]
 
 
 def test_reason_keeps_a_warning_and_survives_a_type_switch(client: TestClient) -> None:
