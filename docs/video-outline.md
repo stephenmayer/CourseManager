@@ -22,7 +22,7 @@ Every spring, counselors build next year's course requests for each student, and
 
 *45s. On screen: [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing).*
 
-Before committing, I'd ask the pilot districts twelve questions; four change the design most. Does the SIS accept writes to requests? That sets how many conflicts counselors see. Does it send a stable ID per request? Without one, a course change looks like a removal plus an addition. What are its rate limits? That sets how often we can sync. And how fast do enrollments and grade changes reach it? That decides nightly versus on demand. Until we know, we assume no writes, no IDs, per-district limits, and nightly plus "sync now".
+Before committing, I'd ask the pilot districts twelve questions. Here are four of the six that change the design most. Does the SIS accept writes to requests? That sets how many conflicts counselors see. Does it send a stable ID per request? Without one, a course change looks like a removal plus an addition. What are its rate limits? That sets how often we can sync. And how fast do enrollments and grade changes reach it? That decides nightly versus on demand. Until we know, we assume no writes, no IDs, per-district limits, and nightly plus "sync now".
 
 **Source:** [requirements to confirm](sis-sync-design.md#1-requirements-what-we-need-to-know-before-committing) RQ1-RQ4 (the first six change the most).
 
