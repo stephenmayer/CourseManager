@@ -119,10 +119,10 @@ def core_subject(student: Student, requests: list[Request], catalog: Catalog) ->
         Issue(
             severity="warning",
             rule="core_subject",
-            message=f"No {subject} priority.",
+            message=f"No priority {subject} course.",
             detail=(
                 f"Grade {student.grade} needs a priority course in {subject}. "
-                f"Add one from the catalog, or make a {subject} course priority."
+                f"Add one from the catalog, or make one of the {subject} courses priority."
             ),
         )
         for subject in CORE_SUBJECTS.get(student.grade, [])
