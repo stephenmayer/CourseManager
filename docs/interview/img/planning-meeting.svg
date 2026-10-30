@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="330" viewBox="0 0 1140 330" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/></marker></defs>
+<rect width="1140" height="330" fill="#ffffff"/>
+<text x="40" y="48" text-anchor="start" font-size="22" font-weight="700" fill="#1f2937">A planning meeting with Jordan, in four steps on one screen</text>
+<rect x="40" y="100" width="215" height="130" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="147.5" y="150.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Where he is</text>
+<text x="147.5" y="176.0" text-anchor="middle" font-size="15" fill="#6b7280">SIS profile and</text>
+<text x="147.5" y="198.0" text-anchor="middle" font-size="15" fill="#6b7280">draft requests</text>
+<rect x="310" y="100" width="215" height="130" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="417.5" y="150.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">What he needs</text>
+<text x="417.5" y="176.0" text-anchor="middle" font-size="15" fill="#6b7280">core subjects,</text>
+<text x="417.5" y="198.0" text-anchor="middle" font-size="15" fill="#6b7280">grade warnings</text>
+<line x1="259" y1="165.0" x2="306" y2="165.0" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<rect x="580" y="100" width="215" height="130" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="687.5" y="161.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">What he wants</text>
+<text x="687.5" y="187.0" text-anchor="middle" font-size="15" fill="#6b7280">his electives</text>
+<line x1="529" y1="165.0" x2="576" y2="165.0" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<rect x="850" y="100" width="215" height="130" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="957.5" y="150.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Wrap up</text>
+<text x="957.5" y="176.0" text-anchor="middle" font-size="15" fill="#6b7280">Done, or On hold</text>
+<text x="957.5" y="198.0" text-anchor="middle" font-size="15" fill="#6b7280">with a reason</text>
+<line x1="799" y1="165.0" x2="846" y2="165.0" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<text x="40" y="302" text-anchor="start" font-size="15" font-weight="400" fill="#6b7280">Student detail is the whole meeting: no screen changes between steps.</text>
+</svg>

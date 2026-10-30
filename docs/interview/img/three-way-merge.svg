@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="440" viewBox="0 0 920 440" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/></marker></defs>
+<rect width="920" height="440" fill="#ffffff"/>
+<text x="40" y="48" text-anchor="start" font-size="22" font-weight="700" fill="#1f2937">The merge: compare three values, never overwrite a counselor</text>
+<rect x="40" y="100" width="230" height="80" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="155.0" y="136.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Base (SIS before)</text>
+<text x="155.0" y="162.0" text-anchor="middle" font-size="15" fill="#6b7280">AT201</text>
+<rect x="40" y="200" width="230" height="80" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="155.0" y="236.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Counselor now</text>
+<text x="155.0" y="262.0" text-anchor="middle" font-size="15" fill="#6b7280">AT202</text>
+<rect x="40" y="300" width="230" height="80" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="155.0" y="336.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">SIS now</text>
+<text x="155.0" y="362.0" text-anchor="middle" font-size="15" fill="#6b7280">AT203</text>
+<path d="M274 140 H310 M274 240 H310 M274 340 H310 M310 140 V340" stroke="#9ca3af" stroke-width="2" fill="none"/>
+<line x1="310" y1="240" x2="356" y2="240" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<rect x="360" y="100" width="520" height="80" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="620.0" y="136.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Only the SIS changed</text>
+<text x="620.0" y="162.0" text-anchor="middle" font-size="15" fill="#6b7280">apply it</text>
+<rect x="360" y="200" width="520" height="80" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="620.0" y="236.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Only the counselor changed</text>
+<text x="620.0" y="262.0" text-anchor="middle" font-size="15" fill="#6b7280">keep it</text>
+<rect x="360" y="300" width="520" height="80" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="620.0" y="336.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Both changed, differently</text>
+<text x="620.0" y="362.0" text-anchor="middle" font-size="15" fill="#6b7280">keep the counselor&#x27;s value, flag it</text>
+<text x="40" y="412" text-anchor="start" font-size="15" font-weight="400" fill="#6b7280">Jordan&#x27;s example lands in the bottom row: AT202 stays, and Ms. Lee sees the SIS now says AT203.</text>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="330" viewBox="0 0 1280 330" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/></marker></defs>
+<rect width="1280" height="330" fill="#ffffff"/>
+<text x="40" y="48" text-anchor="start" font-size="22" font-weight="700" fill="#1f2937">One sync run: the SIS&#x27;s data becomes a new version, then merges into counselor work</text>
+<rect x="40" y="100" width="200" height="130" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="140.0" y="150.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">District SIS</text>
+<text x="140.0" y="176.0" text-anchor="middle" font-size="15" fill="#6b7280">PowerSchool or</text>
+<text x="140.0" y="198.0" text-anchor="middle" font-size="15" fill="#6b7280">a CSV export</text>
+<rect x="290" y="100" width="200" height="130" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="390.0" y="150.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Fetch + normalize</text>
+<text x="390.0" y="176.0" text-anchor="middle" font-size="15" fill="#6b7280">one adapter</text>
+<text x="390.0" y="198.0" text-anchor="middle" font-size="15" fill="#6b7280">per SIS type</text>
+<line x1="244" y1="165.0" x2="286" y2="165.0" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<rect x="540" y="100" width="200" height="130" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="640.0" y="150.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">New import</text>
+<text x="640.0" y="176.0" text-anchor="middle" font-size="15" fill="#6b7280">a full copy,</text>
+<text x="640.0" y="198.0" text-anchor="middle" font-size="15" fill="#6b7280">never edited</text>
+<line x1="494" y1="165.0" x2="536" y2="165.0" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<rect x="790" y="100" width="200" height="130" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="890.0" y="150.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Three-way merge</text>
+<text x="890.0" y="176.0" text-anchor="middle" font-size="15" fill="#6b7280">into counselor</text>
+<text x="890.0" y="198.0" text-anchor="middle" font-size="15" fill="#6b7280">requests</text>
+<line x1="744" y1="165.0" x2="786" y2="165.0" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<rect x="1040" y="100" width="200" height="130" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="1140.0" y="150.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Counselors</text>
+<text x="1140.0" y="176.0" text-anchor="middle" font-size="15" fill="#6b7280">see changes</text>
+<text x="1140.0" y="198.0" text-anchor="middle" font-size="15" fill="#6b7280">and flags</text>
+<line x1="994" y1="165.0" x2="1036" y2="165.0" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<text x="40" y="302" text-anchor="start" font-size="15" font-weight="400" fill="#6b7280">All in one transaction: a failed run writes nothing.</text>
+</svg>

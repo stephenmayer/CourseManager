@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="470" viewBox="0 0 840 470" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/></marker></defs>
+<rect width="840" height="470" fill="#ffffff"/>
+<text x="40" y="48" text-anchor="start" font-size="22" font-weight="700" fill="#1f2937">Each request remembers the SIS version it last agreed with</text>
+<rect x="40" y="100" width="220" height="100" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="150.0" y="146.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Import #41</text>
+<text x="150.0" y="172.0" text-anchor="middle" font-size="15" fill="#6b7280">Mon: AT201</text>
+<rect x="310" y="100" width="220" height="100" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="420.0" y="146.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Import #42</text>
+<text x="420.0" y="172.0" text-anchor="middle" font-size="15" fill="#6b7280">Tue: AT201</text>
+<rect x="580" y="100" width="220" height="100" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="690.0" y="146.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Import #43</text>
+<text x="690.0" y="172.0" text-anchor="middle" font-size="15" fill="#6b7280">Wed: AT203 · current</text>
+<line x1="264" y1="150" x2="306" y2="150" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<line x1="534" y1="150" x2="576" y2="150" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<rect x="310" y="290" width="220" height="110" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="420.0" y="330.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Jordan&#x27;s request</text>
+<text x="420.0" y="356.0" text-anchor="middle" font-size="15" fill="#6b7280">AT202 (counselor)</text>
+<text x="420.0" y="378.0" text-anchor="middle" font-size="15" fill="#6b7280">base = #42</text>
+<line x1="420" y1="286" x2="420" y2="204" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<text x="432.0" y="249.0" text-anchor="start" font-size="14" fill="#6b7280">last agreed with</text>
+<text x="40" y="442" text-anchor="start" font-size="15" font-weight="400" fill="#6b7280">That base is what lets the merge tell a SIS change from a counselor edit.</text>
+</svg>
