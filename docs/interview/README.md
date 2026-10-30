@@ -28,4 +28,3 @@ Each diagram has a title that states its one idea, five boxes or fewer, and no n
 | [site-map](img/site-map.png) | Three screens and a dialog; every path ends on a student | [Site map](../design/site-map.md) |
 | [planning-meeting](img/planning-meeting.png) | A planning meeting in four steps on one screen | [Planning meeting flow](../scenarios/planning-meeting.md) |
 
-The detailed diagrams are still the reference when someone asks "where does the secret live?" or "which table holds that?". The simple ones are what I'd show first.

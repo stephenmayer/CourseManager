@@ -26,5 +26,5 @@
 <text x="1140.0" y="176.0" text-anchor="middle" font-size="15" fill="#6b7280">see changes</text>
 <text x="1140.0" y="198.0" text-anchor="middle" font-size="15" fill="#6b7280">and flags</text>
 <line x1="994" y1="165.0" x2="1036" y2="165.0" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
-<text x="40" y="302" text-anchor="start" font-size="15" font-weight="400" fill="#6b7280">Runs as a job on Timely&#x27;s existing queue. All in one transaction: a failed run writes nothing; a bad run is undone by restoring an earlier import.</text>
+<text x="40" y="302" text-anchor="start" font-size="15" font-weight="400" fill="#6b7280">All in one transaction: a failed run writes nothing.</text>
 </svg>
