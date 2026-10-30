@@ -3,7 +3,7 @@ id: docs-index
 title: Docs map
 status: current
 owns: "the map of the docs tree"
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 # Docs map
@@ -17,6 +17,7 @@ updated: 2026-10-29
 | [decisions/](decisions/README.md) | Why: every decision with options and trade-offs, plus open questions |
 | [sis-sync-design.md](sis-sync-design.md) | The production SIS sync design: requirements to confirm, key decisions, flow and architecture, path to an MVP (#10) |
 | [video-outline.md](video-outline.md) | The timed outline and talking points for the 5-minute SIS design video (#11) |
+| [interview/](interview/README.md) | Prep for the next interview round: one-idea diagrams and the reconciliation deep dive |
 | [plan/](plan/README.md) | Sequencing: phases, status, seams reviews |
 | [design/](design/README.md) | Screens Stephen approved, site map, add-on designs |
 | [process/](process/README.md) | How we work (points to the installed kit) |

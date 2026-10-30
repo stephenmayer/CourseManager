@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="440" viewBox="0 0 700 440" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/></marker></defs>
+<rect width="700" height="440" fill="#ffffff"/>
+<text x="40" y="48" text-anchor="start" font-size="22" font-weight="700" fill="#1f2937">Three screens and a dialog; every path ends on a student</text>
+<rect x="40" y="100" width="260" height="100" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="170.0" y="146.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Students</text>
+<text x="170.0" y="172.0" text-anchor="middle" font-size="15" fill="#6b7280">list, search, filters</text>
+<rect x="400" y="100" width="260" height="100" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="530.0" y="146.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Student detail</text>
+<text x="530.0" y="172.0" text-anchor="middle" font-size="15" fill="#6b7280">where the work happens</text>
+<rect x="40" y="270" width="260" height="100" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="170.0" y="316.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Courses</text>
+<text x="170.0" y="342.0" text-anchor="middle" font-size="15" fill="#6b7280">request counts per course</text>
+<rect x="400" y="270" width="260" height="100" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-width="2"/>
+<text x="530.0" y="316.0" text-anchor="middle" font-size="19" font-weight="600" fill="#1f2937">Course dialog</text>
+<text x="530.0" y="342.0" text-anchor="middle" font-size="15" fill="#6b7280">who requested it</text>
+<line x1="304" y1="150" x2="396" y2="150" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<line x1="304" y1="320" x2="396" y2="320" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<line x1="530" y1="266" x2="530" y2="204" stroke="#9ca3af" stroke-width="2" marker-end="url(#a)"/>
+<text x="542.0" y="239.0" text-anchor="start" font-size="14" fill="#6b7280">open a student</text>
+<text x="40" y="412" text-anchor="start" font-size="15" font-weight="400" fill="#6b7280">Settings turns checks on and off.</text>
+</svg>
